@@ -105,6 +105,7 @@ class Layer extends Component {
       this.setState({layout: newLayouts2})
     }
     console.log('change layer static : '+this.state.layout[1].static)
+    console.log('this is test for version2')
   }
 
   render() {
