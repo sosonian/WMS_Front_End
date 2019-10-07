@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import ThreeDLayer from './ThreeDLayer';
 import GridLayout from 'react-grid-layout';
 import ThreeDGridItem from './ThreeDGridItem';
+import TestComponent1 from './TestComponent1';
 import 'react-grid-layout/css/styles.css';
   
 
@@ -12,12 +13,13 @@ class Layer extends Component {
     this.state = {
       changeCount : 0,
       static : false,
-      // layout:[
-      //   {i: 'a', x: 0, y: 0, w: 1, h: 7},
-      //   {i: 'b', x: 1, y: 0, w: 5, h: 7, static: false},
-      //   {i: 'c', x: 0, y: 6, w: 6, h: 1}
-      // ]
+      layoutc:[
+         {i: 'a', x: 0, y: 0, w: 1, h: 7},
+         {i: 'b', x: 1, y: 0, w: 5, h: 7},
+         {i: 'c', x: 0, y: 6, w: 6, h: 1}
+      ]
     }
+    this.refGridLayout = React.createRef()
   }
   
   onResize = () => {
@@ -29,84 +31,48 @@ class Layer extends Component {
 
   threeDLayerFixStart = (e) => {
     console.log('key down')
-    if(e.key == 'c')
+    if(e.key === 'c')
     {
       console.log('c is pressed')
-      //let newLayouts1 = this.state.layout
-      //newLayouts1[1].static = true
-      //this.setState({static:true, layout: newLayouts1})
-      //console.log('static when key pressed : '+this.state.layout[1].static)
-      this.setState({static:true})
-      console.log(this.state.static)
+      this.setState({static: true})
+      //setTimeout(()=>console.log('static when key pressed : '+this.state.layoutc[1].static),3000)
     }
-    else if(e.key == 'r')
+    else if(e.key === 'r')
     {
       console.log('r is pressed')
-      // let newLayouts1 = this.state.layout
-      // newLayouts1[1].static = false
-      // this.setState({static:false, layout: newLayouts1})
-      //console.log('static when key pressed : '+this.state.layout[1].static)
-      this.setState({static:false})
-      console.log(this.state.static)
+      this.setState({static: false})
+      //setTimeout(()=>console.log('static when key pressed : '+this.state.layoutc[1].static),3000)
     }
   }
-  
-  threeDLayerFixEnd = (e) => {
-    // if(e.key == 'c')
-    // {
-    //   console.log('c is pressed')
-    //   let newLayouts2 = this.state.layout
-    //   newLayouts2[1].static = false
-    //   this.setState({static:false, layout: newLayouts2})
-    //   console.log('static when key pressed : '+this.state.layout[1].static)
-    // }  
-  }
 
-
-
-  // threeDLayerDragStart = (e) => {
-  //   this.tempCount = this.state.changeCount +1
-  //   this.setState({changeCount:this.tempCount})
-  //   console.log('mouse down!')
-  //   //console.log('altKey boolean : '+e.altKey)
-  //   if(e.altKey == true){
-  //     console.log('start dragging!')
-  //     this.setState({static : true})
-  //     let newLayouts1 = this.state.layout
-  //     newLayouts1[1].static = true
-  //     this.setState({layout: newLayouts1})
-  //     console.log('static : '+this.state.layout[1].static)
-  //   }
-  // }
-  // // threeDLayerDrag = () => {
-  // //   console.log('mouse move!')
-  // // }
-
-  // threeDLayerDragStop = () => {
-  //   this.tempCount = this.state.changeCount +1
-  //   this.setState({changeCount:this.tempCount})
-  //   console.log('drag complete!')
-  //   this.setState({static : false})
-  //   let newLayouts3 = this.state.layout
-  //   newLayouts3[1].static = false
-  //   this.setState({layout: newLayouts3})
-  // }
-
-  handleLayoutChange = (layouts) => {
-    let newLayouts2 = layouts
+  test=(layout, oldItem, newItem, placeholder, e, element)=>{
+    let newLayouts5 = layout
     if(this.state.static)
     {
-      newLayouts2[1].static = true
-      this.setState({layout: newLayouts2})
+      newLayouts5[1].static = true
     }
     else
     {
-      newLayouts2[1].static = false
-      this.setState({layout: newLayouts2})
+      newLayouts5[1].static = false
     }
-    console.log('change layer static : '+this.state.layout[1].static)
-    console.log('this is test for version2')
+    this.refGridLayout.current.setState({layout:newLayouts5})
   }
+  
+   threeDLayerDragStart = () => {
+     this.tempCount = this.state.changeCount +1
+     let newLayouts4 = this.state.layoutc
+     newLayouts4[1].static = true
+     this.setState({layoutc: newLayouts4, changeCount:this.tempCount})
+     //console.log('mouse down!')
+     //console.log('altKey boolean : '+e.altKey)
+     //if(e.altKey == true){
+       console.log('start dragging!')
+      //  this.setState({static : true})
+      //  let newLayouts3 = this.state.layout
+      //  newLayouts3[1].static = true
+      //  this.setState({layout: newLayouts3})
+       console.log('static : '+this.state.layoutc[1].static)
+    }
 
   render() {
     const myStyle1 = {
@@ -117,19 +83,17 @@ class Layer extends Component {
       height: '100%',
     }
 
-
-
-
-  
   return (
-    <GridLayout className="layout" layout={this.state.layout} cols={12} rowHeight={45} width={2000}>
-      <div style={myStyle1} key="a" data-grid={{x: 0, y: 0, w: 1, h: 7}}>a</div>
-      <div style={myStyle1} key="b" data-grid={{x: 1, y: 0, w: 5, h: 7}} isDraggable= {false}>
+    <GridLayout className="layout" layout={this.state.layoutc} cols={12} rowHeight={45} width={2000} ref={this.refGridLayout} onDragStart={this.test}>
+      <div style={myStyle1} key="a" >
+          <TestComponent1/>
+      </div>
+      <div style={myStyle1} key="b" >
       <div style={myStyle2} onKeyDown={this.threeDLayerFixStart} onKeyUp={this.threeDLayerFixEnd} tabIndex='0'>
           <ThreeDLayer testProp={this.state.changeCount}/>
       </div>
       </div>
-      <div style={myStyle1} key="c" data-grid={{x: 0, y: 6, w: 6, h: 1}}>c</div>
+      <div style={myStyle1} key="c" >c</div>
     </GridLayout>
   )
 }
