@@ -29,52 +29,54 @@ class Layer extends Component {
     //console.log('change count :'+this.state.changeCount)
   }
 
+  componentWillUnmount(){
+    console.log('Layer would nmount in seconds!!')
+  }
+
   threeDLayerFixStart = (e) => {
     console.log('key down')
     if(e.key === 'c')
     {
       console.log('c is pressed')
       this.setState({static: true})
+      let newLayouts5 = this.refGridLayout.current.state.layout
+      newLayouts5[1].static = true
+      this.refGridLayout.current.setState({layout:newLayouts5})
       //setTimeout(()=>console.log('static when key pressed : '+this.state.layoutc[1].static),3000)
     }
     else if(e.key === 'r')
     {
       console.log('r is pressed')
       this.setState({static: false})
+      let newLayouts5 = this.refGridLayout.current.state.layout
+      newLayouts5[1].static = false
+      this.refGridLayout.current.setState({layout:newLayouts5})
       //setTimeout(()=>console.log('static when key pressed : '+this.state.layoutc[1].static),3000)
     }
   }
 
-  test=(layout, oldItem, newItem, placeholder, e, element)=>{
-    let newLayouts5 = layout
-    if(this.state.static)
-    {
-      newLayouts5[1].static = true
-    }
-    else
-    {
-      newLayouts5[1].static = false
-    }
-    this.refGridLayout.current.setState({layout:newLayouts5})
-  }
-  
-   threeDLayerDragStart = () => {
-     this.tempCount = this.state.changeCount +1
-     let newLayouts4 = this.state.layoutc
-     newLayouts4[1].static = true
-     this.setState({layoutc: newLayouts4, changeCount:this.tempCount})
-     //console.log('mouse down!')
-     //console.log('altKey boolean : '+e.altKey)
-     //if(e.altKey == true){
-       console.log('start dragging!')
-      //  this.setState({static : true})
-      //  let newLayouts3 = this.state.layout
-      //  newLayouts3[1].static = true
-      //  this.setState({layout: newLayouts3})
-       console.log('static : '+this.state.layoutc[1].static)
+   threeDLayerResize = () => {
+      this.tempCount = this.state.changeCount +1
+      this.setState({changeCount:this.tempCount})
+      console.log('start dragging!')
     }
 
   render() {
+    let changeStyle
+    if(this.state.static)
+    {
+      changeStyle = {
+        borderStyle:'solid',
+        borderColor:'red'
+      }
+    }
+    else
+    {
+      changeStyle = {
+        borderStyle:'solid',
+        borderColor:'black'
+      }
+    }
     const myStyle1 = {
       borderStyle:'solid',
     }
@@ -84,13 +86,13 @@ class Layer extends Component {
     }
 
   return (
-    <GridLayout className="layout" layout={this.state.layoutc} cols={12} rowHeight={45} width={2000} ref={this.refGridLayout} onDragStart={this.test}>
+    <GridLayout className="layout" layout={this.state.layoutc} cols={12} rowHeight={45} width={2000} ref={this.refGridLayout} onResizeStart = {this.threeDLayerResizeStart} onResize = {this.threeDLayerResize} onResizeStop = {this.threeDLayerResize}>
       <div style={myStyle1} key="a" >
           <TestComponent1/>
       </div>
-      <div style={myStyle1} key="b" >
+      <div style={changeStyle} key="b" >
       <div style={myStyle2} onKeyDown={this.threeDLayerFixStart} onKeyUp={this.threeDLayerFixEnd} tabIndex='0'>
-          <ThreeDLayer testProp={this.state.changeCount}/>
+        <ThreeDLayer testProp={this.state.changeCount}/>
       </div>
       </div>
       <div style={myStyle1} key="c" >c</div>

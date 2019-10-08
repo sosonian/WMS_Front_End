@@ -22,13 +22,14 @@ class TestComponent1 extends Component {
     }
     
     render() {
+     
       return (
        
           <div>
               <form onSubmit={this.handleSubmit}>
                 <label>
                    Name:
-                   <input type="text" value={this.state.value} onChange={this.handleChange} />
+                   <input type="text"  style={{width:'75%'}} value={this.state.value} onChange={this.handleChange} />
                 </label>
                 <input type="submit" value="Submit" />
               </form>
