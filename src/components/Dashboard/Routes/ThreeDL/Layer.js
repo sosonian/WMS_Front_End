@@ -12,8 +12,10 @@ class Layer extends Component {
     super(props)
     this.state = {
       changeCount : 0,
-      static : false,
-      layoutc:[
+      static : JSON.parse(localStorage.getItem('WMSLayoutSetting')).map(x=>x.static),
+      layoutc: 
+      JSON.parse(localStorage.getItem('WMSLayoutSetting'))|| 
+      [
          {i: 'a', x: 0, y: 0, w: 1, h: 7},
          {i: 'b', x: 1, y: 0, w: 5, h: 7},
          {i: 'c', x: 0, y: 6, w: 6, h: 1}
@@ -29,56 +31,73 @@ class Layer extends Component {
     //console.log('change count :'+this.state.changeCount)
   }
 
+  gridItemOnClick = () => {
+    console.log('this grid item has been clicked !')
+  }
+
   componentWillUnmount(){
     console.log('Layer would nmount in seconds!!')
+    let tempLayouts = this.refGridLayout.current.state.layout
+    localStorage.setItem('WMSLayoutSetting', JSON.stringify(tempLayouts))
   }
 
   threeDLayerFixStart = (e) => {
-    console.log('key down')
+    console.log(e.target.getAttribute('keyIndex'))
+    let divToken = e.target.getAttribute('keyIndex')
     if(e.key === 'c')
-    {
+    {     
+      switch(divToken)
+      {
+        case 'a':
+          this.toggleFix(0)
+          break
+        case 'b':
+          this.toggleFix(1)
+          break
+        case 'c':
+          this.toggleFix(2)
+          break    
+      }
       console.log('c is pressed')
-      this.setState({static: true})
-      let newLayouts5 = this.refGridLayout.current.state.layout
-      newLayouts5[1].static = true
-      this.refGridLayout.current.setState({layout:newLayouts5})
-      //setTimeout(()=>console.log('static when key pressed : '+this.state.layoutc[1].static),3000)
-    }
-    else if(e.key === 'r')
-    {
-      console.log('r is pressed')
-      this.setState({static: false})
-      let newLayouts5 = this.refGridLayout.current.state.layout
-      newLayouts5[1].static = false
-      this.refGridLayout.current.setState({layout:newLayouts5})
-      //setTimeout(()=>console.log('static when key pressed : '+this.state.layoutc[1].static),3000)
     }
   }
 
-   threeDLayerResize = () => {
-      this.tempCount = this.state.changeCount +1
-      this.setState({changeCount:this.tempCount})
-      console.log('start dragging!')
-    }
+  toggleFix = (tokenIndex) => {
+    let newLayouts = this.refGridLayout.current.state.layout
+    let newStatic = this.state.static
 
-  render() {
-    let changeStyle
-    if(this.state.static)
+    if(newLayouts[tokenIndex].static)
     {
-      changeStyle = {
-        borderStyle:'solid',
-        borderColor:'red'
-      }
+      newLayouts[tokenIndex].static = false
+      this.refGridLayout.current.setState({layout:newLayouts})
+      newStatic[tokenIndex] = false
+      this.setState({static:newStatic})
     }
     else
     {
-      changeStyle = {
-        borderStyle:'solid',
-        borderColor:'black'
-      }
+      newLayouts[tokenIndex].static = true
+      this.refGridLayout.current.setState({layout:newLayouts})
+      newStatic[tokenIndex] = true
+      this.setState({static:newStatic})
     }
-    const myStyle1 = {
+  }
+
+  threeDLayerResize = () => {
+    this.tempCount = this.state.changeCount +1
+    this.setState({changeCount:this.tempCount})
+    console.log('start dragging!')
+  }
+
+  render() {
+
+    const fixStyle = {
       borderStyle:'solid',
+      borderColor:'red'
+    }
+    
+    const notFixStyle = {
+      borderStyle:'solid',
+      borderColor:'black'
     }
     const myStyle2 = {
       width: '100%',
@@ -86,16 +105,22 @@ class Layer extends Component {
     }
 
   return (
-    <GridLayout className="layout" layout={this.state.layoutc} cols={12} rowHeight={45} width={2000} ref={this.refGridLayout} onResizeStart = {this.threeDLayerResizeStart} onResize = {this.threeDLayerResize} onResizeStop = {this.threeDLayerResize}>
-      <div style={myStyle1} key="a" >
-          <TestComponent1/>
+    <GridLayout className="layout" layout={this.state.layoutc} cols={12} rowHeight={45} width={2000} ref={this.refGridLayout} onResizeStart = {this.threeDLayerResizeStart} onResize = {this.threeDLayerResize} onResizeStop = {this.threeDLayerResize}
+    draggableCancel='.myDrag'>
+      <div className={this.state.static[0]?'myDrag':'None'} style={this.state.static[0]?fixStyle:notFixStyle} key="a">
+        <div style={myStyle2} onKeyDown={this.threeDLayerFixStart} tabIndex='0' keyIndex='a'>
+          <TestComponent1 /> 
+        </div>
       </div>
-      <div style={changeStyle} key="b" >
-      <div style={myStyle2} onKeyDown={this.threeDLayerFixStart} onKeyUp={this.threeDLayerFixEnd} tabIndex='0'>
-        <ThreeDLayer testProp={this.state.changeCount}/>
+      <div className={this.state.static[1]?'myDrag':'None'} style={this.state.static[1]?fixStyle:notFixStyle} key="b" >
+        <div style={myStyle2} onKeyDown={this.threeDLayerFixStart} tabIndex='0' keyIndex='b'>
+          <ThreeDLayer  testProp={this.state.changeCount}/>
+        </div>
       </div>
+      <div className={this.state.static[2]?'myDrag':'None'} style={this.state.static[2]?fixStyle:notFixStyle} key="c" >
+        <div style={myStyle2} onKeyDown={this.threeDLayerFixStart} tabIndex='0' keyIndex='c'>
+        </div>
       </div>
-      <div style={myStyle1} key="c" >c</div>
     </GridLayout>
   )
 }

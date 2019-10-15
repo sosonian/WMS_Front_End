@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import * as THREE from 'three';
 import Stats from 'stats.js';
 import orbControls from './OrbitControls';
-//import { relative } from 'path';
 
 class ThreeDLayer extends Component{
   constructor(props) {
@@ -77,21 +76,6 @@ class ThreeDLayer extends Component{
 
   }
 
-  // getSnapshotBeforeUpdate(prevProps, prevState)
-  // {
-  //   if(this.orbitControlMode == true)
-  //   {
-  //     if(prevState.orbitControlMode !== this.orbitControlMode)
-  //     {
-  //       return true
-  //     }
-  //     else
-  //     {
-  //       return false
-  //     }
-  //   }
-  // }
-
   componentDidUpdate(){
     //console.log('component has been updated!')
     //console.log('orbit control mode is :')
@@ -125,6 +109,7 @@ class ThreeDLayer extends Component{
     this.mount.appendChild(this.stats.domElement)
   }
 
+
   orbitControlSet = () => {
     this.cameraControl = new orbControls(this.camera)
   }
@@ -148,15 +133,15 @@ class ThreeDLayer extends Component{
     this.refPP = window.requestAnimationFrame(this.animate)
   }
 
-  handleResize = () => {
-    const width = this.mount.clientWidth;
-    const height = this.mount.clientHeight;
+   handleResize = () => {
+     const width = this.mount.clientWidth;
+     const height = this.mount.clientHeight;
 
-    this.renderer.setSize(width, height);
-    this.camera.aspect = width / height;
+     this.renderer.setSize(width, height);
+     this.camera.aspect = width / height;
 
-    this.camera.updateProjectionMatrix();
-  }
+     this.camera.updateProjectionMatrix();
+   }
 
   threeDLayerMouseDown = (e) => {
     //console.log('start control 3D!')
@@ -177,6 +162,29 @@ class ThreeDLayer extends Component{
     }
     else
     {
+      const rayCaster = new THREE.Raycaster()
+      const mouseToken = new THREE.Vector2()
+      let rect = this.mount.getBoundingClientRect()
+      mouseToken.x = ((e.clientX-rect.left)/this.mount.clientWidth)*2-1
+      mouseToken.y = -((e.clientY-rect.top)/this.mount.clientHeight)*2+1
+      
+      
+
+      console.log('mouse down')
+      console.log(e.clientX+' : '+e.clientY)
+      console.log(rect.left+' : '+rect.top)
+      rayCaster.setFromCamera(mouseToken, this.camera)
+
+      let intersects = rayCaster.intersectObjects(this.scene.children)
+      for(var i =0; i <intersects.length; i++)
+      {
+        console.log('find object !')
+        //console.log(intersects[i].object.type)
+        if(intersects[i].object.type == 'Mesh')
+        {
+          intersects[i].object.material.color.set(0x13D73F)
+        }        
+      }
     }
   }
 
@@ -200,6 +208,7 @@ class ThreeDLayer extends Component{
     }
     else
     {
+      
     }
   }
   
