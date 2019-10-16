@@ -7,16 +7,12 @@ class ThreeDLayer extends Component{
   constructor(props) {
     super(props)
     this.state = {
-      orbitControlMode : false
+      orbitControlMode : false,
+      //fullScreenToggle : false
     }
   }
   
-  
   componentDidMount(){
-
-    //const stats = new Stats()
-    //stats.setMode(0) // FPS mode
-    //stats.domElement.style.position = 'absolute'
 
     this.deployState();
     
@@ -28,13 +24,25 @@ class ThreeDLayer extends Component{
     this.renderer.setSize(width, height)
 
     this.scene = new THREE.Scene()
-    this.camera = new THREE.PerspectiveCamera(
-      75,
+    this.camera1 = new THREE.PerspectiveCamera(
+      100,
       width / height,
       0.1,
       1000
     )
-    this.camera.position.z =5
+    this.camera1.position.z =4
+    this.camera1.position.x =0
+    this.camera1.position.y =1
+
+    this.camera2 = new THREE.PerspectiveCamera(
+      70,
+      width / height,
+      0.1,
+      1000
+    )
+    this.camera2.position.z =5
+    this.camera2.position.x =0
+    this.camera2.position.y =0
 
     if(this.state.orbitControlMode)
     {
@@ -55,31 +63,25 @@ class ThreeDLayer extends Component{
       }
     }
     
-
     const axes = new THREE.AxesHelper(20)
     this.scene.add(axes)
 
     this.sceneGrid = new THREE.GridHelper(10,10)
     this.scene.add(this.sceneGrid)
     
-    
-    this.mount.appendChild(this.renderer.domElement)
-    
-    
     const geometry = new THREE.BoxGeometry(1, 1, 1)
     const material = new THREE.MeshBasicMaterial({ color: 0x0000ff})
     this.cube = new THREE.Mesh(geometry, material)
     this.scene.add(this.cube)
 
+    
+    this.mount.appendChild(this.renderer.domElement)
+
     this.animate()
     window.addEventListener('resize', this.handleResize)
-
   }
 
   componentDidUpdate(){
-    //console.log('component has been updated!')
-    //console.log('orbit control mode is :')
-    //console.log(this.state.orbitControlMode)
     if(this.state.orbitControlMode)
     {
       if(this.cameraControl !== undefined)
@@ -98,8 +100,13 @@ class ThreeDLayer extends Component{
         this.cameraControl.enabled = false
       }
     }
+
     this.handleResize()
-    //console.log('ThreeDLayer property has been change!')
+  }
+
+  componentWillUnmount() {
+    cancelAnimationFrame(this.refPP)
+    this.mount.removeChild(this.renderer.domElement)
   }
 
   deployState = () => {
@@ -109,16 +116,28 @@ class ThreeDLayer extends Component{
     this.mount.appendChild(this.stats.domElement)
   }
 
-
   orbitControlSet = () => {
-    this.cameraControl = new orbControls(this.camera)
+    this.cameraControl = new orbControls(this.camera1)
   }
 
   animate = () => {
     this.stats.begin();
     this.cube.rotation.x += 0.01
     this.cube.rotation.y += 0.01
-    this.renderer.render(this.scene, this.camera)
+    let rect = this.mount.getBoundingClientRect()
+    this.renderer.setViewport(0,0,this.mount.clientWidth*0.5,this.mount.clientHeight*1)
+    this.renderer.setScissor(0,0,this.mount.clientWidth*0.5,this.mount.clientHeight*1)
+    this.renderer.setScissorTest( true );
+    let c1Background = new THREE.Color('rgb(255,255,255)')
+    this.renderer.setClearColor(c1Background)
+    this.renderer.render(this.scene, this.camera1)
+    this.renderer.setViewport(this.mount.clientWidth*0.5,0,this.mount.clientWidth*0.5,this.mount.clientHeight*1)
+    this.renderer.setScissor(this.mount.clientWidth*0.5,0,this.mount.clientWidth*0.5,this.mount.clientHeight*1)
+    this.renderer.setScissorTest( true );
+    let c2Background = new THREE.Color('rgb(203,242,255)')
+    this.renderer.setClearColor(c2Background)
+    this.renderer.render(this.scene, this.camera2)
+
 
     if(this.state.orbitControlMode)
     {
@@ -138,26 +157,23 @@ class ThreeDLayer extends Component{
      const height = this.mount.clientHeight;
 
      this.renderer.setSize(width, height);
-     this.camera.aspect = width / height;
+     this.camera1.aspect = width / height;
 
-     this.camera.updateProjectionMatrix();
+     console.log('aspect of camera1 : '+this.camera1.aspect)
+
+     this.camera1.updateProjectionMatrix();
    }
 
   threeDLayerMouseDown = (e) => {
-    //console.log('start control 3D!')
     if(this.cameraControl !== undefined)
     {
-      //console.log(this,this.cameraControl)
     }
     else
     {
-      //console.log("No 3D cameraControl !")
     }
-
 
     if(e.altKey)
     {
-      //console.log('3D Ctrl has been pressed!')
       this.setState({orbitControlMode : true})
     }
     else
@@ -165,21 +181,19 @@ class ThreeDLayer extends Component{
       const rayCaster = new THREE.Raycaster()
       const mouseToken = new THREE.Vector2()
       let rect = this.mount.getBoundingClientRect()
-      mouseToken.x = ((e.clientX-rect.left)/this.mount.clientWidth)*2-1
+      mouseToken.x = (2*(e.clientX-rect.left)/this.mount.clientWidth)*2-1
       mouseToken.y = -((e.clientY-rect.top)/this.mount.clientHeight)*2+1
       
-      
-
-      console.log('mouse down')
-      console.log(e.clientX+' : '+e.clientY)
-      console.log(rect.left+' : '+rect.top)
-      rayCaster.setFromCamera(mouseToken, this.camera)
+      // console.log('mouse down')
+      // console.log(e.clientX+' : '+e.clientY)
+      // console.log(rect.left+' : '+rect.top)
+      // console.log(mouseToken.x+' : '+mouseToken.y)
+      rayCaster.setFromCamera(mouseToken, this.camera1)
 
       let intersects = rayCaster.intersectObjects(this.scene.children)
       for(var i =0; i <intersects.length; i++)
       {
         console.log('find object !')
-        //console.log(intersects[i].object.type)
         if(intersects[i].object.type == 'Mesh')
         {
           intersects[i].object.material.color.set(0x13D73F)
@@ -189,14 +203,11 @@ class ThreeDLayer extends Component{
   }
 
   threeDLayerMouseUp = (e) => {
-    //console.log('3D Mouse Up!')
     if(this.cameraControl !== undefined)
     {
-      //console.log(this,this.cameraControl)
     }
     else
     {
-      //console.log("No cameraControl !")
     }
     this.setState({orbitControlMode : false})
   }
@@ -207,15 +218,13 @@ class ThreeDLayer extends Component{
       this.setState({orbitControlMode : true})
     }
     else
-    {
-      
+    {    
     }
   }
-  
+
   render(){
     
     const myStyle = {
-      position: 'relative',
       width: '100%',
       height: '100%',
     }
@@ -228,9 +237,7 @@ class ThreeDLayer extends Component{
         style={myStyle}
         ref={(mount) => { this.mount = mount }}
       >
-
-      </div>
-      
+      </div>  
     )
   }
 }
