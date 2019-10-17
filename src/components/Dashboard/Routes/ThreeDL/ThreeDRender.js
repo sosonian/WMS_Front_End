@@ -3,6 +3,8 @@ import * as THREE from 'three';
 import Stats from 'stats.js';
 import orbControls from './OrbitControls';
 import StorageLayer from './ThreeDObjects/StorageLayer';
+import guiController from './testGUIController';
+import * as dat from 'dat.gui';
 
 class ThreeDRender extends Component{
   constructor(props) {
@@ -13,7 +15,8 @@ class ThreeDRender extends Component{
   }
   
   componentDidMount(){
-
+    this.guiToken = new guiController()
+    this.activeGUI()
     this.deployState();
     
     this.renderer = new THREE.WebGLRenderer()
@@ -78,8 +81,9 @@ class ThreeDRender extends Component{
     
 
     this.mount.appendChild(this.renderer.domElement)
-
+    
     this.animate()
+    
     window.addEventListener('resize', this.handleResize)
   }
 
@@ -126,8 +130,10 @@ class ThreeDRender extends Component{
   }
 
   animate = () => {
+    
     this.stats.begin();
-    //this.plane.rotation.x += 0.01
+    this.plane.rotation.x += this.guiToken.rotationX
+    
     //this.plane.rotation.y += 0.01
     this.renderer.setViewport(0,0,this.mount.clientWidth*0.5,this.mount.clientHeight*1)
     this.renderer.setScissor(0,0,this.mount.clientWidth*0.5,this.mount.clientHeight*1)
@@ -221,12 +227,20 @@ class ThreeDRender extends Component{
     }
   }
 
+  activeGUI =()=>{
+    this.datGUI = new dat.GUI()
+    this.datGUI.add(this.guiToken, 'rotationX',0,1).name('旋轉X軸')
+    console.log(this.datGUI.domElement)
+    this.mount.appendChild(this.datGUI.domElement)
+  }
+
   render(){
     
     const myStyle = {
       width: '100%',
       height: '100%',
     }
+
 
     return(
       <div 
