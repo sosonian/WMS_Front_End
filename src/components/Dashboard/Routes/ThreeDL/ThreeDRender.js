@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import * as THREE from 'three';
 import Stats from 'stats.js';
 import orbControls from './OrbitControls';
+import StorageLayer from './ThreeDObjects/StorageLayer';
 
-class ThreeDLayer extends Component{
+class ThreeDRender extends Component{
   constructor(props) {
     super(props)
     this.state = {
-      orbitControlMode : false,
-      //fullScreenToggle : false
+      orbitControlMode : false
     }
   }
   
@@ -69,18 +69,23 @@ class ThreeDLayer extends Component{
     this.sceneGrid = new THREE.GridHelper(10,10)
     this.scene.add(this.sceneGrid)
     
-    const geometry = new THREE.BoxGeometry(1, 1, 1)
+    this.planeGeo = new StorageLayer()
     const material = new THREE.MeshBasicMaterial({ color: 0x0000ff})
-    this.cube = new THREE.Mesh(geometry, material)
-    this.scene.add(this.cube)
+    this.plane = new THREE.Mesh(this.planeGeo.layout, material)
+    this.plane.material.side = THREE.DoubleSide
+    this.scene.add(this.plane)
 
     
+
     this.mount.appendChild(this.renderer.domElement)
 
     this.animate()
     window.addEventListener('resize', this.handleResize)
   }
 
+
+
+  
   componentDidUpdate(){
     if(this.state.orbitControlMode)
     {
@@ -122,9 +127,8 @@ class ThreeDLayer extends Component{
 
   animate = () => {
     this.stats.begin();
-    this.cube.rotation.x += 0.01
-    this.cube.rotation.y += 0.01
-    let rect = this.mount.getBoundingClientRect()
+    //this.plane.rotation.x += 0.01
+    //this.plane.rotation.y += 0.01
     this.renderer.setViewport(0,0,this.mount.clientWidth*0.5,this.mount.clientHeight*1)
     this.renderer.setScissor(0,0,this.mount.clientWidth*0.5,this.mount.clientHeight*1)
     this.renderer.setScissorTest( true );
@@ -183,11 +187,6 @@ class ThreeDLayer extends Component{
       let rect = this.mount.getBoundingClientRect()
       mouseToken.x = (2*(e.clientX-rect.left)/this.mount.clientWidth)*2-1
       mouseToken.y = -((e.clientY-rect.top)/this.mount.clientHeight)*2+1
-      
-      // console.log('mouse down')
-      // console.log(e.clientX+' : '+e.clientY)
-      // console.log(rect.left+' : '+rect.top)
-      // console.log(mouseToken.x+' : '+mouseToken.y)
       rayCaster.setFromCamera(mouseToken, this.camera1)
 
       let intersects = rayCaster.intersectObjects(this.scene.children)
@@ -241,4 +240,4 @@ class ThreeDLayer extends Component{
     )
   }
 }
-export default ThreeDLayer
+export default ThreeDRender

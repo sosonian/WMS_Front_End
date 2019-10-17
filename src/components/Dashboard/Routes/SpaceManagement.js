@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
-import Layer from './ThreeDL/Layer';
+import GridLayer from './ThreeDL/GridLayer';
 import Button from '@material-ui/core/Button';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 import DomainIcon from '@material-ui/icons/Domain';
@@ -73,15 +73,11 @@ import DomainIcon from '@material-ui/icons/Domain';
   
 
     render(){
-      //console.log(useStyles());
-      //console.log('classes is :');
-      //console.log(this.props);
       const {classes} = this.props
       const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
       const buttonPaper = clsx(classes.rowPaper);
       const flexHeightPaper = clsx(classes.paper);
 
-      
     return (
 
         <main className={classes.content}>
@@ -102,7 +98,7 @@ import DomainIcon from '@material-ui/icons/Domain';
               </Grid>         
               <Grid item xs={12}>
                 <Paper className={flexHeightPaper}>
-                    <Layer/>
+                    <GridLayer/>
                 </Paper>
               </Grid>              
             </Grid>

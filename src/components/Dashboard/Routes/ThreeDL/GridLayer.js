@@ -1,12 +1,11 @@
 import React, {Component} from 'react';
-import ThreeDLayer from './ThreeDLayer';
+import ThreeDRender from './ThreeDRender';
 import GridLayout from 'react-grid-layout';
-import ThreeDGridItem from './ThreeDGridItem';
 import TestComponent1 from './TestComponent1';
 import 'react-grid-layout/css/styles.css';
   
 
-class Layer extends Component {
+class GridLayer extends Component {
 
   constructor(props) {
     super(props)
@@ -155,7 +154,7 @@ class Layer extends Component {
       </div>
       <div className={this.state.static[1]?'myDrag':'None'}  key="b" style={this.state.fullScreen==1?fullScreenStyleParent:(this.state.static[1]?fixStyle:notFixStyle)}>
         <div style={this.state.fullScreen==1?fullScreenChild:myStyle2} onKeyDown={this.threeDLayerFixStart} tabIndex='0' keyIndex='b'>
-          <ThreeDLayer ref={this.refThreeDLayer} testProp={this.state.changeCount} fullScreenProp={this.state.fullScreen}/>
+          <ThreeDRender testProp={this.state.changeCount} fullScreenProp={this.state.fullScreen}/>
         </div>
       </div>
       <div className={this.state.static[2]?'myDrag':'None'} style={this.state.static[2]?fixStyle:notFixStyle} key="c" >
@@ -167,4 +166,4 @@ class Layer extends Component {
 }
 }
 
-export default Layer;
+export default GridLayer;
