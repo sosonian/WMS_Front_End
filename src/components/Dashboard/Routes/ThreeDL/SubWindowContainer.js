@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Color } from 'three';
 
-class SubWindow extends Component {
+class SubWindowContainer extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -13,11 +13,13 @@ class SubWindow extends Component {
                 x:0,
                 y:0
             },
-            dragging:false,
             divSize:{
-                width:150,
-                height:150,
-            }
+                width:200,
+                height:200,
+            },
+            dragging:false,
+            resizing:false,
+            showing:true
         }
     }
 
@@ -70,6 +72,16 @@ class SubWindow extends Component {
             }
         })
     }
+
+    headerStyleChangeHandler=()=>{
+        let cursorToken = 'grab'
+        if(this.state.dragging)
+        {
+            cursorToken = 'grabbing'
+        }
+        console.log(cursorToken)
+        return cursorToken
+    }
     
     render() {    
         //console.log(this.props.dom)
@@ -80,7 +92,7 @@ class SubWindow extends Component {
             top:this.positionY+'px',
             left:this.positionX+'px',
             zIndex:'2000',
-            border:'1px solid',
+            border:'2px solid',
             borderColor:'black'
           }
         
@@ -92,16 +104,23 @@ class SubWindow extends Component {
           const headerStyle = {
               width:'100%',
               height:'20px',
-              backgroundColor:'#B6D9EA'
+              backgroundColor:'#B6D9EA',
+              borderBottom:'1px solid',
+              borderColor:'gray',
+              cursor:this.headerStyleChangeHandler()
           }
+
+        
 
         return (
             <div style={containerWindow} ref={(refContainer) => {this.refContainer = refContainer}}>  
-            <div style={headerStyle} onMouseDown={this.onMouseDown} onMouseUp={this.onMouseUp}/>
+            <div style={headerStyle} onMouseDown={this.onMouseDown} onMouseUp={this.onMouseUp}>
+                {this.props.headerTitle}
+            </div>
             <div style={canvasWindow} ref={(refDom)=>{this.refDom=refDom}}/> 
             </div>
         )
       }
 }
 
-export default SubWindow
+export default SubWindowContainer

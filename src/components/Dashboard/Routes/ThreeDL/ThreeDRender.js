@@ -5,7 +5,7 @@ import orbControls from './OrbitControls';
 import StorageLayer from './ThreeDObjects/StorageLayer';
 import guiController from './testGUIController';
 import * as dat from 'dat.gui';
-import SubWindow from './SubWindow'
+import SubWindowContainer from './SubWindowContainer'
 
 class ThreeDRender extends Component{
   constructor(props) {
@@ -297,8 +297,8 @@ class ThreeDRender extends Component{
         style={myStyle}
         ref={(mount) => { this.mount = mount }}
       >
-      <SubWindow ref={(subMount1)=>{this.subMount1=subMount1}} PosX={this.state.mousePos.x} PosY={this.state.mousePos.y}/>
-      <SubWindow ref={(subMount2)=>{this.subMount2=subMount2}} PosX={this.state.mousePos.x} PosY={this.state.mousePos.y}/>
+      <SubWindowContainer ref={(subMount1)=>{this.subMount1=subMount1}} PosX={this.state.mousePos.x} PosY={this.state.mousePos.y} headerTitle={'總功能列表'}/>
+      <SubWindowContainer ref={(subMount2)=>{this.subMount2=subMount2}} PosX={this.state.mousePos.x} PosY={this.state.mousePos.y} headerTitle={'正面視圖'}/>
       </div>  
     )
   }

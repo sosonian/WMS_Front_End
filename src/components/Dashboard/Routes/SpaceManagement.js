@@ -82,7 +82,7 @@ import DomainIcon from '@material-ui/icons/Domain';
 
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
-          <Container maxWidth="lg" className={classes.container}>
+          <Container maxWidth={false} className={classes.container}>
             <Grid container spacing={1}>
               <Grid item xs={12}>
                 <Paper className={buttonPaper}>
