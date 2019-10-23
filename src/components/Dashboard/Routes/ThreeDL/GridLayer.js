@@ -19,25 +19,38 @@ class GridLayer extends Component {
          {i: 'a', x: 0, y: 0, w: 1, h: 7},
          {i: 'b', x: 1, y: 0, w: 5, h: 7},
          {i: 'c', x: 0, y: 6, w: 6, h: 1}
-      ]
+      ],
+      ThreeDRenderCotainerSize:{
+        width:0,
+        height:0
+      }
     }
     this.refGridLayout = React.createRef()
-    //this.refThreeDLayer = React.createRef()
-  }
-  
-  onResize = () => {
-    this.tempCount = this.state.changeCount +1
-    this.setState({changeCount:this.tempCount})
-    //console.log('size changed!')
-    //console.log('change count :'+this.state.changeCount)
   }
 
+  componentDidMount(){
+    //console.log('GridLayer componentDidMount refThreeDRenderDom offset :')
+    //console.log(this.refThreeDRenderDom.mount.clientWidth)
+    //console.log(this.refThreeDRenderDom.mount.clientHeight)
+    this.setState({
+      ThreeDRenderCotainerSize:{
+        width:this.refThreeDRenderDom.mount.clientWidth,
+        height:this.refThreeDRenderDom.mount.clientHeight,
+      }
+    })
+  }
+  
+  // onResize = () => {
+  //   this.tempCount = this.state.changeCount +1
+  //   this.setState({changeCount:this.tempCount})
+  // }
+
   gridItemOnClick = () => {
-    console.log('this grid item has been clicked !')
+  //  console.log('this grid item has been clicked !')
   }
 
   componentWillUnmount(){
-    console.log('Layer would nmount in seconds!!')
+  //  console.log('Layer would nmount in seconds!!')
     let tempLayouts = this.refGridLayout.current.state.layout
     localStorage.setItem('WMSLayoutSetting', JSON.stringify(tempLayouts))
   }
@@ -59,7 +72,7 @@ class GridLayer extends Component {
           this.toggleFix(2)
           break    
       }
-      console.log('c is pressed')
+      //console.log('c is pressed')
     }
     else if(e.key === 'f')
     {
@@ -70,13 +83,18 @@ class GridLayer extends Component {
           break
         case 'b':
           this.toggleFullScreen(1)
+          this.setState({
+            ThreeDRenderCotainerSize:{
+              width:this.refThreeDRenderDom.mount.clientWidth,
+              height:this.refThreeDRenderDom.mount.clientHeight,
+            }
+          })
           break
         case 'c':
           this.toggleFullScreen(2)
           break    
       }
-      console.log('f is pressed')
-
+      //console.log('f is pressed')
     }
   }
 
@@ -112,9 +130,14 @@ class GridLayer extends Component {
   }
 
   threeDLayerResize = () => {
-    this.tempCount = this.state.changeCount +1
-    this.setState({changeCount:this.tempCount})
-    console.log('start dragging!')
+    //this.tempCount = this.state.changeCount +1
+    this.setState({
+      ThreeDRenderCotainerSize:{
+        width:this.refThreeDRenderDom.mount.clientWidth,
+        height:this.refThreeDRenderDom.mount.clientHeight,
+      }
+    })
+    //console.log('start dragging!')
   }
 
   render() {
@@ -145,7 +168,7 @@ class GridLayer extends Component {
     }
 
   return (
-    <GridLayout className="layout" layout={this.state.layoutc} cols={12} rowHeight={45} width={2000} ref={this.refGridLayout} onResizeStart = {this.threeDLayerResizeStart} onResize = {this.threeDLayerResize} onResizeStop = {this.threeDLayerResize}
+    <GridLayout className="layout" layout={this.state.layoutc} cols={12} rowHeight={45} width={2000} ref={this.refGridLayout} onResize = {this.threeDLayerResize} onResizeStop = {this.threeDLayerResize}
     draggableCancel='.myDrag'>
       <div className={this.state.static[0]?'myDrag':'None'} style={this.state.static[0]?fixStyle:notFixStyle} key="a">
         <div style={myStyle2} onKeyDown={this.threeDLayerFixStart} tabIndex='0' keyIndex='a'>
@@ -154,7 +177,7 @@ class GridLayer extends Component {
       </div>
       <div className={this.state.static[1]?'myDrag':'None'}  key="b" style={this.state.fullScreen==1?fullScreenStyleParent:(this.state.static[1]?fixStyle:notFixStyle)}>
         <div style={this.state.fullScreen==1?fullScreenChild:myStyle2} onKeyDown={this.threeDLayerFixStart} tabIndex='0' keyIndex='b'>
-          <ThreeDRender testProp={this.state.changeCount} fullScreenProp={this.state.fullScreen}/>
+          <ThreeDRender ref={(refDom)=>{this.refThreeDRenderDom=refDom}} containerSize={this.state.ThreeDRenderCotainerSize} fullScreenProp={this.state.fullScreen}/>
         </div>
       </div>
       <div className={this.state.static[2]?'myDrag':'None'} style={this.state.static[2]?fixStyle:notFixStyle} key="c" >

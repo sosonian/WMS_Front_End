@@ -3,49 +3,67 @@ import * as THREE from 'three';
 import Stats from 'stats.js';
 import orbControls from './OrbitControls';
 import StorageLayer from './ThreeDObjects/StorageLayer';
-import guiController from './testGUIController';
-import * as dat from 'dat.gui';
-import SubWindowContainer from './SubWindowContainer'
+//import guiController from './ControllerUnit.js/testGUIController';
+//import * as dat from 'dat.gui';
+import ControllerUnitLayout from './ControllerUnit/ControllerUnitLayout'
+//import ControllerUnitContainer from './ControllerUnit/ControllerUnitContainer'
 
 class ThreeDRender extends Component{
   constructor(props) {
     super(props)
     this.state = {
       orbitControlMode : false,
+      canvasSize:{
+        width:0,
+        height:0
+      },
       mousePos:{
         x:0,
         y:0
-      }
+      },
+      controllorUnitNumber:3,
+      controllorUnitValus:{
+
+      },
+      
+      tabDragging:false
     }
   }
   
   componentDidMount(){
-    this.guiToken = new guiController()
-    this.activeGUI()
+  //  console.log('ThreeDRender componentDidMount !')
+    //console.log(this.props.containerSize)
+
     this.deployState();
-    //this.nodeToken = this.subMount2.getDivDom()
-    //this.node = ReactDOM.findDOMNode(this.subMount2)
 
     this.rect = this.mount.getBoundingClientRect()
     this.renderer1 = new THREE.WebGLRenderer()
     this.renderer1.setClearColor(0xeeeeee, 1.0)
     
-    const width = this.mount.clientWidth
-    const height = this.mount.clientHeight
-    this.renderer1.setSize(width, height)
+    this.setState({
+       canvasSize:{
+         width:this.mount.clientWidth,
+         height:this.mount.clientHeight
+       }
+    })
+    //const width = this.mount.clientWidth
+    //const height = this.mount.clientHeight
+    this.renderer1.setSize(this.mount.clientWidth, this.mount.clientHeight)
 
     this.renderer2 = new THREE.WebGLRenderer()
     this.renderer2.setClearColor(0xeeeeee, 1.0)
     
-    const width1 = this.subMount2.refDom.clientWidth
-    const height1 = this.subMount2.refDom.clientHeight-20
+    //const width1 = this.subMount2.refDom.clientWidth
+    //const height1 = this.subMount2.refDom.clientHeight-20
+    const width1 = 100
+    const height1 = 100
     
     this.renderer2.setSize(width1, height1)
 
     this.scene = new THREE.Scene()
     this.camera1 = new THREE.PerspectiveCamera(
       100,
-      width / height,
+      this.mount.clientWidth / this.mount.clientHeight,
       0.1,
       1000
     )
@@ -95,16 +113,15 @@ class ThreeDRender extends Component{
     this.scene.add(this.plane)
 
     this.mount.appendChild(this.renderer1.domElement)
-    this.subMount2.refDom.appendChild(this.renderer2.domElement)
+    //this.subMount2.refDom.appendChild(this.renderer2.domElement)
     this.animate()
+    //this.handleResize()
+    //window.addEventListener('resize', this.handleResize)
     
-    window.addEventListener('resize', this.handleResize)
   }
 
-
-
-  
-  componentDidUpdate(){
+  componentDidUpdate(preProps, preState){
+    //if(preState !== this.state)
     if(this.state.orbitControlMode)
     {
       if(this.cameraControl !== undefined)
@@ -123,15 +140,16 @@ class ThreeDRender extends Component{
         this.cameraControl.enabled = false
       }
     }
-    
-
-    this.handleResize()
+    if(preProps.containerSize !== this.props.containerSize)
+    {
+      this.handleResize()
+    }
   }
 
   componentWillUnmount() {
     cancelAnimationFrame(this.refPP)
-    this.mount.removeChild(this.renderer1.domElement)
-    this.subMount2.refDom.removeChild(this.renderer2.domElement)
+    //this.mount.removeChild(this.renderer1.domElement)
+    //this.subMount2.refDom.removeChild(this.renderer2.domElement)
   }
 
   deployState = () => {
@@ -148,18 +166,12 @@ class ThreeDRender extends Component{
   animate = () => {
     
     this.stats.begin();
-    this.plane.rotation.x += this.guiToken.rotationX
-    
-    //this.renderer.setViewport(0,0,this.mount.clientWidth*0.5,this.mount.clientHeight*1)
-    //this.renderer.setScissor(0,0,this.mount.clientWidth*0.5,this.mount.clientHeight*1)
-    //this.renderer.setScissorTest( true );
+    //this.plane.rotation.x += this.guiToken.rotationX
+ 
     let c1Background = new THREE.Color('rgb(255,255,255)')
     this.renderer1.setClearColor(c1Background)
     this.renderer1.render(this.scene, this.camera1)
 
-    //this.renderer.setViewport(this.mount.clientWidth*0.5,0,this.mount.clientWidth*0.5,this.mount.clientHeight*1)
-    //this.renderer.setScissor(this.mount.clientWidth*0.5,0,this.mount.clientWidth*0.5,this.mount.clientHeight*1)
-    //this.renderer.setScissorTest( true );
     let c2Background = new THREE.Color('rgb(255,255,255)')
     this.renderer2.setClearColor(c2Background)
     this.renderer2.render(this.scene, this.camera2)
@@ -178,21 +190,26 @@ class ThreeDRender extends Component{
     this.refPP = window.requestAnimationFrame(this.animate)
   }
 
-   handleResize = () => {
-     this.rect = this.mount.getBoundingClientRect()
-     const width1 = this.mount.clientWidth;
-     const height1 = this.mount.clientHeight;
+  handleResize = () => {
+    this.rect = this.mount.getBoundingClientRect()
+      this.setState({
+        canvasSize:{
+          width:this.props.containerSize.width,
+          height:this.props.containerSize.height
+        }
+      })
+     
+      //const width1 = this.mount.clientWidth;
+      //const height1 = this.mount.clientHeight;
 
-     this.renderer1.setSize(width1, height1);
-     this.camera1.aspect = width1 / height1;
+      this.renderer1.setSize(this.mount.clientWidth, this.mount.clientHeight);
+      this.camera1.aspect = this.mount.clientWidth / this.mount.clientHeight;
 
-     const width2 = this.subMount2.refDom.clientWidth
-     const height2 = this.subMount2.refDom.clientHeight-20
+      const width2 = 100
+      const height2 = 100
 
      this.renderer2.setSize(width2, height2);
      this.camera2.aspect = width2 / height2;
-
-     //console.log('aspect of camera1 : '+this.camera1.aspect)
 
      this.camera1.updateProjectionMatrix();
      this.camera2.updateProjectionMatrix();
@@ -222,7 +239,6 @@ class ThreeDRender extends Component{
       let intersects = rayCaster.intersectObjects(this.scene.children)
       for(var i =0; i <intersects.length; i++)
       {
-        console.log('find object !')
         if(intersects[i].object.type == 'Mesh')
         {
           intersects[i].object.material.color.set(0x13D73F)
@@ -242,9 +258,6 @@ class ThreeDRender extends Component{
   }
 
   ThreeDLayerMouseMove = (e) => {
-    console.log('mousePos :')
-    console.log(e.clientX-this.rect.left)
-    console.log(e.clientY-this.rect.top)
     if(e.altKey)
     {   
       this.setState({
@@ -266,29 +279,29 @@ class ThreeDRender extends Component{
     }
   }
 
-
-
-  activeGUI =()=>{
-    this.datGUI = new dat.GUI({autoPlace:false})
-    this.datGUI.add(this.guiToken, 'rotationX',0,1).name('旋轉X軸')
-    this.subMount1.refDom.appendChild(this.datGUI.domElement)
-    //this.mount.appendChild(this.datGUI.domElement)
-    console.log(this.datGUI.domElement)
+  onTabDragging =(msg)=>{
+    if(msg=='true')
+    {
+      this.setState({
+        tabDragging:true
+      })
+    }
+    else
+    {
+      this.setState({
+        tabDragging:false
+      })
+    }
   }
 
   render(){
-    console.log('render start!')
-
+    const sizeProps = this.props.containerSize
+  //  console.log('ThreeDRender render receive sizeProps :')
+  //  console.log(sizeProps)
     const myStyle = {
       width: '100%',
       height: '100%',
     }
-
-    const mystyle2 = {
-      width:'100px',
-      height:'100px',
-    }
-
     return(
       <div 
         onMouseDown={this.threeDLayerMouseDown}
@@ -297,10 +310,11 @@ class ThreeDRender extends Component{
         style={myStyle}
         ref={(mount) => { this.mount = mount }}
       >
-      <SubWindowContainer ref={(subMount1)=>{this.subMount1=subMount1}} PosX={this.state.mousePos.x} PosY={this.state.mousePos.y} headerTitle={'總功能列表'}/>
-      <SubWindowContainer ref={(subMount2)=>{this.subMount2=subMount2}} PosX={this.state.mousePos.x} PosY={this.state.mousePos.y} headerTitle={'正面視圖'}/>
+        <ControllerUnitLayout ref={(refDom)=>{this.refControllerUnitLayout=refDom}} PosX={this.state.mousePos.x} PosY={this.state.mousePos.y}/> 
       </div>  
     )
+    //<ControllerUnitContainer ref={(subMount1)=>{this.subMount1=subMount1}} PosX={this.state.mousePos.x} PosY={this.state.mousePos.y} onTabDragging={this.onTabDragging} tabDraggingBooling={this.state.tabDragging}/>
+    //<ControllerUnitContainer ref={(subMount2)=>{this.subMount2=subMount2}} PosX={this.state.mousePos.x} PosY={this.state.mousePos.y} onTabDragging={this.onTabDragging} tabDraggingBooling={this.state.tabDragging}/>
   }
 }
 export default ThreeDRender
