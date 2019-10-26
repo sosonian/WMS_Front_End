@@ -9,24 +9,104 @@ class ControllerUnitLayout extends Component {
             controllerUnitState:[
                 {
                     name:'datGui',
-                    ContainerUnitContainerID:1,
-                    tabSequence:1,
+                    unitID:1,
+                    containerUnitContainerID:1,
                 },
                 {
-                    name:'subViewFrom',
-                    ContainerUnitContainerID:2,
-                    tabSequence:1,
+                    name:'subViewFromFront',
+                    unitID:2,
+                    containerUnitContainerID:2,
+                },
+                {
+                    name:'subViewFromSide',
+                    unitID:3,
+                    containerUnitContainerID:3,
                 }
             ],
+            ControllerUnitContainerState:[
+                {
+                    controllerUnitContainerID:1,
+                    size:
+                    {
+                        width:150,
+                        height:150
+                    },
+                    position:{
+                        left:0,
+                        top:0
+                    },
+                    showing:true,
+                },
+                {
+                    controllerUnitContainerID:2,
+                    size:
+                    {
+                        width:150,
+                        height:150
+                    },
+                    position:{
+                        left:0,
+                        top:200
+                    },
+                    showing:true,
+                },
+                {
+                    controllerUnitContainerID:3,
+                    size:
+                    {
+                        width:150,
+                        height:150
+                    },
+                    position:{
+                        left:0,
+                        top:400
+                    },
+                    showing:true,
+                }
+            ],
+            tabDragging:false
         }
     }
 
+    componentDidUpdate(){
+
+    }
+
+    onTabDragging =(msg)=>{
+        if(msg=='true')
+        {
+          this.setState({
+            tabDragging:true
+          })
+        }
+        else
+        {
+          this.setState({
+            tabDragging:false
+          })
+        }
+    }
+
+    sendRotationValueBack=(value)=>{
+        this.props.rotationValue(value)
+    }
+
+    sendFrontViewToggle=(refDom)=>{
+        console.log('ControllerUnitLayout sendFrontViewToggle refDom : ')
+        console.log(refDom)
+        this.props.frontView(refDom)
+    }
+
+    sendSideViewToggle=(refDom)=>{
+        console.log('ControllerUnitLayout sendSideViewToggle refDom : ')
+        console.log(refDom)
+        this.props.sideView(refDom)
+    }
+
     createControllerUnitContainer = () => {
-        console.log('ControllerUnitLayout createControllerUnitContainer : ')
-        console.log(this.state.controllerUnitState)
         return (
-            this.state.controllerUnitState.map(unit=>
-                <ControllerUnitContainer PosX={this.props.PosX} PosY={this.props.PosY} />  
+            this.state.ControllerUnitContainerState.map(container=> container.showing?
+                (<ControllerUnitContainer key={container.controllerUnitContainerID} conID={container.controllerUnitContainerID} initialPosX={container.position.left} initialPosY={container.position.top} PosX={this.props.PosX} PosY={this.props.PosY} controllerUnitState={this.state.controllerUnitState} rotationValue={this.sendRotationValueBack} frontViewToggle={this.sendFrontViewToggle} sideViewToggle={this.sendSideViewToggle} onTabDragging={this.onTabDragging} tabDraggingBooling={this.state.tabDragging}/>):null
             )
         )
     }

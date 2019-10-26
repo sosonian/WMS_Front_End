@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Color } from 'three';
 import TestRotationControllerUnit from './TestRotationControllerUnit'
-import SubViewFrontControllerUnit from './SubViewFrontControllerUnit'
+import SubFrontViewControllerUnit from './SubFrontViewControllerUnit'
+import SubSideViewControllerUnit from './SubSideViewControllerUnit'
 
 class ControllerUnitContainer extends Component {
     constructor(props) {
@@ -21,14 +22,24 @@ class ControllerUnitContainer extends Component {
             },
             controllerUnitState:[
                 {
+                    unitID:1,
                     name:'DatGui',
                     title:'旋轉控制',
-                    state:-1
+                    sequenceNumber:-1,
+   
                 },
                 {
+                    unitID:2,
                     name:'SubViewFront',
                     title:'前視圖',
-                    state:-1
+                    sequenceNumber:-1,
+ 
+                },
+                {
+                    unitID:3,
+                    name:'SubViewFront',
+                    title:'側視圖',
+                    sequenceNumber:-1,
                 }
             ],
             dragging:false,
@@ -36,45 +47,46 @@ class ControllerUnitContainer extends Component {
             showing:true,
             headerMergeSingnal:false
         }
+        this.loadControllerUnitState()
     }
 
     componentDidMount() {
-        this.rect = this.refContainer.getBoundingClientRect()
-        this.positionX = this.props.PosX
-        this.positionY = this.props.PosY
+
+        this.positionX = this.props.initialPosX
+        this.positionY = this.props.initialPosY
         
     }
 
     componentDidUpdate() {
-        this.rect = this.refContainer.getBoundingClientRect()
+
+    }
+
+    getContainerPosX=()=>{
         if(this.state.dragging)
         {
             this.positionX = this.props.PosX-this.state.refPos.x
-            this.positionY = this.props.PosY-this.state.refPos.y
-            console.log('SubWindow position Update!')
         }
-        else
+        return this.positionX+'px'
+    }
+
+    getContainerPosY=()=>{
+        if(this.state.dragging)
         {
-            //console.log('SubWindow position dont Update!')
-            //console.log('SubWindow Current PosX : '+ this.positionX)
-            //console.log('SubWindow Current PosY : '+ this.positionY)
+            this.positionY = this.props.PosY-this.state.refPos.y        
         }
+        return this.positionY+'px'
     }
 
     headerMouseDown=()=>{   
-        //console.log('header mouse down')
-        //console.log('mouseX : '+this.props.PosX-this.positionX)
-        //console.log('mouseY : '+this.props.PosY-this.positionY)
         this.setState({
+            dragging:true,
             refPos:{
                 x:this.props.PosX-this.positionX,
                 y:this.props.PosY-this.positionY
             }
         })     
-        this.setState({          
-            dragging:true
-        })
     }
+
     headerMouseOver=(e)=>{
         console.log('pointer over header')
         console.log(e.target)
@@ -149,51 +161,151 @@ class ControllerUnitContainer extends Component {
         }
         return zIndexToken
     }
+
+    loadControllerUnit=()=>{
+        let stateArray = this.state.controllerUnitState
+        let unitFront = stateArray.find((unit)=>{
+            return unit.sequenceNumber === 0
+        })
+        switch(unitFront.unitID) {
+            case 1:
+                return(
+                    this.loadDatGui()
+                )
+                
+            case 2:
+                return(
+                   this.loadFrontView()
+                )
+            case 3:
+                return(
+                    this.loadSideView()
+                )
+        }
+    }
+
+    
+
+    loadDatGui=()=>{
+        return(
+        <TestRotationControllerUnit ref={(refDom)=>{this.refDom=refDom}} rotationValue={this.getRotationValue}/>
+        )
+    }
+
+    sendSideViewToggle=(refDom)=>{
+        console.log('ControllerUnitContainer sendFrontViewToggle refDom : ')
+        console.log(refDom)
+        this.props.sideViewToggle(refDom)
+    }
+    
+    loadSideView=()=>{
+        return(
+            <SubSideViewControllerUnit ref={(refDom)=>{this.refDom=refDom}} sideViewToggle={this.sendSideViewToggle}/>
+        )
+    }
+
+    sendFrontViewToggle=(refDom)=>{
+        console.log('ControllerUnitContainer sendFrontViewToggle refDom : ')
+        console.log(refDom)
+        this.props.frontViewToggle(refDom)
+    }
+
+    loadFrontView=()=>{
+        return(
+            <SubFrontViewControllerUnit ref={(refDom)=>{this.refDom=refDom}} frontViewToggle={this.sendFrontViewToggle}/>
+        )
+    }
+
+    loadHeaderTaps=()=>{
+        const tabStyle = {
+            width:'40%',
+            borderTopRightRadius:10,
+            borderRight:'1px solid',
+            borderTop:'1px solid',
+            borderColor:'gray',
+            backgroundColor:'#9FC5E8',
+            padding:'1px'  
+        }
+        let unitStateArray = []
+        this.state.controllerUnitState.map((unitState)=>{
+            if(unitState.sequenceNumber>-1)
+            {
+                unitStateArray.push(unitState)
+            }
+        })
+        unitStateArray.sort(function(a,b){return a.sequenceNumber-b.sequenceNumber})
+        return(unitStateArray.map(unitState=>
+                <div style= {tabStyle} onMouseDown={this.tabMouseDown} onMouseUp={this.tabMouseUP}>
+                    {unitState.title}
+                </div>
+            )
+        )
+    }
+
+    getRotationValue=(value)=>{
+        console.log('ControllerUnitContainer getRotationValue : '+value)
+        this.props.rotationValue(value)
+    }
+
+    loadControllerUnitState=()=>{
+        console.log('ControllerUnitContainer loadControllerUnitState start')
+        console.log('container ID : '+this.props.conID)
+        this.props.controllerUnitState.map(unitState=>{
+            console.log('map start : ')
+            console.log(unitState.containerUnitContainerID)
+            
+            if(unitState.containerUnitContainerID === this.props.conID){
+                console.log('pass if condition first')
+                console.log(this.state.controllerUnitState)
+                this.setState({
+                    controllerUnitState:this.state.controllerUnitState.map(thisUnitState=>{
+                        if( thisUnitState.unitID === unitState.unitID)
+                        {
+                            console.log('pass if condition second')
+                            console.log('before change : '+thisUnitState.sequenceNumber)
+                            thisUnitState.sequenceNumber = thisUnitState.sequenceNumber +1
+                            console.log('after change : '+thisUnitState.sequenceNumber)
+                        }
+                    })
+                })
+            }
+        })
+    }
     
     render() {    
+        
         const containerWindow = {
             width: this.state.divSize.width,
             height:  this.state.divSize.height,
             position:'absolute',
-            top:this.positionY+'px',
-            left:this.positionX+'px',
+            left:this.getContainerPosX(),
+            top:this.getContainerPosY(),
             zIndex:this.headerChangeZIndex(),
             border:'2px solid',
-            borderColor:'black'
+            borderColor:'black',
+            boxSizing:'border-box'
           }
-        
-          const canvasWindow = {
-              width:'100%',
-              height:'100%'
-          }
-
+    
           const headerStyle = {
               width:'100%',
-              height:'20px',
+              height:'25px',
               backgroundColor:this.headerBackgroundColorChangeHandler(),
               borderBottom:'1px solid',
               borderColor:'gray',
               cursor:this.headerCursorChangeHandler(),
-              flexDirection:'row'    
+              flexDirection:'row',
+              paddingTop:'2px',
+              userSelect:'none'    
           }
 
-          const tabStyle = {
-              width:'40%',
-              borderTopRightRadius:10,
-              borderRight:'1px solid',
-              borderColor:'gray',
-              backgroundColor:'#9FC5E8',  
-                
-          }
+          
 
         return (
             <div style={containerWindow} ref={(refContainer) => {this.refContainer = refContainer}}>  
             <div style={headerStyle} onMouseDown={this.headerMouseDown} onMouseUp={this.onMouseUp} onMouseOver={this.headerMouseOver} onMouseOut={this.headerMouseOut}>
-                <div style= {tabStyle} onMouseDown={this.tabMouseDown} onMouseUp={this.tabMouseUP}>
-                    {'test Title'}
-                </div>
-            </div>
-            <div style={canvasWindow} ref={(refDom)=>{this.refDom=refDom}}/> 
+                {this.loadHeaderTaps()}
+            </div>            
+                {this.loadControllerUnit()}         
             </div>
         )
       }

@@ -3,8 +3,6 @@ import * as THREE from 'three';
 import Stats from 'stats.js';
 import orbControls from './OrbitControls';
 import StorageLayer from './ThreeDObjects/StorageLayer';
-//import guiController from './ControllerUnit.js/testGUIController';
-//import * as dat from 'dat.gui';
 import ControllerUnitLayout from './ControllerUnit/ControllerUnitLayout'
 //import ControllerUnitContainer from './ControllerUnit/ControllerUnitContainer'
 
@@ -21,12 +19,8 @@ class ThreeDRender extends Component{
         x:0,
         y:0
       },
-      controllorUnitNumber:3,
-      controllorUnitValus:{
-
-      },
+      rotationValue:0.01,
       
-      tabDragging:false
     }
   }
   
@@ -52,13 +46,17 @@ class ThreeDRender extends Component{
 
     this.renderer2 = new THREE.WebGLRenderer()
     this.renderer2.setClearColor(0xeeeeee, 1.0)
+
+    this.renderer3 = new THREE.WebGLRenderer()
+    this.renderer3.setClearColor(0xeeeeee, 1.0)
     
-    //const width1 = this.subMount2.refDom.clientWidth
-    //const height1 = this.subMount2.refDom.clientHeight-20
-    const width1 = 100
-    const height1 = 100
+    const width1 = this.frontViewRef.clientWidth
+    const height1 = this.frontViewRef.clientHeight-25
+    const width2 = this.sideViewRef.clientWidth
+    const height2 = this.sideViewRef.clientHeight-25
     
     this.renderer2.setSize(width1, height1)
+    this.renderer3.setSize(width2, height2)
 
     this.scene = new THREE.Scene()
     this.camera1 = new THREE.PerspectiveCamera(
@@ -77,9 +75,21 @@ class ThreeDRender extends Component{
       0.1,
       1000
     )
-    this.camera2.position.z =5
+    this.camera2.position.z =10
     this.camera2.position.x =0
-    this.camera2.position.y =0
+    this.camera2.position.y =1
+    this.camera2.lookAt(0,0,0)
+
+    this.camera3 = new THREE.PerspectiveCamera(
+      70,
+      width2 / height2,
+      0.1,
+      1000
+    )
+    this.camera3.position.z =0
+    this.camera3.position.x =-10
+    this.camera3.position.y =1
+    this.camera3.lookAt(0,0,0)
 
     if(this.state.orbitControlMode)
     {
@@ -113,9 +123,10 @@ class ThreeDRender extends Component{
     this.scene.add(this.plane)
 
     this.mount.appendChild(this.renderer1.domElement)
-    //this.subMount2.refDom.appendChild(this.renderer2.domElement)
+    this.frontViewRef.appendChild(this.renderer2.domElement)
+    this.sideViewRef.appendChild(this.renderer3.domElement)
     this.animate()
-    //this.handleResize()
+    this.handleResize()
     //window.addEventListener('resize', this.handleResize)
     
   }
@@ -152,6 +163,13 @@ class ThreeDRender extends Component{
     //this.subMount2.refDom.removeChild(this.renderer2.domElement)
   }
 
+  getFrontViewRef=()=>{
+    if(this.state.frontViewConID !== -1)
+    {
+      this.frontViewRef= this.mountrefControllerUnitLayout
+    }
+  }
+
   deployState = () => {
     this.stats = new Stats()
     this.stats.setMode(0) // FPS mode
@@ -166,7 +184,7 @@ class ThreeDRender extends Component{
   animate = () => {
     
     this.stats.begin();
-    //this.plane.rotation.x += this.guiToken.rotationX
+    this.plane.rotation.x += this.state.rotationValue
  
     let c1Background = new THREE.Color('rgb(255,255,255)')
     this.renderer1.setClearColor(c1Background)
@@ -175,6 +193,10 @@ class ThreeDRender extends Component{
     let c2Background = new THREE.Color('rgb(255,255,255)')
     this.renderer2.setClearColor(c2Background)
     this.renderer2.render(this.scene, this.camera2)
+
+    let c3Background = new THREE.Color('rgb(255,255,255)')
+    this.renderer3.setClearColor(c3Background)
+    this.renderer3.render(this.scene, this.camera3)
 
 
     if(this.state.orbitControlMode)
@@ -199,20 +221,27 @@ class ThreeDRender extends Component{
         }
       })
      
-      //const width1 = this.mount.clientWidth;
-      //const height1 = this.mount.clientHeight;
+      const width1 = this.frontViewRef.clientWidth;
+      const height1 = this.frontViewRef.clientHeight-25;
+
+      const width2 = this.sideViewRef.clientWidth;
+      const height2 = this.sideViewRef.clientHeight-25;
 
       this.renderer1.setSize(this.mount.clientWidth, this.mount.clientHeight);
       this.camera1.aspect = this.mount.clientWidth / this.mount.clientHeight;
 
-      const width2 = 100
-      const height2 = 100
+      //const width2 = 196
+      //const height2 = 176
 
-     this.renderer2.setSize(width2, height2);
-     this.camera2.aspect = width2 / height2;
+     this.renderer2.setSize(width1, height1);
+     this.camera2.aspect = width1 / height1;
+
+     this.renderer3.setSize(width2, height2);
+     this.camera3.aspect = width2 / height2;
 
      this.camera1.updateProjectionMatrix();
      this.camera2.updateProjectionMatrix();
+     this.camera3.updateProjectionMatrix();
    }
 
   threeDLayerMouseDown = (e) => {
@@ -279,19 +308,27 @@ class ThreeDRender extends Component{
     }
   }
 
-  onTabDragging =(msg)=>{
-    if(msg=='true')
-    {
-      this.setState({
-        tabDragging:true
-      })
-    }
-    else
-    {
-      this.setState({
-        tabDragging:false
-      })
-    }
+  getRotationValue=(value)=>{
+    this.setState((prevProps, prevState)=>{
+      if(prevState.rotationValue !== this.state.rotationValue)
+      {
+        this.state.rotationValue=value
+      }
+    })
+  }
+
+  
+
+  getFrontView =(refDom)=>{
+    console.log('ThreeDRender getFrontView refDom :')
+    console.log(refDom)
+    this.frontViewRef = refDom
+  }
+
+  getSideView =(refDom)=>{
+    console.log('ThreeDRender getFrontView refDom :')
+    console.log(refDom)
+    this.sideViewRef = refDom
   }
 
   render(){
@@ -310,7 +347,7 @@ class ThreeDRender extends Component{
         style={myStyle}
         ref={(mount) => { this.mount = mount }}
       >
-        <ControllerUnitLayout ref={(refDom)=>{this.refControllerUnitLayout=refDom}} PosX={this.state.mousePos.x} PosY={this.state.mousePos.y}/> 
+        <ControllerUnitLayout ref={(refDom)=>{this.refControllerUnitLayout=refDom}} PosX={this.state.mousePos.x} PosY={this.state.mousePos.y} rotationValue={this.getRotationValue} frontView={this.getFrontView} sideView={this.getSideView}/> 
       </div>  
     )
     //<ControllerUnitContainer ref={(subMount1)=>{this.subMount1=subMount1}} PosX={this.state.mousePos.x} PosY={this.state.mousePos.y} onTabDragging={this.onTabDragging} tabDraggingBooling={this.state.tabDragging}/>
