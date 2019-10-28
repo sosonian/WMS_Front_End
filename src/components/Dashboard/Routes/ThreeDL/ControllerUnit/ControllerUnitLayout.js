@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ControllerUnitContainer from './ControllerUnitContainer'
+import ShadowContainer from './ShadowContainer'
 
 
 class ControllerUnitLayout extends Component {
@@ -21,7 +22,13 @@ class ControllerUnitLayout extends Component {
                     name:'subViewFromSide',
                     unitID:3,
                     containerUnitContainerID:3,
-                }
+                },
+                {
+                    name:'TestUnit',
+                    unitID:4,
+                    containerUnitContainerID:3,
+                },
+
             ],
             ControllerUnitContainerState:[
                 {
@@ -35,6 +42,7 @@ class ControllerUnitLayout extends Component {
                         left:0,
                         top:0
                     },
+                    zIndex:1,
                     showing:true,
                 },
                 {
@@ -48,6 +56,7 @@ class ControllerUnitLayout extends Component {
                         left:0,
                         top:200
                     },
+                    zIndex:2,
                     showing:true,
                 },
                 {
@@ -61,10 +70,12 @@ class ControllerUnitLayout extends Component {
                         left:0,
                         top:400
                     },
+                    zIndex:3,
                     showing:true,
                 }
             ],
-            tabDragging:false
+            tabDragging:false,
+            shadowContainer:{}
         }
     }
 
@@ -72,17 +83,41 @@ class ControllerUnitLayout extends Component {
 
     }
 
+    appendShadowContainer=()=>{
+        console.log('ControllerUnitLayout appendShadowContainer')
+        if(this.state.tabDragging)
+        {
+            console.log('tab is Dragging !')
+            console.log('width : '+this.state.shadowContainer.width )
+            console.log('height : '+this.state.shadowContainer.height )
+            console.log('x : '+this.props.PosX )
+            console.log('x : '+this.props.PosY )
+            return(
+                <ShadowContainer  width={this.state.shadowContainer.width} height={this.state.shadowContainer.height} posX={this.props.PosX} posY={this.props.PosY} refPosX={this.state.shadowContainer.posX} refPosY={this.state.shadowContainer.posY}/>
+            )
+        }
+        else
+        {
+            console.log('tab is Not Dragging !')
+            return("")
+        }
+    }
+
+
     onTabDragging =(msg)=>{
-        if(msg=='true')
+        if(msg.tabDragging)
         {
           this.setState({
-            tabDragging:true
+            tabDragging:true,
+            shadowContainer:msg
           })
+
         }
         else
         {
           this.setState({
-            tabDragging:false
+            tabDragging:false,
+            shadowContainer:{}
           })
         }
     }
@@ -92,40 +127,127 @@ class ControllerUnitLayout extends Component {
     }
 
     sendFrontViewToggle=(refDom)=>{
-        console.log('ControllerUnitLayout sendFrontViewToggle refDom : ')
-        console.log(refDom)
+        //console.log('ControllerUnitLayout sendFrontViewToggle refDom : ')
+        //console.log(refDom)
         this.props.frontView(refDom)
     }
 
     sendSideViewToggle=(refDom)=>{
-        console.log('ControllerUnitLayout sendSideViewToggle refDom : ')
-        console.log(refDom)
+        //console.log('ControllerUnitLayout sendSideViewToggle refDom : ')
+        //console.log(refDom)
         this.props.sideView(refDom)
     }
+
+    
+
+    controllerUnitToggle=(e)=>{
+        if(e.showing===false)
+        {
+            let containerStateToken =[]
+            this.state.ControllerUnitContainerState.map(containerState=>{
+                let stateObj = containerState
+                if(stateObj.controllerUnitContainerID===e.conID)
+                {
+                    stateObj.showing = false
+                }
+                containerStateToken.push(stateObj)
+            })
+            this.setState({
+                ControllerUnitContainerState:containerStateToken
+            })
+        }
+    }
+
+    getContainerNewWidth=(msg)=>{
+        if(msg.conID ==2)
+        {
+            this.props.frontViewChange(msg.width)
+        }
+        else if(msg.conID ==3)
+        {
+            this.props.sideViewChange(msg.width)
+        }
+    }
+
+    getContainerNewHeight=(msg)=>{
+        if(msg.conID ==2)
+        {
+            this.props.frontViewChange(msg.Height)
+        }
+        else if(msg.conID ==3)
+        {
+            this.props.sideViewChange(msg.Height)
+        }
+    }
+
+    getContainerZIndexUpdate=(msg)=>{
+        let containerStateToken =[]
+        let arrayToken = this.state.ControllerUnitContainerState
+        let stateLength = arrayToken.length
+        this.state.ControllerUnitContainerState.map(containerState=>{
+            let stateObj = containerState
+            if(stateObj.controllerUnitContainerID===msg.conID)
+            {
+                stateObj.zIndex = stateLength
+            }
+            else
+            {
+                if(stateObj.zIndex > msg.zIndex)
+                {
+                    stateObj.zIndex = stateObj.zIndex -1
+                }
+            }
+            containerStateToken.push(stateObj)
+        })
+        this.setState({
+            ControllerUnitContainerState:containerStateToken
+        })
+    }
+
+
 
     createControllerUnitContainer = () => {
         return (
             this.state.ControllerUnitContainerState.map(container=> container.showing?
-                (<ControllerUnitContainer key={container.controllerUnitContainerID} conID={container.controllerUnitContainerID} initialPosX={container.position.left} initialPosY={container.position.top} PosX={this.props.PosX} PosY={this.props.PosY} controllerUnitState={this.state.controllerUnitState} rotationValue={this.sendRotationValueBack} frontViewToggle={this.sendFrontViewToggle} sideViewToggle={this.sendSideViewToggle} onTabDragging={this.onTabDragging} tabDraggingBooling={this.state.tabDragging}/>):null
+                (<ControllerUnitContainer key={container.controllerUnitContainerID} conID={container.controllerUnitContainerID} initialPosX={container.position.left} initialPosY={container.position.top} PosX={this.props.PosX} PosY={this.props.PosY} controllerUnitState={this.state.controllerUnitState} rotationValue={this.sendRotationValueBack} frontViewToggle={this.sendFrontViewToggle} sideViewToggle={this.sendSideViewToggle} containerExtendX={this.getContainerNewWidth} containerExtendY={this.getContainerNewHeight} onTabDragging={this.onTabDragging} tabDraggingBooling={this.state.tabDragging} containerShowing={this.controllerUnitToggle} zIndex={container.zIndex} getContainerZIndexUpdate={this.getContainerZIndexUpdate}/>):null
             )
         )
+    }
+
+    onMouseUp=()=>{
+        console.log('ControllerUnitLayout tabDragging complete !!')
+        this.setState({
+            tabDragging:false,
+            shadowContainer:{}
+        })
+    }
+    
+    changeCursorWhenTabDragging=()=>{
+        let cursor = 'default'
+        if(this.state.tabDragging)
+        {
+            cursor = 'grabbing'
+        }
+        return cursor
     }
 
 
 
     render(){
-        console.log('ControllerUnitLayout render :')
+        //console.log('ControllerUnitLayout render :')
         const containerStyle = {
             width: '100%',
             height: '100%',
             position:'absolute',
             top:'0px',
-            left:'0px'
+            left:'0px',
+            cursor:this.changeCursorWhenTabDragging()
         }
 
         return(
-            <div style={containerStyle}> 
+            <div style={containerStyle}  ref={(refLayout)=>{this.refLayout=refLayout}} onMouseUp={this.onMouseUp}> 
                 {this.createControllerUnitContainer()}
+                {this.appendShadowContainer()}
             </div>
         )
     }

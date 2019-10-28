@@ -19,6 +19,10 @@ class ThreeDRender extends Component{
         x:0,
         y:0
       },
+      offset:{
+        top:0,
+        left:0
+      },
       rotationValue:0.01,
       
     }
@@ -38,6 +42,10 @@ class ThreeDRender extends Component{
        canvasSize:{
          width:this.mount.clientWidth,
          height:this.mount.clientHeight
+       },
+       offset:{
+         top:this.rect.top,
+         left:this.rect.left
        }
     })
     //const width = this.mount.clientWidth
@@ -218,6 +226,10 @@ class ThreeDRender extends Component{
         canvasSize:{
           width:this.props.containerSize.width,
           height:this.props.containerSize.height
+        },
+        offset:{
+          top:this.rect.top,
+          left:this.rect.left
         }
       })
      
@@ -317,17 +329,29 @@ class ThreeDRender extends Component{
     })
   }
 
-  
+  frontViewChange = (msg) =>{
+    const width = this.frontViewRef.clientWidth;
+    const height = this.frontViewRef.clientHeight-25;
+    this.renderer2.setSize(width, height);
+    this.camera2.aspect = width / height;
+  }
+
+  sideViewChange = (msg) =>{
+    const width = this.sideViewRef.clientWidth;
+    const height = this.sideViewRef.clientHeight-25;
+    this.renderer3.setSize(width, height);
+    this.camera3.aspect = width / height;
+  }
 
   getFrontView =(refDom)=>{
-    console.log('ThreeDRender getFrontView refDom :')
-    console.log(refDom)
+    //console.log('ThreeDRender getFrontView refDom :')
+    //console.log(refDom)
     this.frontViewRef = refDom
   }
 
   getSideView =(refDom)=>{
-    console.log('ThreeDRender getFrontView refDom :')
-    console.log(refDom)
+    //console.log('ThreeDRender getFrontView refDom :')
+    //console.log(refDom)
     this.sideViewRef = refDom
   }
 
@@ -347,11 +371,9 @@ class ThreeDRender extends Component{
         style={myStyle}
         ref={(mount) => { this.mount = mount }}
       >
-        <ControllerUnitLayout ref={(refDom)=>{this.refControllerUnitLayout=refDom}} PosX={this.state.mousePos.x} PosY={this.state.mousePos.y} rotationValue={this.getRotationValue} frontView={this.getFrontView} sideView={this.getSideView}/> 
+        <ControllerUnitLayout ref={(refDom)=>{this.refControllerUnitLayout=refDom}} PosX={this.state.mousePos.x} PosY={this.state.mousePos.y} rotationValue={this.getRotationValue} frontView={this.getFrontView} sideView={this.getSideView}offset={this.state.offset} frontViewChange={this.frontViewChange} sideViewChange={this.sideViewChange}/> 
       </div>  
     )
-    //<ControllerUnitContainer ref={(subMount1)=>{this.subMount1=subMount1}} PosX={this.state.mousePos.x} PosY={this.state.mousePos.y} onTabDragging={this.onTabDragging} tabDraggingBooling={this.state.tabDragging}/>
-    //<ControllerUnitContainer ref={(subMount2)=>{this.subMount2=subMount2}} PosX={this.state.mousePos.x} PosY={this.state.mousePos.y} onTabDragging={this.onTabDragging} tabDraggingBooling={this.state.tabDragging}/>
   }
 }
 export default ThreeDRender

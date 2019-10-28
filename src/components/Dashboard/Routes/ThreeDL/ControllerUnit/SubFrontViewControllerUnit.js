@@ -11,11 +11,11 @@ class SubFrontViewControllerUnit extends Component{
     componentDidMount(){
     }
 
-    sendFrontViewToggle=()=>{
-        console.log('SubViewControllerUnits sendFrontViewToggle refDom : ')
-        console.log(this.refDom)
-        this.props.frontViewToggle(this.refDom)
-    }
+    // sendFrontViewToggle=()=>{
+    //     //console.log('SubViewControllerUnits sendFrontViewToggle refDom : ')
+    //     //console.log(this.refDom)
+    //     this.props.frontViewToggle(this.refDom)
+    // }
 
     render() {
         //this.sendFrontViewToggle()
