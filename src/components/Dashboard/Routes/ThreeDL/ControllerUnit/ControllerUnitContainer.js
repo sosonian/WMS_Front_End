@@ -239,6 +239,7 @@ class ControllerUnitContainer extends Component {
         let tabDraggingMsg={
             unitID:msg.unitID,
             tabDom:msg.refDom,
+            tabTitle:msg.tabTitle,
             posX:this.props.PosX-this.positionX,
             posY:this.props.PosY-this.positionY,
             width:this.state.divSize.width,
@@ -306,9 +307,7 @@ class ControllerUnitContainer extends Component {
     }
 
     loadControllerUnit=()=>{
-        //console.log('ControllerUnitContainer loadControllerUnit conID ',this.props.conID)
-        //console.log('state controllerUnitState before')
-        //console.log(this.state.controllerUnitState)
+
         let stateArray = this.state.controllerUnitState
         let unitFront = stateArray.find((unit)=>{
             return unit.sequenceNumber === 0
@@ -316,7 +315,6 @@ class ControllerUnitContainer extends Component {
         
         if(unitFront==undefined)
         {
-            //console.log('unitFront is undefined')
         }
         else
         {
@@ -344,8 +342,6 @@ class ControllerUnitContainer extends Component {
     }
 
     sendSideViewToggle=(refDom)=>{
-        //console.log('ControllerUnitContainer sendFrontViewToggle refDom : ')
-        //console.log(refDom)
         this.props.sideViewToggle(refDom)
     }
     
@@ -356,8 +352,6 @@ class ControllerUnitContainer extends Component {
     }
 
     sendFrontViewToggle=(refDom)=>{
-        //console.log('ControllerUnitContainer sendFrontViewToggle refDom : ')
-        //console.log(refDom)
         this.props.frontViewToggle(refDom)
     }
 
@@ -368,14 +362,12 @@ class ControllerUnitContainer extends Component {
     }
 
     loadHeaderTaps=()=>{
-        //console.log('ControllerUnitContainer loadHeaderTaps conID ',this.props.conID)
-        //console.log('controllerUnitState before')
-        //console.log(this.state.controllerUnitState)
+
         let unitStateArray = []
         this.state.controllerUnitState.map((unitState)=>{
             if(unitState==undefined)
             {
-                //console.log('unitState undefined!')
+
             }
             else
             {
@@ -385,8 +377,7 @@ class ControllerUnitContainer extends Component {
                 }
             }
         })
-        //console.log('controllerUnitState after')
-        //console.log(this.state.controllerUnitState)
+ 
         unitStateArray.sort(function(a,b){return a.sequenceNumber-b.sequenceNumber})
         return(unitStateArray.map(unitState=>
                 <ControllerUnitContainerTab unitID={unitState.unitID} tabTitle={unitState.title} tabDragging={this.getTabDraggingMsg} />
@@ -403,6 +394,7 @@ class ControllerUnitContainer extends Component {
     }
 
     extendAreaMouseDown=(e)=>{
+        console.log('extendArea mouse down')
         e.stopPropagation()
         this.setState({
             refPos:{
@@ -418,35 +410,11 @@ class ControllerUnitContainer extends Component {
         this.sendContainerZIndexUpdate()
     }
 
-    // extendAreaMouseMove=()=>{
-    //     //e.stopPropagation()
-    //     console.log('ControllerUnitContainer extendAreaMouseMove !')
-    //     if(this.state.extending)
-    //     {
-    //         console.log('X ',this.props.PosX)
-    //         console.log('Y ', this.props.PosY)
-    //         this.setState({
-    //             divSize:{
-    //                 width:this.state.divSize.width+(this.props.PosX-this.state.refPos.x),
-    //                 height:this.state.divSize.height+(this.props.PosY-this.state.refPos.y)
-    //             }
-    //         })
-    //     }
-    //     else{
-    //         console.log('container is not extending!')
-    //     }
-    // }
-
-    
-
     extendAreaMouseUp=(e)=>{
         e.stopPropagation()
-        //console.log('extendAreaMouseUp !')
+
         let width = this.state.refDivSize.width+(this.props.PosX-this.state.refPos.x)
         let height = this.state.refDivSize.height+(this.props.PosY-this.state.refPos.y)
-
-        //console.log('extendAreaMouseUp ref width ',width)
-        //console.log('extendAreaMouseUp ref height ',height)
 
         this.setState({
             divSize:{
@@ -478,11 +446,9 @@ class ControllerUnitContainer extends Component {
 
     onMouseOut=(e)=>{
         e.stopPropagation()
-        //console.log('onMouseOut test!')
     }
 
     render() {    
-        //console.log('ControllerUnitContainer render conID ',this.props.conID)
         
         const containerWindow = {
             width:this.state.divSize.width,

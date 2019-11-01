@@ -109,14 +109,13 @@ class ThreeDRender extends Component{
     this.setSideView()
     this.animate()
     this.handleResize()
-    //window.addEventListener('resize', this.handleResize)
+  
     
   }
 
   componentDidUpdate(preProps, preState){
-    console.log('ThreeDRender componentDidUpdate')
+    //console.log('ThreeDRender componentDidUpdate')
     
-    //if(preState !== this.state)
     this.updateFrontView()
     if(this.state.orbitControlMode)
     {
@@ -136,7 +135,7 @@ class ThreeDRender extends Component{
         this.cameraControl.enabled = false
       }
     }
-    if((preProps.containerSize !== this.props.containerSize)||(preState.frontViewSize !== this.state.frontViewSize))
+    if((preProps.containerSize !== this.props.containerSize))
     {
       this.handleResize()
     }
@@ -168,8 +167,7 @@ class ThreeDRender extends Component{
   }
   
   updateFrontView=()=>{
-    console.log('ThreeDRender updateFrontView')
-    console.log(this.renderer2)
+
     if(this.state.frontViewShow)
     {
       const width = this.state.frontViewSize.width
@@ -195,8 +193,6 @@ class ThreeDRender extends Component{
   }
 
   updateSideView=()=>{
-    console.log('ThreeDRender updateSideView')
-    console.log(this.renderer3)
     if(this.state.sideViewShow)
     {
       const width = this.state.sideViewSize.width
@@ -206,10 +202,29 @@ class ThreeDRender extends Component{
     }
   }
 
-  getFrontViewRef=()=>{
-    if(this.state.frontViewConID !== -1)
+  getFrontView =(refDom)=>{
+    if(refDom==undefined)
     {
-      this.frontViewRef= this.mountrefControllerUnitLayout
+      this.setState({frontViewShow:false})
+    }
+    else
+    {
+      this.setState({frontViewShow:true})
+      this.frontViewRef = refDom
+    }
+  }
+
+  
+
+  getSideView =(refDom)=>{
+    if(refDom==undefined)
+    {
+      this.setState({sideViewShow:false})
+    }
+    else
+    {
+      this.setState({sideViewShow:true})
+      this.sideViewRef = refDom
     }
   }
 
@@ -287,6 +302,7 @@ class ThreeDRender extends Component{
    }
 
   threeDLayerMouseDown = (e) => {
+    console.log('Mouse Down')
     if(this.cameraControl !== undefined)
     {
     }
@@ -323,6 +339,7 @@ class ThreeDRender extends Component{
   }
 
   ThreeDLayerMouseMove = (e) => {
+    console.log('rect : ', this.rect)
     if(e.altKey)
     {   
       this.setState({
@@ -391,19 +408,7 @@ class ThreeDRender extends Component{
     }
   }
 
-  getSideView =(refDom)=>{
-    //console.log('ThreeDRender getFrontView refDom :')
-    //console.log(refDom)
-    if(refDom==undefined)
-    {
-      this.setState({sideViewShow:false})
-    }
-    else
-    {
-      this.setState({sideViewShow:true})
-      this.sideViewRef = refDom
-    }
-  }
+
 
   render(){
   //  console.log('ThreeDRender render')

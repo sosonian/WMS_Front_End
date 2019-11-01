@@ -10,22 +10,18 @@ class ControllerUnitLayout extends Component {
         this.state = {
             controllerUnitState:[
                 {
-                    name:'datGui',
                     unitID:1,
                     containerUnitContainerID:1,
                 },
                 {
-                    name:'subViewFromFront',
                     unitID:2,
                     containerUnitContainerID:2,
                 },
                 {
-                    name:'subViewFromSide',
                     unitID:3,
                     containerUnitContainerID:3,
                 },
                 {
-                    name:'TestUnit',
                     unitID:4,
                     containerUnitContainerID:3,
                 },
@@ -87,16 +83,10 @@ class ControllerUnitLayout extends Component {
     }
 
     appendShadowContainer=()=>{
-        //console.log('ControllerUnitLayout appendShadowContainer')
         if(this.state.tabDragging)
         {
-            //console.log('tab is Dragging !')
-            //console.log('width : '+this.state.shadowContainer.width )
-            //console.log('height : '+this.state.shadowContainer.height )
-            //console.log('x : '+this.props.PosX )
-            //console.log('x : '+this.props.PosY )
             return(
-                <ShadowContainer  width={this.state.shadowContainer.width} height={this.state.shadowContainer.height} posX={this.props.PosX} posY={this.props.PosY} refPosX={this.state.shadowContainer.posX} refPosY={this.state.shadowContainer.posY}/>
+                <ShadowContainer  width={this.state.shadowContainer.width} height={this.state.shadowContainer.height} posX={this.props.PosX} posY={this.props.PosY} refPosX={this.state.shadowContainer.posX} refPosY={this.state.shadowContainer.posY} tabTitle={this.state.shadowContainer.tabTitle}/>
             )
         }
         else
@@ -130,14 +120,12 @@ class ControllerUnitLayout extends Component {
     }
 
     sendFrontViewToggle=(refDom)=>{
-        //console.log('ControllerUnitLayout sendFrontViewToggle refDom : ')
-        //console.log(refDom)
+
         this.props.frontView(refDom)
     }
 
     sendSideViewToggle=(refDom)=>{
-        //console.log('ControllerUnitLayout sendSideViewToggle refDom : ')
-        //console.log(refDom)
+
         this.props.sideView(refDom)
     }
 

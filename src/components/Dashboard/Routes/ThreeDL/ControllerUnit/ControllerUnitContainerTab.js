@@ -15,7 +15,7 @@ class ControllerUnitContainerTab extends Component{
         e.stopPropagation()
         let tabMsg = {
             unitID:this.props.unitID,
-
+            tabTitle:this.props.tabTitle,
             refDom:this.refDom,
             tabDragging:true
         }
@@ -35,7 +35,7 @@ class ControllerUnitContainerTab extends Component{
     render() {
         //this.sendFrontViewToggle()
         const tapStyle = {
-            width:'50px',
+            //width:'50px',
             borderTopRightRadius:10,
             borderRight:'1px solid',
             borderLeft:'1px solid',
