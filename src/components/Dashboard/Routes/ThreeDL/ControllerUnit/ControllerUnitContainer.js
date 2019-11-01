@@ -3,6 +3,7 @@ import ControllerUnitContainerTab from './ControllerUnitContainerTab'
 import TestRotationControllerUnit from './TestRotationControllerUnit'
 import SubFrontViewControllerUnit from './SubFrontViewControllerUnit'
 import SubSideViewControllerUnit from './SubSideViewControllerUnit'
+import TestControllerUnit from './TestControllerUnit'
 
 
 class ControllerUnitContainer extends Component {
@@ -31,24 +32,28 @@ class ControllerUnitContainer extends Component {
                     name:'DatGui',
                     title:'旋轉控制',
                     sequenceNumber:-1,
+                    showing:false
                 },
                 {
                     unitID:2,
                     name:'SubViewFront',
                     title:'前視圖',
                     sequenceNumber:-1,
+                    showing:false
                 },
                 {
                     unitID:3,
                     name:'SubViewFront',
                     title:'側視圖',
                     sequenceNumber:-1,
+                    showing:false
                 },
                 {
                     unitID:4,
                     name:'TestUnit',
                     title:'測試控制',
                     sequenceNumber:-1,
+                    showing:false
                 }
             ],
             containerDragging:false,
@@ -63,8 +68,6 @@ class ControllerUnitContainer extends Component {
 
 
     componentDidMount() {
-        //console.log('ControllerUnitContainer componentDidMount conID ', this.props.conID)
-        //console.log('state controllerUnitState')
         this.loadControllerUnitState()
         this.loadContainerPosition()
 
@@ -113,8 +116,6 @@ class ControllerUnitContainer extends Component {
     }
 
     loadControllerUnitState=()=>{
-        //console.log('ControllerUnitContainer loadControllerUnitState conID ', this.props.conID)
-
         let tempControllerUnitState = this.state.controllerUnitState
         let tempControllerUnitStateProps = this.props.controllerUnitStateProps
 
@@ -131,7 +132,8 @@ class ControllerUnitContainer extends Component {
                     unitID:unitState.unitID,
                     name:unitState.name,
                     title:unitState.title,
-                    sequenceNumber:unitState.sequenceNumber+ sequenceCount,       
+                    sequenceNumber:unitState.sequenceNumber+ sequenceCount,
+                    showing:unitState.showing       
                 }
                 return unitStateObj
             }
@@ -229,7 +231,6 @@ class ControllerUnitContainer extends Component {
     }
 
     headerMouseOut=()=>{
-        
         this.setState({
             headerMergeSingnal:false
         })
@@ -246,6 +247,41 @@ class ControllerUnitContainer extends Component {
             height:this.state.divSize.height,
             tabDragging:msg.tabDragging
         }
+
+        let tempControllerUnitState = this.state.controllerUnitState
+        let output = tempControllerUnitState.map((unitState=>{  
+            let unitStateObj ={} 
+            if(unitState.unitID === msg.unitID)
+            {
+                unitStateObj = {
+                    unitID:unitState.unitID,
+                    name:unitState.name,
+                    title:unitState.title,
+                    sequenceNumber:unitState.sequenceNumber,
+                    showing:true    
+                }
+                return unitStateObj
+            }
+            else
+            {
+                unitStateObj = {
+                    unitID:unitState.unitID,
+                    name:unitState.name,
+                    title:unitState.title,
+                    sequenceNumber:unitState.sequenceNumber,
+                    showing:false   
+                }
+                return unitStateObj
+            }
+        }))
+        
+        if(this.state.controllerUnitState !== output)
+        {
+            this.setState({
+                controllerUnitState : output
+            })
+        }
+///////////////////////////////////////////////////////////////////////////////        
         if(msg.tabDragging)
         {
             this.setState({
@@ -310,11 +346,37 @@ class ControllerUnitContainer extends Component {
 
         let stateArray = this.state.controllerUnitState
         let unitFront = stateArray.find((unit)=>{
-            return unit.sequenceNumber === 0
+            return unit.showing == true
         })
         
         if(unitFront==undefined)
         {
+            console.log('unitFront not found!')
+            let unitFront2 = stateArray.find((unit)=>{
+                return unit.sequenceNumber == 0
+            })
+
+            if(unitFront2 !== undefined)
+            {
+            switch(unitFront2.unitID) {
+                case 1:
+                    return(
+                        this.loadDatGui()
+                    )
+                case 2:
+                    return(
+                       this.loadFrontView()
+                    )
+                case 3:
+                    return(
+                        this.loadSideView()
+                    )
+                case 4:
+                    return(
+                        this.loadTestUnit()
+                    )
+            }
+            }
         }
         else
         {
@@ -331,8 +393,18 @@ class ControllerUnitContainer extends Component {
                     return(
                         this.loadSideView()
                     )
+                case 4:
+                    return(
+                        this.loadTestUnit()
+                    )
             }
         }
+    }
+
+    loadTestUnit=()=>{
+        return(
+            <TestControllerUnit />
+        )
     }
 
     loadDatGui=()=>{
