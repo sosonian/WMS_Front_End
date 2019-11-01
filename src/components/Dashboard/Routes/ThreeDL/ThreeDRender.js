@@ -4,7 +4,6 @@ import Stats from 'stats.js';
 import orbControls from './OrbitControls';
 import StorageLayer from './ThreeDObjects/StorageLayer';
 import ControllerUnitLayout from './ControllerUnit/ControllerUnitLayout'
-//import ControllerUnitContainer from './ControllerUnit/ControllerUnitContainer'
 
 class ThreeDRender extends Component{
   constructor(props) {
@@ -23,14 +22,23 @@ class ThreeDRender extends Component{
         top:0,
         left:0
       },
-      rotationValue:0.01,
-      
+      frontViewShow:false,
+      frontViewSize:{
+        width:200-4,
+        height:200-29
+      },
+      sideViewShow:false,
+      sideViewSize:{
+        width:200-4,
+        height:200-29
+      },
+      rotationValue:0.01,      
     }
+    //console.log('ThreeDRender constructor')
   }
   
   componentDidMount(){
-  //  console.log('ThreeDRender componentDidMount !')
-    //console.log(this.props.containerSize)
+    //console.log('ThreeDRender componentDidMount')
 
     this.deployState();
 
@@ -48,24 +56,7 @@ class ThreeDRender extends Component{
          left:this.rect.left
        }
     })
-    //const width = this.mount.clientWidth
-    //const height = this.mount.clientHeight
     this.renderer1.setSize(this.mount.clientWidth, this.mount.clientHeight)
-
-    this.renderer2 = new THREE.WebGLRenderer()
-    this.renderer2.setClearColor(0xeeeeee, 1.0)
-
-    this.renderer3 = new THREE.WebGLRenderer()
-    this.renderer3.setClearColor(0xeeeeee, 1.0)
-    
-    const width1 = this.frontViewRef.clientWidth
-    const height1 = this.frontViewRef.clientHeight-25
-    const width2 = this.sideViewRef.clientWidth
-    const height2 = this.sideViewRef.clientHeight-25
-    
-    this.renderer2.setSize(width1, height1)
-    this.renderer3.setSize(width2, height2)
-
     this.scene = new THREE.Scene()
     this.camera1 = new THREE.PerspectiveCamera(
       100,
@@ -77,27 +68,9 @@ class ThreeDRender extends Component{
     this.camera1.position.x =0
     this.camera1.position.y =1
 
-    this.camera2 = new THREE.PerspectiveCamera(
-      70,
-      width1 / height1,
-      0.1,
-      1000
-    )
-    this.camera2.position.z =10
-    this.camera2.position.x =0
-    this.camera2.position.y =1
-    this.camera2.lookAt(0,0,0)
+    
 
-    this.camera3 = new THREE.PerspectiveCamera(
-      70,
-      width2 / height2,
-      0.1,
-      1000
-    )
-    this.camera3.position.z =0
-    this.camera3.position.x =-10
-    this.camera3.position.y =1
-    this.camera3.lookAt(0,0,0)
+    
 
     if(this.state.orbitControlMode)
     {
@@ -131,8 +104,9 @@ class ThreeDRender extends Component{
     this.scene.add(this.plane)
 
     this.mount.appendChild(this.renderer1.domElement)
-    this.frontViewRef.appendChild(this.renderer2.domElement)
-    this.sideViewRef.appendChild(this.renderer3.domElement)
+    
+    this.setFrontView()
+    this.setSideView()
     this.animate()
     this.handleResize()
     //window.addEventListener('resize', this.handleResize)
@@ -140,7 +114,10 @@ class ThreeDRender extends Component{
   }
 
   componentDidUpdate(preProps, preState){
+    console.log('ThreeDRender componentDidUpdate')
+    
     //if(preState !== this.state)
+    this.updateFrontView()
     if(this.state.orbitControlMode)
     {
       if(this.cameraControl !== undefined)
@@ -159,16 +136,74 @@ class ThreeDRender extends Component{
         this.cameraControl.enabled = false
       }
     }
-    if(preProps.containerSize !== this.props.containerSize)
+    if((preProps.containerSize !== this.props.containerSize)||(preState.frontViewSize !== this.state.frontViewSize))
     {
       this.handleResize()
     }
+    
+    this.updateFrontView()
+    this.updateSideView()
+
   }
 
   componentWillUnmount() {
     cancelAnimationFrame(this.refPP)
     //this.mount.removeChild(this.renderer1.domElement)
     //this.subMount2.refDom.removeChild(this.renderer2.domElement)
+  }
+
+  setFrontView=()=>{
+      this.camera2 = new THREE.PerspectiveCamera(
+        70,
+        200 / 200,
+        0.1,
+        1000
+      )
+      this.camera2.position.z =10
+      this.camera2.position.x =0
+      this.camera2.position.y =1
+      this.camera2.lookAt(0,0,0)
+      this.renderer2 = new THREE.WebGLRenderer()
+      this.renderer2.setClearColor(0xeeeeee, 1.0) 
+  }
+  
+  updateFrontView=()=>{
+    console.log('ThreeDRender updateFrontView')
+    console.log(this.renderer2)
+    if(this.state.frontViewShow)
+    {
+      const width = this.state.frontViewSize.width
+      const height = this.state.frontViewSize.height
+      this.renderer2.setSize(width, height)
+      this.frontViewRef.appendChild(this.renderer2.domElement)
+    }
+  }
+
+  setSideView=()=>{
+      this.camera3 = new THREE.PerspectiveCamera(
+        70,
+        200 / 200,
+        0.1,
+        1000
+      )
+      this.camera3.position.z =0
+      this.camera3.position.x =-10
+      this.camera3.position.y =1
+      this.camera3.lookAt(0,0,0)
+      this.renderer3 = new THREE.WebGLRenderer()
+      this.renderer3.setClearColor(0xeeeeee, 1.0)
+  }
+
+  updateSideView=()=>{
+    console.log('ThreeDRender updateSideView')
+    console.log(this.renderer3)
+    if(this.state.sideViewShow)
+    {
+      const width = this.state.sideViewSize.width
+      const height = this.state.sideViewSize.height
+      this.renderer3.setSize(width, height)
+      this.sideViewRef.appendChild(this.renderer3.domElement)
+    }
   }
 
   getFrontViewRef=()=>{
@@ -198,15 +233,20 @@ class ThreeDRender extends Component{
     this.renderer1.setClearColor(c1Background)
     this.renderer1.render(this.scene, this.camera1)
 
-    let c2Background = new THREE.Color('rgb(255,255,255)')
-    this.renderer2.setClearColor(c2Background)
-    this.renderer2.render(this.scene, this.camera2)
+    if(this.state.frontViewShow && (this.renderer2 !== undefined))
+    {
+      let c2Background = new THREE.Color('rgb(255,255,255)')
+      this.renderer2.setClearColor(c2Background)
+      this.renderer2.render(this.scene, this.camera2)
+    }
 
-    let c3Background = new THREE.Color('rgb(255,255,255)')
-    this.renderer3.setClearColor(c3Background)
-    this.renderer3.render(this.scene, this.camera3)
-
-
+    if(this.state.sideViewShow && (this.renderer3 !== undefined))
+    {
+      let c3Background = new THREE.Color('rgb(255,255,255)')
+      this.renderer3.setClearColor(c3Background)
+      this.renderer3.render(this.scene, this.camera3)
+    }
+    
     if(this.state.orbitControlMode)
     {
       if(this.cameraControl !== undefined)
@@ -221,39 +261,29 @@ class ThreeDRender extends Component{
   }
 
   handleResize = () => {
+    //console.log('ThreeDRender handleResize')
     this.rect = this.mount.getBoundingClientRect()
-      this.setState({
-        canvasSize:{
-          width:this.props.containerSize.width,
-          height:this.props.containerSize.height
-        },
-        offset:{
-          top:this.rect.top,
-          left:this.rect.left
-        }
-      })
+    this.renderer1.setSize(this.mount.clientWidth, this.mount.clientHeight);
+    this.camera1.aspect = this.mount.clientWidth / this.mount.clientHeight;
+    this.camera1.updateProjectionMatrix();
+
+     if(this.state.frontViewShow  && (this.renderer2 !== undefined))
+     {
+        const width1 = this.state.frontViewSize.width;
+        const height1 = this.state.frontViewSize.height;
+        this.renderer2.setSize(width1, height1);
+        this.camera2.aspect = width1 / height1;
+        this.camera2.updateProjectionMatrix();
+     }
      
-      const width1 = this.frontViewRef.clientWidth;
-      const height1 = this.frontViewRef.clientHeight-25;
-
-      const width2 = this.sideViewRef.clientWidth;
-      const height2 = this.sideViewRef.clientHeight-25;
-
-      this.renderer1.setSize(this.mount.clientWidth, this.mount.clientHeight);
-      this.camera1.aspect = this.mount.clientWidth / this.mount.clientHeight;
-
-      //const width2 = 196
-      //const height2 = 176
-
-     this.renderer2.setSize(width1, height1);
-     this.camera2.aspect = width1 / height1;
-
-     this.renderer3.setSize(width2, height2);
-     this.camera3.aspect = width2 / height2;
-
-     this.camera1.updateProjectionMatrix();
-     this.camera2.updateProjectionMatrix();
-     this.camera3.updateProjectionMatrix();
+     if(this.state.sideViewShow && (this.renderer3 !== undefined))
+     {
+        const width2 = this.sideViewRef.clientWidth;
+        const height2 = this.sideViewRef.clientHeight;
+        this.renderer3.setSize(width2, height2);
+        this.camera3.aspect = width2 / height2;
+        this.camera3.updateProjectionMatrix();
+     }
    }
 
   threeDLayerMouseDown = (e) => {
@@ -272,7 +302,7 @@ class ThreeDRender extends Component{
     {
       const rayCaster = new THREE.Raycaster()
       const mouseToken = new THREE.Vector2()
-      //let rect = this.mount.getBoundingClientRect()
+      let rect = this.mount.getBoundingClientRect()
       mouseToken.x = ((e.clientX-this.rect.left)/this.mount.clientWidth)*2-1
       mouseToken.y = -((e.clientY-this.rect.top)/this.mount.clientHeight)*2+1
       rayCaster.setFromCamera(mouseToken, this.camera1)
@@ -289,12 +319,6 @@ class ThreeDRender extends Component{
   }
 
   threeDLayerMouseUp = (e) => {
-    if(this.cameraControl !== undefined)
-    {
-    }
-    else
-    {
-    }
     this.setState({orbitControlMode : false})
   }
 
@@ -329,34 +353,60 @@ class ThreeDRender extends Component{
     })
   }
 
-  frontViewChange = (msg) =>{
-    const width = this.frontViewRef.clientWidth;
-    const height = this.frontViewRef.clientHeight-25;
-    this.renderer2.setSize(width, height);
-    this.camera2.aspect = width / height;
+  frontViewSizeChange = (msg) =>{
+    if((this.state.frontViewSize.width !==msg.width-4)||(this.state.frontViewSize.height !==msg.height-29))
+    {
+      this.setState({
+      frontViewSize:{
+        width:msg.width-4,
+        height:msg.height-29
+      }
+      })
+    }
   }
 
-  sideViewChange = (msg) =>{
-    const width = this.sideViewRef.clientWidth;
-    const height = this.sideViewRef.clientHeight-25;
-    this.renderer3.setSize(width, height);
-    this.camera3.aspect = width / height;
+  sideViewSizeChange = (msg) =>{
+    if((this.state.sideViewSize.width !==msg.width-4)||(this.state.sideViewSize.height !==msg.height-29))
+    {
+      this.setState({
+      sideViewSize:{
+        width:msg.width-4,
+        height:msg.height-29
+      }
+      })
+    }
   }
 
   getFrontView =(refDom)=>{
     //console.log('ThreeDRender getFrontView refDom :')
     //console.log(refDom)
-    this.frontViewRef = refDom
+    if(refDom==undefined)
+    {
+      this.setState({frontViewShow:false})
+    }
+    else
+    {
+      this.setState({frontViewShow:true})
+      this.frontViewRef = refDom
+    }
   }
 
   getSideView =(refDom)=>{
     //console.log('ThreeDRender getFrontView refDom :')
     //console.log(refDom)
-    this.sideViewRef = refDom
+    if(refDom==undefined)
+    {
+      this.setState({sideViewShow:false})
+    }
+    else
+    {
+      this.setState({sideViewShow:true})
+      this.sideViewRef = refDom
+    }
   }
 
   render(){
-    const sizeProps = this.props.containerSize
+  //  console.log('ThreeDRender render')
   //  console.log('ThreeDRender render receive sizeProps :')
   //  console.log(sizeProps)
     const myStyle = {
@@ -371,7 +421,7 @@ class ThreeDRender extends Component{
         style={myStyle}
         ref={(mount) => { this.mount = mount }}
       >
-        <ControllerUnitLayout ref={(refDom)=>{this.refControllerUnitLayout=refDom}} PosX={this.state.mousePos.x} PosY={this.state.mousePos.y} rotationValue={this.getRotationValue} frontView={this.getFrontView} sideView={this.getSideView}offset={this.state.offset} frontViewChange={this.frontViewChange} sideViewChange={this.sideViewChange}/> 
+        <ControllerUnitLayout ref={(refDom)=>{this.refControllerUnitLayout=refDom}} PosX={this.state.mousePos.x} PosY={this.state.mousePos.y} rotationValue={this.getRotationValue} frontView={this.getFrontView} sideView={this.getSideView}offset={this.state.offset} frontViewSizeChange={this.frontViewSizeChange}  sideViewSizeChange={this.sideViewSizeChange}/> 
       </div>  
     )
   }

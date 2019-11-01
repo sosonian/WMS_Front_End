@@ -17,6 +17,12 @@ class SubFrontViewControllerUnit extends Component{
     //     this.props.frontViewToggle(this.refDom)
     // }
 
+    getHeight=()=>{
+        return(
+            this.props.height
+        )
+    }
+
     render() {
         //this.sendFrontViewToggle()
         const canvasWindow = {

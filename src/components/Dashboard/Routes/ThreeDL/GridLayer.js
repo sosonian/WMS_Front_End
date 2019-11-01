@@ -11,7 +11,8 @@ class GridLayer extends Component {
     super(props)
     this.state = {
       changeCount : 0,
-      static : JSON.parse(localStorage.getItem('WMSLayoutSetting')).map(x=>x.static),
+      static:this.getStatic(),
+      //static : JSON.parse(localStorage.getItem('WMSLayoutSetting')).map(x=>x.static),
       fullScreen:-1,
       layoutc: 
       JSON.parse(localStorage.getItem('WMSLayoutSetting'))|| 
@@ -26,6 +27,21 @@ class GridLayer extends Component {
       }
     }
     this.refGridLayout = React.createRef()
+  }
+
+  getStatic=()=>{
+    console.log('GridLayer getStatic')
+    let staticArray=[]
+    let staticStoreObj = localStorage.getItem('WMSLayoutSetting')
+    if(staticStoreObj == null)
+    {
+      return [false,false,false]
+    }
+    else
+    {
+      JSON.parse(localStorage.getItem('WMSLayoutSetting')).map(x=>staticArray.push(x.static))
+      return staticArray
+    }
   }
 
   componentDidMount(){
