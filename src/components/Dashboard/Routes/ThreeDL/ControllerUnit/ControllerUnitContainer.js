@@ -71,8 +71,6 @@ class ControllerUnitContainer extends Component {
         this.loadControllerUnitState()
         this.loadContainerPosition()
 
-        //console.log(this.state.controllerUnitState)
-        
         this.positionX = this.props.initialPosX
         this.positionY = this.props.initialPosY
     }
@@ -99,9 +97,7 @@ class ControllerUnitContainer extends Component {
     }
     
     componentWillUnmount() {
-        //console.log('ControllerUnitContainer componentWillUnmount conID ', this.props.conID)
-        //console.log('state controllerUnitState')
-        //console.log(this.state.controllerUnitState)
+        
     }
 
     loadContainerPosition(){
@@ -118,9 +114,6 @@ class ControllerUnitContainer extends Component {
     loadControllerUnitState=()=>{
         let tempControllerUnitState = this.state.controllerUnitState
         let tempControllerUnitStateProps = this.props.controllerUnitStateProps
-
-        //console.log('state controllerUnitState before')
-        //console.log(tempControllerUnitState)
 
         let sequenceCount = 0
         let output = tempControllerUnitState.map(unitState=>{   
@@ -142,10 +135,7 @@ class ControllerUnitContainer extends Component {
                 return unitState
             }
         })
-        //console.log('state controllerUnitState after')
-        //console.log(output)
 
-        
             this.setState({
                 controllerUnitState:output
             })
@@ -523,11 +513,11 @@ class ControllerUnitContainer extends Component {
     render() {    
         
         const containerWindow = {
-            width:this.state.divSize.width,
-            height:this.state.divSize.height,
+            width:this.props.width,
+            height:this.props.height,
             position:'absolute',
-            left:this.getContainerPosX(),
-            top:this.getContainerPosY(),
+            left:this.props.PosX,
+            top:this.props.PosY,
             zIndex:this.containerChangeZIndex(),
             backgroundColor:'yellow',
             border:'2px solid',

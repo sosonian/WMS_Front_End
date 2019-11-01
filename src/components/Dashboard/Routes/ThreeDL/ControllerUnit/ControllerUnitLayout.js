@@ -32,12 +32,12 @@ class ControllerUnitLayout extends Component {
                     controllerUnitContainerID:1,
                     size:
                     {
-                        width:150,
-                        height:150
+                        width:200,
+                        height:200
                     },
                     position:{
-                        left:0,
-                        top:0
+                        x:0,
+                        y:0
                     },
                     zIndex:1,
                     showing:true,
@@ -46,12 +46,12 @@ class ControllerUnitLayout extends Component {
                     controllerUnitContainerID:2,
                     size:
                     {
-                        width:150,
-                        height:150
+                        width:200,
+                        height:200
                     },
                     position:{
-                        left:0,
-                        top:200
+                        x:0,
+                        y:200
                     },
                     zIndex:2,
                     showing:true,
@@ -60,12 +60,12 @@ class ControllerUnitLayout extends Component {
                     controllerUnitContainerID:3,
                     size:
                     {
-                        width:150,
-                        height:150
+                        width:200,
+                        height:200
                     },
                     position:{
-                        left:0,
-                        top:400
+                        x:0,
+                        y:400
                     },
                     zIndex:3,
                     showing:true,
@@ -194,7 +194,8 @@ class ControllerUnitLayout extends Component {
         //console.log('ControllerUnitLayout createControllerUnitContainer')
         return (
             this.state.ControllerUnitContainerState.map(container=> container.showing?
-                (<ControllerUnitContainer key={container.controllerUnitContainerID} conID={container.controllerUnitContainerID} initialPosX={container.position.left} initialPosY={container.position.top} PosX={this.props.PosX} PosY={this.props.PosY} controllerUnitStateProps={this.state.controllerUnitState} rotationValue={this.sendRotationValueBack} frontViewToggle={this.sendFrontViewToggle} sideViewToggle={this.sendSideViewToggle} containerExtend={this.getContainerNewSize} onTabDragging={this.onTabDragging} tabDraggingBooling={this.state.tabDragging} containerShowing={this.controllerUnitToggle} zIndex={container.zIndex} getContainerZIndexUpdate={this.getContainerZIndexUpdate}/>):null
+                (<ControllerUnitContainer key={container.controllerUnitContainerID} conID={container.controllerUnitContainerID} PosX={container.position.x} PosY={container.position.y} width={container.width} height={container.height}
+                controllerUnitStateProps={this.state.controllerUnitState} rotationValue={this.sendRotationValueBack} frontViewToggle={this.sendFrontViewToggle} sideViewToggle={this.sendSideViewToggle} containerExtend={this.getContainerNewSize} onTabDragging={this.onTabDragging} tabDraggingBooling={this.state.tabDragging} containerShowing={this.controllerUnitToggle} zIndex={container.zIndex} getContainerZIndexUpdate={this.getContainerZIndexUpdate}/>):null
             )
         )
     }
