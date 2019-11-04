@@ -157,7 +157,6 @@ class GridLayer extends Component {
   }
 
   render() {
-
     const fixStyle = {
       borderStyle:'solid',
       borderColor:'red'
@@ -184,6 +183,7 @@ class GridLayer extends Component {
     }
 
   return (
+    
     <GridLayout className="layout" layout={this.state.layoutc} cols={12} rowHeight={45} width={2000} ref={this.refGridLayout} onResize = {this.threeDLayerResize} onResizeStop = {this.threeDLayerResize}
     draggableCancel='.myDrag'>
       <div className={this.state.static[0]?'myDrag':'None'} style={this.state.static[0]?fixStyle:notFixStyle} key="a">

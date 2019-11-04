@@ -18,10 +18,7 @@ class ThreeDRender extends Component{
         x:0,
         y:0
       },
-      offset:{
-        top:0,
-        left:0
-      },
+      needMousePos:false,
       frontViewShow:false,
       frontViewSize:{
         width:200-4,
@@ -50,10 +47,6 @@ class ThreeDRender extends Component{
        canvasSize:{
          width:this.mount.clientWidth,
          height:this.mount.clientHeight
-       },
-       offset:{
-         top:this.rect.top,
-         left:this.rect.left
        }
     })
     this.renderer1.setSize(this.mount.clientWidth, this.mount.clientHeight)
@@ -339,25 +332,28 @@ class ThreeDRender extends Component{
   }
 
   ThreeDLayerMouseMove = (e) => {
-    console.log('rect : ', this.rect)
+    //console.log('rect : ', this.rect)
     if(e.altKey)
     {   
       this.setState({
-        orbitControlMode : true,
-        mousePos:{
-          x:e.clientX-this.rect.left,
-          y:e.clientY-this.rect.top
-        }
+        orbitControlMode : true
+        // mousePos:{
+        //   x:e.clientX-this.rect.left,
+        //   y:e.clientY-this.rect.top
+        // }
       })
     }
     else
     {
-      this.setState({
-        mousePos:{
-          x:e.clientX-this.rect.left,
-          y:e.clientY-this.rect.top
-        }
-      })    
+      if(this.state.needMousePos)
+      {
+        this.setState({
+          mousePos:{
+            x:e.clientX-this.rect.left,
+            y:e.clientY-this.rect.top
+          }
+        })    
+      }
     }
   }
 
@@ -408,10 +404,14 @@ class ThreeDRender extends Component{
     }
   }
 
+  needMousePos=(msg)=>{
+
+  }
+
 
 
   render(){
-  //  console.log('ThreeDRender render')
+    console.log('ThreeDRender render')
   //  console.log('ThreeDRender render receive sizeProps :')
   //  console.log(sizeProps)
     const myStyle = {
@@ -426,7 +426,7 @@ class ThreeDRender extends Component{
         style={myStyle}
         ref={(mount) => { this.mount = mount }}
       >
-        <ControllerUnitLayout ref={(refDom)=>{this.refControllerUnitLayout=refDom}} PosX={this.state.mousePos.x} PosY={this.state.mousePos.y} rotationValue={this.getRotationValue} frontView={this.getFrontView} sideView={this.getSideView}offset={this.state.offset} frontViewSizeChange={this.frontViewSizeChange}  sideViewSizeChange={this.sideViewSizeChange}/> 
+        <ControllerUnitLayout ref={(refDom)=>{this.refControllerUnitLayout=refDom}} needMousePos={this.needMousePos} mousePos={this.state.mousePos} rotationValue={this.getRotationValue} frontView={this.getFrontView} sideView={this.getSideView}  frontViewSizeChange={this.frontViewSizeChange}  sideViewSizeChange={this.sideViewSizeChange}/> 
       </div>  
     )
   }

@@ -10,22 +10,22 @@ class ControllerUnitContainer extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            position:{
-                x:0,
-                y:0,
-            },
-            refPos:{
-                x:0,
-                y:0
-            },
-            divSize:{
-                width:200,
-                height:200,
-            },
-            refDivSize:{
-                width:0,
-                height:0
-            },
+            //position:{
+            //    x:0,
+            //    y:0,
+            //},
+            //refPos:{
+            //    x:0,
+            //    y:0
+            //},
+            //divSize:{
+            //    width:200,
+            //    height:200,
+            //},
+            //refDivSize:{
+            //    width:0,
+            //    height:0
+            //},
             controllerUnitState:[
                 {
                     unitID:1,
@@ -69,10 +69,10 @@ class ControllerUnitContainer extends Component {
 
     componentDidMount() {
         this.loadControllerUnitState()
-        this.loadContainerPosition()
+        //this.loadContainerPosition()
 
-        this.positionX = this.props.initialPosX
-        this.positionY = this.props.initialPosY
+        //this.positionX = this.props.initialPosX
+        //this.positionY = this.props.initialPosY
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -181,12 +181,19 @@ class ControllerUnitContainer extends Component {
     headerMouseDown=()=>{   
         this.setState({
             containerDragging:true,
-            refPos:{
-                x:this.props.PosX-this.positionX,
-                y:this.props.PosY-this.positionY
-            }
+            //refPos:{
+            //    x:this.props.PosX-this.positionX,
+            //    y:this.props.PosY-this.positionY
+            //}
         })   
-        this.sendContainerZIndexUpdate()
+
+        let msg ={
+            conID:this.props.conID,
+            zIndex:this.props.zIndex,
+            containerDragging:true
+        }
+        this.props.containerDragging(msg)
+        //this.sendContainerZIndexUpdate()
     }
 
     headerMouseUp=()=>{
@@ -217,6 +224,7 @@ class ControllerUnitContainer extends Component {
             conID:this.props.conID,
             zIndex:this.props.zIndex
         }
+        
         this.props.getContainerZIndexUpdate(msg)
     }
 
@@ -271,7 +279,6 @@ class ControllerUnitContainer extends Component {
                 controllerUnitState : output
             })
         }
-///////////////////////////////////////////////////////////////////////////////        
         if(msg.tabDragging)
         {
             this.setState({
@@ -341,7 +348,7 @@ class ControllerUnitContainer extends Component {
         
         if(unitFront==undefined)
         {
-            console.log('unitFront not found!')
+            //console.log('unitFront not found!')
             let unitFront2 = stateArray.find((unit)=>{
                 return unit.sequenceNumber == 0
             })
@@ -409,7 +416,7 @@ class ControllerUnitContainer extends Component {
     
     loadSideView=()=>{
         return(
-            <SubSideViewControllerUnit ref={(refDom)=>{this.refDom=refDom}} sideViewToggle={this.sendSideViewToggle}  height={this.state.divSize.height+(this.props.PosY-this.state.refPos.y)}/>
+            <SubSideViewControllerUnit ref={(refDom)=>{this.refDom=refDom}} sideViewToggle={this.sendSideViewToggle}  />
         )
     }
 
@@ -419,7 +426,7 @@ class ControllerUnitContainer extends Component {
 
     loadFrontView=()=>{
         return(
-            <SubFrontViewControllerUnit ref={(refDom)=>{this.refDom=refDom}} frontViewToggle={this.sendFrontViewToggle} width={this.state.divSize.width} height={this.state.divSize.height}/>
+            <SubFrontViewControllerUnit ref={(refDom)=>{this.refDom=refDom}} frontViewToggle={this.sendFrontViewToggle} />
         )
     }
 
@@ -511,7 +518,7 @@ class ControllerUnitContainer extends Component {
     }
 
     render() {    
-        
+        console.log('Container render')
         const containerWindow = {
             width:this.props.width,
             height:this.props.height,

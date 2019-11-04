@@ -96,6 +96,7 @@ class ControllerUnitLayout extends Component {
         }
     }
 
+    
 
     onTabDragging =(msg)=>{
         if(msg.tabDragging)
@@ -188,6 +189,10 @@ class ControllerUnitLayout extends Component {
         })
     }
 
+    onContainerDragging = (msg) => {
+
+    }
+
 
 
     createControllerUnitContainer = () => {
@@ -195,7 +200,7 @@ class ControllerUnitLayout extends Component {
         return (
             this.state.ControllerUnitContainerState.map(container=> container.showing?
                 (<ControllerUnitContainer key={container.controllerUnitContainerID} conID={container.controllerUnitContainerID} PosX={container.position.x} PosY={container.position.y} width={container.width} height={container.height}
-                controllerUnitStateProps={this.state.controllerUnitState} rotationValue={this.sendRotationValueBack} frontViewToggle={this.sendFrontViewToggle} sideViewToggle={this.sendSideViewToggle} containerExtend={this.getContainerNewSize} onTabDragging={this.onTabDragging} tabDraggingBooling={this.state.tabDragging} containerShowing={this.controllerUnitToggle} zIndex={container.zIndex} getContainerZIndexUpdate={this.getContainerZIndexUpdate}/>):null
+                controllerUnitStateProps={this.state.controllerUnitState} containerDragging={this.onContainerDragging} rotationValue={this.sendRotationValueBack} frontViewToggle={this.sendFrontViewToggle} sideViewToggle={this.sendSideViewToggle} containerExtend={this.getContainerNewSize} onTabDragging={this.onTabDragging} tabDraggingBooling={this.state.tabDragging} containerShowing={this.controllerUnitToggle} zIndex={container.zIndex} getContainerZIndexUpdate={this.getContainerZIndexUpdate}/>):null
             )
         )
     }
@@ -220,7 +225,7 @@ class ControllerUnitLayout extends Component {
 
 
     render(){
-        //console.log('ControllerUnitLayout render ')
+        console.log('ControllerUnitLayout render ')
         const containerStyle = {
             width: '100%',
             height: '100%',
