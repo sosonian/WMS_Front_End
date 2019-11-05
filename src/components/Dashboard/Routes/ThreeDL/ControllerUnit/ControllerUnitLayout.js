@@ -85,6 +85,12 @@ class ControllerUnitLayout extends Component {
         //console.log('ControllerUnitLayout constructor')
     }
 
+    ////////////need to improve avoid no necessary re-render
+
+    //shouldComponentUpdate(nextProps, nextState){
+    //    
+    //}
+
     componentDidUpdate(prevProps, prevState){
         console.log('ControllerUnitLayout componentDidUpdate')
         if(this.state.containerDragging.status)

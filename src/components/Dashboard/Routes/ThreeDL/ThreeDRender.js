@@ -35,11 +35,23 @@ class ThreeDRender extends Component{
       },
       rotationValue:0.01,      
     }
-    //console.log('ThreeDRender constructor')
   }
+
+  // shouldComponentUpdate(nextProps, nextState){
+  //   if((nextState.canvasSize !== this.state.canvasSize) || (nextState.offset !== this.state.offset)||(nextProps.containerSize !== this.props.containerSize) || (nextState.needMousePos))
+  //   {
+  //     return true
+  //   }
+    
+    
+  // }
   
   componentDidMount(){
-    //console.log('ThreeDRender componentDidMount')
+    this.mousePos = {
+      x:0,
+      y:0
+    }
+    this.rotationValue = 0.01
 
     this.deployState();
 
@@ -113,6 +125,8 @@ class ThreeDRender extends Component{
   
     
   }
+
+  
 
   componentDidUpdate(preProps, preState){
     //console.log('ThreeDRender componentDidUpdate')
@@ -350,7 +364,7 @@ class ThreeDRender extends Component{
   }
 
   ThreeDLayerMouseMove = (e) => {
-    //console.log('rect : ', this.rect)
+    console.log('ThreeDLayerMouseMove : ',this.mousePos)
     if(e.altKey)
     {   
       this.setState({
@@ -365,6 +379,10 @@ class ThreeDRender extends Component{
     {
       if(this.state.needMousePos)
       {
+        this.mousePos = {
+          x:e.clientX-this.rect.left,
+          y:e.clientY-this.rect.top
+        }
         this.setState({
           mousePos:{
             x:e.clientX-this.rect.left,
@@ -432,8 +450,13 @@ class ThreeDRender extends Component{
     }
     else
     {
+      // this.mousePos = {
+      //   x:0,
+      //   y:0
+      // }
       this.setState({
         needMousePos:false,
+        
         mousePos:{
           x:0,
           y:0
