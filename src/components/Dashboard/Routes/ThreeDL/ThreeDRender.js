@@ -14,6 +14,10 @@ class ThreeDRender extends Component{
         width:0,
         height:0
       },
+      offset:{
+        x:0,
+        y:0
+      },
       mousePos:{
         x:0,
         y:0
@@ -47,6 +51,10 @@ class ThreeDRender extends Component{
        canvasSize:{
          width:this.mount.clientWidth,
          height:this.mount.clientHeight
+       },
+       offset:{
+         x:this.rect.left,
+         y:this.rect.top
        }
     })
     this.renderer1.setSize(this.mount.clientWidth, this.mount.clientHeight)
@@ -101,7 +109,7 @@ class ThreeDRender extends Component{
     this.setFrontView()
     this.setSideView()
     this.animate()
-    this.handleResize()
+    //this.handleResize()
   
     
   }
@@ -130,7 +138,7 @@ class ThreeDRender extends Component{
     }
     if((preProps.containerSize !== this.props.containerSize))
     {
-      this.handleResize()
+      this.handleResize(preState)
     }
     
     this.updateFrontView()
@@ -268,9 +276,19 @@ class ThreeDRender extends Component{
     this.refPP = window.requestAnimationFrame(this.animate)
   }
 
-  handleResize = () => {
+  handleResize = (preState) => {
     //console.log('ThreeDRender handleResize')
     this.rect = this.mount.getBoundingClientRect()
+    if(preState.offset.x !== this.rect.left || preState.offset.y !== this.rect.top)
+    {
+      this.setState({
+        offset:{
+          x:this.rect.left,
+          y:this.rect.top
+        }
+      })
+    }
+
     this.renderer1.setSize(this.mount.clientWidth, this.mount.clientHeight);
     this.camera1.aspect = this.mount.clientWidth / this.mount.clientHeight;
     this.camera1.updateProjectionMatrix();
@@ -295,7 +313,7 @@ class ThreeDRender extends Component{
    }
 
   threeDLayerMouseDown = (e) => {
-    console.log('Mouse Down')
+    //console.log('Mouse Down')
     if(this.cameraControl !== undefined)
     {
     }
@@ -405,7 +423,23 @@ class ThreeDRender extends Component{
   }
 
   needMousePos=(msg)=>{
-
+    if(msg)
+    {
+      //this.rect = this.mount.getBoundingClientRect()
+      this.setState({
+        needMousePos:true,
+      })
+    }
+    else
+    {
+      this.setState({
+        needMousePos:false,
+        mousePos:{
+          x:0,
+          y:0
+        }     
+      })
+    }
   }
 
 
@@ -426,7 +460,7 @@ class ThreeDRender extends Component{
         style={myStyle}
         ref={(mount) => { this.mount = mount }}
       >
-        <ControllerUnitLayout ref={(refDom)=>{this.refControllerUnitLayout=refDom}} needMousePos={this.needMousePos} mousePos={this.state.mousePos} rotationValue={this.getRotationValue} frontView={this.getFrontView} sideView={this.getSideView}  frontViewSizeChange={this.frontViewSizeChange}  sideViewSizeChange={this.sideViewSizeChange}/> 
+        <ControllerUnitLayout ref={(refDom)=>{this.refControllerUnitLayout=refDom}} needMousePos={this.needMousePos} mousePos={this.state.mousePos} offset={this.state.offset} rotationValue={this.getRotationValue} frontView={this.getFrontView} sideView={this.getSideView}  frontViewSizeChange={this.frontViewSizeChange}  sideViewSizeChange={this.sideViewSizeChange}/> 
       </div>  
     )
   }

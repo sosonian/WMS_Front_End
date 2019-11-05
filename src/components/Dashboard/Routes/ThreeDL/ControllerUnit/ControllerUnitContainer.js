@@ -14,10 +14,10 @@ class ControllerUnitContainer extends Component {
             //    x:0,
             //    y:0,
             //},
-            //refPos:{
-            //    x:0,
-            //    y:0
-            //},
+            // refPos:{
+            //     x:0,
+            //     y:0
+            // },
             //divSize:{
             //    width:200,
             //    height:200,
@@ -75,8 +75,26 @@ class ControllerUnitContainer extends Component {
         //this.positionY = this.props.initialPosY
     }
 
+    shouldComponentUpdate(nextProps, nextState){
+        if(nextProps.containerShowing)
+        {
+            if(nextState.containerDragging==false && nextProps.anyOtherDragging==true)
+            {
+                return false
+            }
+            else
+            {
+                return true
+            }
+        }
+        else
+        {
+            return false
+        }
+    }
+
     componentDidUpdate(prevProps, prevState) {
-        //console.log('ControllerUnitContainer componentDidUpdate conID ', this.props.conID)
+        console.log('ControllerUnitContainer componentDidUpdate conID ', this.props.conID)
 
         if(prevProps.controllerUnitStateProps !== this.props.controllerUnitStateProps)
         {
@@ -178,19 +196,24 @@ class ControllerUnitContainer extends Component {
         return this.positionY+'px'
     }
 
-    headerMouseDown=()=>{   
+    headerMouseDown=(e)=>{   
+        //this.rect = this.mount.getBoundingClientRect()
         this.setState({
             containerDragging:true,
-            //refPos:{
-            //    x:this.props.PosX-this.positionX,
-            //    y:this.props.PosY-this.positionY
-            //}
+            // refPos:{
+            //     x:e.clientX-this.props.offset.x,
+            //     y:e.clientY-this.props.offset.y
+            // }
         })   
 
         let msg ={
             conID:this.props.conID,
             zIndex:this.props.zIndex,
-            containerDragging:true
+            containerDragging:true,
+            refPos:{
+                x:e.clientX-this.props.offset.x-this.props.PosX,
+                y:e.clientY-this.props.offset.y-this.props.PosY
+            }
         }
         this.props.containerDragging(msg)
         //this.sendContainerZIndexUpdate()
@@ -198,16 +221,23 @@ class ControllerUnitContainer extends Component {
 
     headerMouseUp=()=>{
         this.setState({
-            position:{
-                x:this.positionX,
-                y:this.positionY
-            },
+            containerDragging:false,
+            // refPos:{
+            //     x:0,
+            //     y:0
+            // }
+        })  
+
+        let msg ={
+            conID:this.props.conID,
+            zIndex:this.props.zIndex,
             containerDragging:false,
             refPos:{
                 x:0,
                 y:0
             }
-        })
+        }
+        this.props.containerDragging(msg)
     }
 
     headerMouseOver=(e)=>{

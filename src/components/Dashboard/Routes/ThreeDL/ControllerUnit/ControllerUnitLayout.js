@@ -71,15 +71,52 @@ class ControllerUnitLayout extends Component {
                     showing:true,
                 }
             ],
+            refPos:{
+                x:0,
+                y:0
+            },
             tabDragging:false,
+            containerDragging:{
+                status:false,
+                conID:0
+            },
             shadowContainer:{}
         }
         //console.log('ControllerUnitLayout constructor')
     }
 
-    componentDidUpdate(){
-        //console.log('ControllerUnitLayout componentDidUpdate')
-
+    componentDidUpdate(prevProps, prevState){
+        console.log('ControllerUnitLayout componentDidUpdate')
+        if(this.state.containerDragging.status)
+        {
+            if(prevProps.mousePos !== this.props.mousePos)
+            {
+                let tempContainerState = this.state. ControllerUnitContainerState
+                let output = tempContainerState.map(containerState=>{
+                   if(containerState.controllerUnitContainerID==this.state.containerDragging.conID)
+                   {
+                    let containerStateObj = {
+                        controllerUnitContainerID:containerState.controllerUnitContainerID,
+                        size:containerState.size,
+                        position:{
+                            x:this.props.mousePos.x-this.state.refPos.x,
+                            y:this.props.mousePos.y-this.state.refPos.y,
+                        },
+                        zIndex:containerState.zIndex, 
+                        showing:containerState.showing
+                    }
+                    return containerStateObj
+                   }
+                   else
+                   {
+                       return containerState
+                   }
+                })
+                this.setState({
+                    ControllerUnitContainerState : output
+                })
+            }
+        }
     }
 
     appendShadowContainer=()=>{
@@ -190,7 +227,20 @@ class ControllerUnitLayout extends Component {
     }
 
     onContainerDragging = (msg) => {
-
+        let conIDToken = 0 
+        if(msg.containerDragging)
+        {
+            conIDToken = msg.conID
+        }
+        this.setState({
+            containerDragging:{
+                status:msg.containerDragging,
+                conID:conIDToken
+            },
+            refPos:msg.refPos
+        })
+        this.getContainerZIndexUpdate(msg)
+        this.props.needMousePos(msg.containerDragging)
     }
 
 
@@ -199,8 +249,8 @@ class ControllerUnitLayout extends Component {
         //console.log('ControllerUnitLayout createControllerUnitContainer')
         return (
             this.state.ControllerUnitContainerState.map(container=> container.showing?
-                (<ControllerUnitContainer key={container.controllerUnitContainerID} conID={container.controllerUnitContainerID} PosX={container.position.x} PosY={container.position.y} width={container.width} height={container.height}
-                controllerUnitStateProps={this.state.controllerUnitState} containerDragging={this.onContainerDragging} rotationValue={this.sendRotationValueBack} frontViewToggle={this.sendFrontViewToggle} sideViewToggle={this.sendSideViewToggle} containerExtend={this.getContainerNewSize} onTabDragging={this.onTabDragging} tabDraggingBooling={this.state.tabDragging} containerShowing={this.controllerUnitToggle} zIndex={container.zIndex} getContainerZIndexUpdate={this.getContainerZIndexUpdate}/>):null
+                (<ControllerUnitContainer key={container.controllerUnitContainerID} conID={container.controllerUnitContainerID} PosX={container.position.x} PosY={container.position.y} width={container.width} height={container.height} offset={this.props.offset}
+                controllerUnitStateProps={this.state.controllerUnitState} containerDragging={this.onContainerDragging} anyOtherDragging={this.state.containerDragging.status} rotationValue={this.sendRotationValueBack} frontViewToggle={this.sendFrontViewToggle} sideViewToggle={this.sendSideViewToggle} containerExtend={this.getContainerNewSize} onTabDragging={this.onTabDragging} tabDraggingBooling={this.state.tabDragging} containerShowing={this.controllerUnitToggle} zIndex={container.zIndex} getContainerZIndexUpdate={this.getContainerZIndexUpdate}/>):null
             )
         )
     }
