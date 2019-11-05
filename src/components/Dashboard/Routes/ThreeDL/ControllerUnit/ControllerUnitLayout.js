@@ -75,11 +75,14 @@ class ControllerUnitLayout extends Component {
                 x:0,
                 y:0
             },
+            orbitControlMode:false,
             tabDragging:false,
+            
             containerDragging:{
                 status:false,
                 conID:0
             },
+
             shadowContainer:{}
         }
         //console.log('ControllerUnitLayout constructor')
@@ -261,6 +264,35 @@ class ControllerUnitLayout extends Component {
         )
     }
 
+    onMouseDown = (e) => {
+        console.log('ControllerUnitLayout onMouseDown')
+        this.setState({
+            ThreeDLayerClick:false,
+        })
+    }
+
+    onMouseMove = (e) => {
+        console.log('ControllerUnitLayout onMouseMove')
+        if(e.altKey)
+        {   
+          this.setState({
+            orbitControlMode : true
+          })
+        }
+        else
+        {
+          if(this.state.needMousePos)
+          {
+            this.setState({
+              mousePos:{
+                x:e.clientX-this.props.offset.x,
+                y:e.clientY-this.props.offset.y
+              }
+            })    
+          }
+        }
+      }
+
     onMouseUp=()=>{
         //console.log('ControllerUnitLayout tabDragging complete !!')
         this.setState({
@@ -292,7 +324,7 @@ class ControllerUnitLayout extends Component {
         }
 
         return(
-            <div style={containerStyle}  ref={(refLayout)=>{this.refLayout=refLayout}} onMouseUp={this.onMouseUp}> 
+            <div style={containerStyle}  ref={(refLayout)=>{this.refLayout=refLayout}} onMouseDown={this.onMouseDown} onMouseMove={this.onMouseMove} onMouseUp={this.onMouseUp}> 
                 {this.createControllerUnitContainer()}
                 {this.appendShadowContainer()}
             </div>

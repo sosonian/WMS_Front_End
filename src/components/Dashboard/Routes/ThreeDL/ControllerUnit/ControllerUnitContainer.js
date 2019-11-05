@@ -197,6 +197,7 @@ class ControllerUnitContainer extends Component {
     }
 
     headerMouseDown=(e)=>{   
+        e.stopPropagation()
         //this.rect = this.mount.getBoundingClientRect()
         this.setState({
             containerDragging:true,
@@ -219,7 +220,8 @@ class ControllerUnitContainer extends Component {
         //this.sendContainerZIndexUpdate()
     }
 
-    headerMouseUp=()=>{
+    headerMouseUp=(e)=>{
+        e.stopPropagation()
         this.setState({
             containerDragging:false,
             // refPos:{
