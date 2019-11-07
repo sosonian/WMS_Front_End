@@ -71,10 +71,16 @@ class ControllerUnitLayout extends Component {
                     showing:true,
                 }
             ],
+
+            mousePos:{
+                x:0,
+                y:0
+            },
             refPos:{
                 x:0,
                 y:0
             },
+            needMousePos:false,
             orbitControlMode:false,
             tabDragging:false,
             
@@ -82,10 +88,13 @@ class ControllerUnitLayout extends Component {
                 status:false,
                 conID:0
             },
-
+            containerExtending:{
+                status:false,
+                conID:0,
+                subView:'nonSubView'
+            },
             shadowContainer:{}
         }
-        //console.log('ControllerUnitLayout constructor')
     }
 
     ////////////need to improve avoid no necessary re-render
@@ -96,48 +105,47 @@ class ControllerUnitLayout extends Component {
 
     componentDidUpdate(prevProps, prevState){
         console.log('ControllerUnitLayout componentDidUpdate')
-        if(this.state.containerDragging.status)
-        {
-            if(prevProps.mousePos !== this.props.mousePos)
-            {
-                let tempContainerState = this.state. ControllerUnitContainerState
-                let output = tempContainerState.map(containerState=>{
-                   if(containerState.controllerUnitContainerID==this.state.containerDragging.conID)
-                   {
-                    let containerStateObj = {
-                        controllerUnitContainerID:containerState.controllerUnitContainerID,
-                        size:containerState.size,
-                        position:{
-                            x:this.props.mousePos.x-this.state.refPos.x,
-                            y:this.props.mousePos.y-this.state.refPos.y,
-                        },
-                        zIndex:containerState.zIndex, 
-                        showing:containerState.showing
-                    }
-                    return containerStateObj
-                   }
-                   else
-                   {
-                       return containerState
-                   }
-                })
-                this.setState({
-                    ControllerUnitContainerState : output
-                })
-            }
-        }
+        // if(this.state.containerDragging.status)
+        // {
+        //     if(prevProps.mousePos !== this.props.mousePos)
+        //     {
+        //         let tempContainerState = this.state. ControllerUnitContainerState
+        //         let output = tempContainerState.map(containerState=>{
+        //            if(containerState.controllerUnitContainerID==this.state.containerDragging.conID)
+        //            {
+        //             let containerStateObj = {
+        //                 controllerUnitContainerID:containerState.controllerUnitContainerID,
+        //                 size:containerState.size,
+        //                 position:{
+        //                     x:this.props.mousePos.x-this.state.refPos.x,
+        //                     y:this.props.mousePos.y-this.state.refPos.y,
+        //                 },
+        //                 zIndex:containerState.zIndex, 
+        //                 showing:containerState.showing
+        //             }
+        //             return containerStateObj
+        //            }
+        //            else
+        //            {
+        //                return containerState
+        //            }
+        //         })
+        //         this.setState({
+        //             ControllerUnitContainerState : output
+        //         })
+        //     }
+        // }
     }
 
     appendShadowContainer=()=>{
         if(this.state.tabDragging)
         {
             return(
-                <ShadowContainer  width={this.state.shadowContainer.width} height={this.state.shadowContainer.height} posX={this.props.PosX} posY={this.props.PosY} refPosX={this.state.shadowContainer.posX} refPosY={this.state.shadowContainer.posY} tabTitle={this.state.shadowContainer.tabTitle}/>
+                <ShadowContainer  width={this.state.shadowContainer.width} height={this.state.shadowContainer.height} posX={this.state.mousePos.x} posY={this.state.mousePos.y} refPosX={this.state.shadowContainer.posX} refPosY={this.state.shadowContainer.posY} tabTitle={this.state.shadowContainer.tabTitle}/>
             )
         }
         else
         {
-            //console.log('tab is Not Dragging !')
             return("")
         }
     }
@@ -149,14 +157,15 @@ class ControllerUnitLayout extends Component {
         {
           this.setState({
             tabDragging:true,
+            needMousePos:true,
             shadowContainer:msg
           })
-
         }
         else
         {
           this.setState({
             tabDragging:false,
+            needMousePos:false,
             shadowContainer:{}
           })
         }
@@ -196,22 +205,39 @@ class ControllerUnitLayout extends Component {
         }
     }
 
-    getContainerNewSize=(msg)=>{
-        if(msg.conID ==2)
+    getContainerNewSize = (msg) => {
+        if(this.state.containerExtending.status)
         {
-            this.props.frontViewSizeChange(msg)
-            //console.log('ControllerUnitLayout getContainerNewSize')
-            //console.log('width : '+msg.width)
-            //console.log('height : '+msg.height)
+           switch(this.state.containerExtending.subView){
+                case 'frontView':
+                    this.props.frontViewSizeChange(msg)
+                break;
+                case 'sideView':
+                    this.props.sideViewSizeChange(msg)
+                break;
+                case 'nonSubView':
+                break;
+           }
         }
-        else if(msg.conID ==3)
+        else
         {
-            this.props.sideViewSizeChange(msg)
         }
+
+        // if(msg.conID ==2)
+        // {
+        //     this.props.frontViewSizeChange(msg)
+        //     //console.log('ControllerUnitLayout getContainerNewSize')
+        //     //console.log('width : '+msg.width)
+        //     //console.log('height : '+msg.height)
+        // }
+        // else if(msg.conID ==3)
+        // {
+        //     this.props.sideViewSizeChange(msg)
+        // }
     }
 
 
-    getContainerZIndexUpdate=(msg)=>{
+    getContainerZIndexUpdate = (msg) => {
         let containerStateToken =[]
         let arrayToken = this.state.ControllerUnitContainerState
         let stateLength = arrayToken.length
@@ -235,70 +261,105 @@ class ControllerUnitLayout extends Component {
         })
     }
 
+    onContainerExtending = (msg)=>{
+        let conIDToken = 0 
+        if(msg.containerExtending)
+        {
+            conIDToken = msg.conID
+            this.setState({
+                containerExtending:{
+                    status:msg.containerExtending,
+                    conID:conIDToken,
+                    subView:msg.subView
+                },
+                needMousePos:true
+                //refPos:msg.refPos
+            })
+        }
+        else
+        {
+            this.setState({
+                containerExtending:{
+                    status:false,
+                    conID:conIDToken,
+                    subView:msg.subView
+                },
+                needMousePos:false
+                //refPos:msg.refPos
+            })
+        }
+        
+        this.getContainerZIndexUpdate(msg)
+
+    }
+
     onContainerDragging = (msg) => {
         let conIDToken = 0 
         if(msg.containerDragging)
         {
             conIDToken = msg.conID
+            this.setState({
+                containerDragging:{
+                    status:msg.containerDragging,
+                    conID:conIDToken
+                },
+                needMousePos:true
+                //refPos:msg.refPos
+            })
         }
-        this.setState({
-            containerDragging:{
-                status:msg.containerDragging,
-                conID:conIDToken
-            },
-            refPos:msg.refPos
-        })
+        else
+        {
+            this.setState({
+                containerDragging:{
+                    status:false,
+                    conID:conIDToken
+                },
+                needMousePos:false
+                //refPos:msg.refPos
+            })
+        }
+        
         this.getContainerZIndexUpdate(msg)
-        this.props.needMousePos(msg.containerDragging)
+        //this.props.needMousePos(msg.containerDragging)
     }
-
-
 
     createControllerUnitContainer = () => {
         //console.log('ControllerUnitLayout createControllerUnitContainer')
         return (
             this.state.ControllerUnitContainerState.map(container=> container.showing?
-                (<ControllerUnitContainer key={container.controllerUnitContainerID} conID={container.controllerUnitContainerID} PosX={container.position.x} PosY={container.position.y} width={container.width} height={container.height} offset={this.props.offset}
-                controllerUnitStateProps={this.state.controllerUnitState} containerDragging={this.onContainerDragging} anyOtherDragging={this.state.containerDragging.status} rotationValue={this.sendRotationValueBack} frontViewToggle={this.sendFrontViewToggle} sideViewToggle={this.sendSideViewToggle} containerExtend={this.getContainerNewSize} onTabDragging={this.onTabDragging} tabDraggingBooling={this.state.tabDragging} containerShowing={this.controllerUnitToggle} zIndex={container.zIndex} getContainerZIndexUpdate={this.getContainerZIndexUpdate}/>):null
+                (<ControllerUnitContainer key={container.controllerUnitContainerID} conID={container.controllerUnitContainerID} initialPos={container.position} mousePos={this.state.mousePos} offset={this.props.offset}
+                controllerUnitStateProps={this.state.controllerUnitState} containerDragging={this.onContainerDragging} anyOtherDragging={this.state.containerDragging.status} anyOtherExtending={this.state.containerExtending.status} rotationValue={this.sendRotationValueBack} frontViewToggle={this.sendFrontViewToggle} sideViewToggle={this.sendSideViewToggle} containerExtending={this.onContainerExtending} getContainerNewSize={this.getContainerNewSize} onTabDragging={this.onTabDragging} tabDraggingBooling={this.state.tabDragging} containerShowing={this.controllerUnitToggle} zIndex={container.zIndex} getContainerZIndexUpdate={this.getContainerZIndexUpdate}/>):null
             )
         )
     }
 
     onMouseDown = (e) => {
         console.log('ControllerUnitLayout onMouseDown')
-        this.setState({
-            ThreeDLayerClick:false,
-        })
+        // this.setState({
+        //     ThreeDLayerClick:false,
+        // })
     }
 
     onMouseMove = (e) => {
-        console.log('ControllerUnitLayout onMouseMove')
-        if(e.altKey)
-        {   
-          this.setState({
-            orbitControlMode : true
-          })
-        }
-        else
+        //console.log('ControllerUnitLayout onMouseMove')
+        if(this.state.needMousePos)
         {
-          if(this.state.needMousePos)
-          {
             this.setState({
               mousePos:{
                 x:e.clientX-this.props.offset.x,
                 y:e.clientY-this.props.offset.y
               }
             })    
-          }
         }
+        
       }
 
-    onMouseUp=()=>{
+    onMouseUp = () => {
         //console.log('ControllerUnitLayout tabDragging complete !!')
-        this.setState({
-            tabDragging:false,
-            shadowContainer:{}
-        })
+        // this.setState({
+        //     tabDragging:false,
+        //     shadowContainer:{}
+        // })
     }
     
     changeCursorWhenTabDragging=()=>{
@@ -309,8 +370,6 @@ class ControllerUnitLayout extends Component {
         }
         return cursor
     }
-
-
 
     render(){
         console.log('ControllerUnitLayout render ')
@@ -326,6 +385,7 @@ class ControllerUnitLayout extends Component {
         return(
             <div style={containerStyle}  ref={(refLayout)=>{this.refLayout=refLayout}} onMouseDown={this.onMouseDown} onMouseMove={this.onMouseMove} onMouseUp={this.onMouseUp}> 
                 {this.createControllerUnitContainer()}
+                {/** <TestContainer mousePos={this.state.mousePos}/> **/}
                 {this.appendShadowContainer()}
             </div>
         )

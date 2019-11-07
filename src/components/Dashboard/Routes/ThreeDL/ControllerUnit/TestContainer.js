@@ -15,7 +15,25 @@ class TestContainer extends Component{
         //console.log('ShadowContainer tabDragging complete !!')
     }
 
+    onMouseMove = (e) => {
+        e.stopPropagation()
+        console.log('TestContainer on Mouse move')
+
+    }
+
+    onMouseUp = (e) => {
+        e.stopPropagation()
+        console.log('TestContainer on Mouse up')
+
+    }
+
+    onMouseDown = (e) => {
+        e.stopPropagation()
+        console.log('TestContainer on Mouse down')
+    }
+
     render() {
+        console.log('TestContainer render')
         //this.sendFrontViewToggle()
         const testContainerStyle ={
             width:200,
@@ -29,7 +47,7 @@ class TestContainer extends Component{
             boxSizing:'border-box',
         }
         return(
-            <div style={testContainerStyle}> 
+            <div style={testContainerStyle} onMouseDown={this.onMouseDown} onMouseMove={this.onMouseMove} > 
                 {'test container'}
             </div>
         )

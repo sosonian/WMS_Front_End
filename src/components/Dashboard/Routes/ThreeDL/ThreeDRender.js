@@ -18,10 +18,6 @@ class ThreeDRender extends Component{
         x:0,
         y:0
       },
-      mousePos:{
-        x:0,
-        y:0
-      },
       needMousePos:false,
       frontViewShow:false,
       frontViewSize:{
@@ -327,13 +323,13 @@ class ThreeDRender extends Component{
    }
 
   threeDLayerMouseDown = (e) => {
-    //console.log('Mouse Down')
-    if(this.cameraControl !== undefined)
-    {
-    }
-    else
-    {
-    }
+    console.log('ThreeDRender Mouse Down')
+    // if(this.cameraControl !== undefined)
+    // {
+    // }
+    // else
+    // {
+    // }
 
     if(e.altKey)
     {
@@ -341,9 +337,10 @@ class ThreeDRender extends Component{
     }
     else
     {
+      console.log('ThreeDRender Mouse Down without alt key')
       const rayCaster = new THREE.Raycaster()
       const mouseToken = new THREE.Vector2()
-      let rect = this.mount.getBoundingClientRect()
+      this.rect = this.mount.getBoundingClientRect()
       mouseToken.x = ((e.clientX-this.rect.left)/this.mount.clientWidth)*2-1
       mouseToken.y = -((e.clientY-this.rect.top)/this.mount.clientHeight)*2+1
       rayCaster.setFromCamera(mouseToken, this.camera1)
@@ -360,11 +357,23 @@ class ThreeDRender extends Component{
   }
 
   threeDLayerMouseUp = (e) => {
-    this.setState({orbitControlMode : false})
+    if(e.altKey)
+    {
+      this.setState({orbitControlMode : false})
+    }
+    else
+    {
+    }
+    //this.setState({orbitControlMode : false})
   }
 
   ThreeDLayerMouseMove = (e) => {
-    console.log('ThreeDLayerMouseMove : ',this.mousePos)
+    console.log('ThreeDLayerMouseMove')
+    this.mousePos = {
+      x:e.clientX-this.rect.left,
+      y:e.clientY-this.rect.top
+    }
+    //console.log('ThreeDLayerMouseMove : ',this.mousePos)
     if(e.altKey)
     {   
       this.setState({
@@ -374,22 +383,6 @@ class ThreeDRender extends Component{
         //   y:e.clientY-this.rect.top
         // }
       })
-    }
-    else
-    {
-      if(this.state.needMousePos)
-      {
-        this.mousePos = {
-          x:e.clientX-this.rect.left,
-          y:e.clientY-this.rect.top
-        }
-        this.setState({
-          mousePos:{
-            x:e.clientX-this.rect.left,
-            y:e.clientY-this.rect.top
-          }
-        })    
-      }
     }
   }
 
@@ -483,7 +476,7 @@ class ThreeDRender extends Component{
         style={myStyle}
         ref={(mount) => { this.mount = mount }}
       >
-        <ControllerUnitLayout ref={(refDom)=>{this.refControllerUnitLayout=refDom}} needMousePos={this.needMousePos} mousePos={this.state.mousePos} offset={this.state.offset} rotationValue={this.getRotationValue} frontView={this.getFrontView} sideView={this.getSideView}  frontViewSizeChange={this.frontViewSizeChange}  sideViewSizeChange={this.sideViewSizeChange}/> 
+        <ControllerUnitLayout ref={(refDom)=>{this.refControllerUnitLayout=refDom}}  offset={this.state.offset} rotationValue={this.getRotationValue} frontView={this.getFrontView} sideView={this.getSideView}  frontViewSizeChange={this.frontViewSizeChange}  sideViewSizeChange={this.sideViewSizeChange}/> 
       </div>  
     )
   }

@@ -10,22 +10,22 @@ class ControllerUnitContainer extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            //position:{
-            //    x:0,
-            //    y:0,
-            //},
-            // refPos:{
-            //     x:0,
-            //     y:0
-            // },
-            //divSize:{
-            //    width:200,
-            //    height:200,
-            //},
-            //refDivSize:{
-            //    width:0,
-            //    height:0
-            //},
+            position:{
+                x:0,
+                y:0,
+            },
+            refPos:{
+                x:0,
+                y:0
+            },
+            divSize:{
+                width:200,
+                height:200,
+            },
+            refDivSize:{
+                width:0,
+                height:0
+            },
             controllerUnitState:[
                 {
                     unitID:1,
@@ -57,8 +57,8 @@ class ControllerUnitContainer extends Component {
                 }
             ],
             containerDragging:false,
+            containerExtending:false,
             tabDragging:false,
-            extending:false,
             showing:true,
             headerMergeSingnal:false,
             cancelAreaHover:false,
@@ -69,16 +69,17 @@ class ControllerUnitContainer extends Component {
 
     componentDidMount() {
         this.loadControllerUnitState()
-        //this.loadContainerPosition()
-
-        //this.positionX = this.props.initialPosX
-        //this.positionY = this.props.initialPosY
+        this.loadContainerPosition()
     }
 
     shouldComponentUpdate(nextProps, nextState){
         if(nextProps.containerShowing)
         {
             if(nextState.containerDragging==false && nextProps.anyOtherDragging==true)
+            {
+                return false
+            }
+            else if(nextState.containerExtending==false && nextProps.anyOtherExtending==true)
             {
                 return false
             }
@@ -101,31 +102,53 @@ class ControllerUnitContainer extends Component {
             this.loadControllerUnitState()
         }
         
-        if(this.state.extending)
+        if(this.state.containerExtending == false && this.state.containerDragging == true)
         {
-            if((prevProps.PosX !== this.props.PosX)||(prevProps.PosY !== this.props.PosY))
+            if(prevProps.mousePos !== this.props.mousePos)
             {
-                this.getDivSize()
-            }
+                this.setNewContainerPosition()
+            } 
         }
-        else
+        else if(this.state.containerExtending == true && this.state.containerDragging == false)
         {
-            //console.log('extending false')
+            if(prevProps.mousePos !== this.props.mousePos)
+            {
+                this.setNewContainerSize()
+            } 
         }
+        
+        // if(this.state.extending)
+        // {
+        //     if((prevProps.PosX !== this.props.PosX)||(prevProps.PosY !== this.props.PosY))
+        //     {
+        //         this.setNewContainerSize()
+        //     }
+        // }
+        // else
+        // {
+        //     //console.log('extending false')
+        // }
     }
     
     componentWillUnmount() {
         
     }
 
-    loadContainerPosition(){
-        let positionX = this.props.initialPosX
-        let positionY = this.props.initialPosY
+    setNewContainerPosition() {
+        let containerX = this.props.mousePos.x-this.state.refPos.x
+        let containerY = this.props.mousePos.y-this.state.refPos.y
         this.setState({
             position:{
-                x:positionX,
-                y:positionY
+                x:containerX,
+                y:containerY
             }
+        })
+    }
+
+    loadContainerPosition(){
+
+        this.setState({
+            position:this.props.initialPos
         })
     }
 
@@ -160,61 +183,63 @@ class ControllerUnitContainer extends Component {
         
     }
 
-    getDivSize=()=>{
+    setNewContainerSize=()=>{
 
-        let width = this.state.refDivSize.width+(this.props.PosX-this.state.refPos.x)
-        let height = this.state.refDivSize.height+(this.props.PosY-this.state.refPos.y)
-   
-        this.setState({
-            divSize:{
-                width:width,
-                height:height
-            }
-        })
-
-        let Msg = {
-            conID:this.props.conID,
+        let width = this.state.refDivSize.width+(this.props.mousePos.x-this.state.refPos.x)
+        let height = this.state.refDivSize.height+(this.props.mousePos.y-this.state.refPos.y)
+        let newSize = {
             width:width,
             height:height
         }
-        this.props.containerExtend(Msg)
+   
+        this.setState({
+            divSize:newSize
+        })
+        this.props.getContainerNewSize(newSize)
+
+        //let Msg = {
+        //    conID:this.props.conID,
+        //    width:width,
+        //    height:height
+        //}
+        //this.props.containerExtend(Msg)
     }
 
-    getContainerPosX=()=>{
-        if(this.state.containerDragging)
-        {
-            this.positionX = this.props.PosX-this.state.refPos.x
-        }
-        return this.positionX+'px'
-    }
+    // getContainerPosX=()=>{
+    //     if(this.state.containerDragging)
+    //     {
+    //         this.positionX = this.props.PosX-this.state.refPos.x
+    //     }
+    //     return this.positionX+'px'
+    // }
 
-    getContainerPosY=()=>{
-        if(this.state.containerDragging)
-        {
-            this.positionY = this.props.PosY-this.state.refPos.y        
-        }
-        return this.positionY+'px'
-    }
+    // getContainerPosY=()=>{
+    //     if(this.state.containerDragging)
+    //     {
+    //         this.positionY = this.props.PosY-this.state.refPos.y        
+    //     }
+    //     return this.positionY+'px'
+    // }
 
     headerMouseDown=(e)=>{   
         e.stopPropagation()
         //this.rect = this.mount.getBoundingClientRect()
         this.setState({
             containerDragging:true,
-            // refPos:{
-            //     x:e.clientX-this.props.offset.x,
-            //     y:e.clientY-this.props.offset.y
-            // }
+            refPos:{
+                x:e.clientX-this.props.offset.x-this.state.position.x,
+                y:e.clientY-this.props.offset.y-this.state.position.y
+            }
         })   
 
         let msg ={
             conID:this.props.conID,
             zIndex:this.props.zIndex,
             containerDragging:true,
-            refPos:{
-                x:e.clientX-this.props.offset.x-this.props.PosX,
-                y:e.clientY-this.props.offset.y-this.props.PosY
-            }
+            // refPos:{
+            //     x:e.clientX-this.props.offset.x-this.props.PosX,
+            //     y:e.clientY-this.props.offset.y-this.props.PosY
+            // }
         }
         this.props.containerDragging(msg)
         //this.sendContainerZIndexUpdate()
@@ -224,20 +249,20 @@ class ControllerUnitContainer extends Component {
         e.stopPropagation()
         this.setState({
             containerDragging:false,
-            // refPos:{
-            //     x:0,
-            //     y:0
-            // }
+            refPos:{
+                x:0,
+                y:0
+            }
         })  
 
         let msg ={
             conID:this.props.conID,
             zIndex:this.props.zIndex,
             containerDragging:false,
-            refPos:{
-                x:0,
-                y:0
-            }
+            // refPos:{
+            //     x:0,
+            //     y:0
+            // }
         }
         this.props.containerDragging(msg)
     }
@@ -496,49 +521,77 @@ class ControllerUnitContainer extends Component {
 
     extendAreaMouseDown=(e)=>{
         console.log('extendArea mouse down')
+        //console.log(this.getSubView())
         e.stopPropagation()
+
         this.setState({
+            containerExtending:true,
             refPos:{
-                x:this.props.PosX,
-                y:this.props.PosY
+                x:e.clientX-this.props.offset.x,
+                y:e.clientY-this.props.offset.y
             },
-            refDivSize:{
-                width:this.state.divSize.width,
-                height:this.state.divSize.height
-            },
-            extending:true
-        })
-        this.sendContainerZIndexUpdate()
+            refDivSize:this.state.divSize
+        })   
+
+        let msg ={
+            conID:this.props.conID,
+            zIndex:this.props.zIndex,
+            containerExtending:true,
+            subView:this.getSubView()
+        }
+        this.props.containerExtending(msg)
+    }
+
+    getSubView = () => {
+        if(this.state.controllerUnitState[1].sequenceNumber==0)
+        {
+            return 'frontView'
+        }
+        else if(this.state.controllerUnitState[2].sequenceNumber==0)
+        {
+            return 'sideView'
+        }
+        else
+        {
+            return 'nonSubView'
+        }
     }
 
     extendAreaMouseUp=(e)=>{
         e.stopPropagation()
-
-        let width = this.state.refDivSize.width+(this.props.PosX-this.state.refPos.x)
-        let height = this.state.refDivSize.height+(this.props.PosY-this.state.refPos.y)
-
+        let width = this.state.refDivSize.width+(this.props.mousePos.x-this.state.refPos.x)
+        let height = this.state.refDivSize.height+(this.props.mousePos.y-this.state.refPos.y)
+        let newSize = {
+            width:width,
+            height:height
+        }
+        //this.props.getContainerNewSize(newSize)
         this.setState({
-            divSize:{
-                width:width,
-                height:height
-            },
+            containerExtending:false,
             refPos:{
                 x:0,
                 y:0
             },
-            refDivSize:{
-                width:0,
-                height:0
-            },
-            extending:false
-        })
+            divSize:newSize
+        })  
+
         
-        let Msg = {
+
+        let msg ={
             conID:this.props.conID,
-            width:width,
-            height:height
+            zIndex:this.props.zIndex,
+            containerExtending:false,
+            subView:'nonSubView'
         }
-        this.props.containerExtend(Msg)
+        
+        this.props.containerExtending(msg)
+
+        // let Msg = {
+        //     conID:this.props.conID,
+        //     width:width,
+        //     height:height
+        // }
+        // this.props.containerExtend(Msg)
     }
 
     getRotationValue=(value)=>{
@@ -552,11 +605,11 @@ class ControllerUnitContainer extends Component {
     render() {    
         console.log('Container render')
         const containerWindow = {
-            width:this.props.width,
-            height:this.props.height,
+            width:this.state.divSize.width,
+            height:this.state.divSize.height,
             position:'absolute',
-            left:this.props.PosX,
-            top:this.props.PosY,
+            left:this.state.position.x,
+            top:this.state.position.y,
             zIndex:this.containerChangeZIndex(),
             backgroundColor:'yellow',
             border:'2px solid',
