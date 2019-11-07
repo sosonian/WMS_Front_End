@@ -323,7 +323,7 @@ class ThreeDRender extends Component{
    }
 
   threeDLayerMouseDown = (e) => {
-    console.log('ThreeDRender Mouse Down')
+    //console.log('ThreeDRender Mouse Down')
     // if(this.cameraControl !== undefined)
     // {
     // }
@@ -337,7 +337,7 @@ class ThreeDRender extends Component{
     }
     else
     {
-      console.log('ThreeDRender Mouse Down without alt key')
+      //console.log('ThreeDRender Mouse Down without alt key')
       const rayCaster = new THREE.Raycaster()
       const mouseToken = new THREE.Vector2()
       this.rect = this.mount.getBoundingClientRect()
@@ -368,7 +368,7 @@ class ThreeDRender extends Component{
   }
 
   ThreeDLayerMouseMove = (e) => {
-    console.log('ThreeDLayerMouseMove')
+    //console.log('ThreeDLayerMouseMove')
     this.mousePos = {
       x:e.clientX-this.rect.left,
       y:e.clientY-this.rect.top
@@ -461,7 +461,7 @@ class ThreeDRender extends Component{
 
 
   render(){
-    console.log('ThreeDRender render')
+  //  console.log('ThreeDRender render')
   //  console.log('ThreeDRender render receive sizeProps :')
   //  console.log(sizeProps)
     const myStyle = {

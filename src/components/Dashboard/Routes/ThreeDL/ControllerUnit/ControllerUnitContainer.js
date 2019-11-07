@@ -95,7 +95,7 @@ class ControllerUnitContainer extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        console.log('ControllerUnitContainer componentDidUpdate conID ', this.props.conID)
+        //console.log('ControllerUnitContainer componentDidUpdate conID ', this.props.conID)
 
         if(prevProps.controllerUnitStateProps !== this.props.controllerUnitStateProps)
         {
@@ -162,12 +162,17 @@ class ControllerUnitContainer extends Component {
             if(result.containerUnitContainerID === this.props.conID)
             {
                 sequenceCount = sequenceCount + 1
+                let showingToggle = false
+                if(sequenceCount+unitState.sequenceNumber == 0)
+                {
+                    showingToggle = true
+                }
                 let unitStateObj = {
                     unitID:unitState.unitID,
                     name:unitState.name,
                     title:unitState.title,
                     sequenceNumber:unitState.sequenceNumber+ sequenceCount,
-                    showing:unitState.showing       
+                    showing:showingToggle       
                 }
                 return unitStateObj
             }
@@ -177,10 +182,9 @@ class ControllerUnitContainer extends Component {
             }
         })
 
-            this.setState({
-                controllerUnitState:output
-            })
-        
+        this.setState({
+            controllerUnitState:output
+        })   
     }
 
     setNewContainerSize=()=>{
@@ -223,6 +227,7 @@ class ControllerUnitContainer extends Component {
 
     headerMouseDown=(e)=>{   
         e.stopPropagation()
+        //console.log('ControllerUnitContainer headerMouseDown')
         //this.rect = this.mount.getBoundingClientRect()
         this.setState({
             containerDragging:true,
@@ -267,7 +272,8 @@ class ControllerUnitContainer extends Component {
         this.props.containerDragging(msg)
     }
 
-    headerMouseOver=(e)=>{
+    onDragEnter=(e)=>{
+        console.log('ControllerUnitContainer onDragEnter')
         if(this.props.tabDraggingBooling && !this.state.containerDragging)
         {
             this.setState({
@@ -291,15 +297,23 @@ class ControllerUnitContainer extends Component {
         })
     }
 
-   getTabDraggingMsg=(msg)=>{
+    getTabDraggingMsg=(msg)=>{
         let tabDraggingMsg={
             unitID:msg.unitID,
             tabDom:msg.refDom,
             tabTitle:msg.tabTitle,
-            posX:this.props.PosX-this.positionX,
-            posY:this.props.PosY-this.positionY,
-            width:this.state.divSize.width,
-            height:this.state.divSize.height,
+            refPos:{
+                //x:msg.refPos.x-this.props.offset.x-this.state.position.x,
+                //y:msg.refPos.y-this.props.offset.y-this.state.position.y
+                x:this.state.position.x,
+                y:this.state.position.y
+            },
+            tabPos:msg.tabPos,
+            //posX:this.props.PosX-this.positionX,
+            //posY:this.props.PosY-this.positionY,
+            divSize:this.state.divSize,
+            //width:this.state.divSize.width,
+            //height:this.state.divSize.height,
             tabDragging:msg.tabDragging
         }
 
@@ -351,7 +365,7 @@ class ControllerUnitContainer extends Component {
             this.props.onTabDragging(tabDraggingMsg)
         }
         this.sendContainerZIndexUpdate()
-   }
+    }
 
     cancelIconHover =()=>{
         this.setState({
@@ -506,7 +520,7 @@ class ControllerUnitContainer extends Component {
  
         unitStateArray.sort(function(a,b){return a.sequenceNumber-b.sequenceNumber})
         return(unitStateArray.map(unitState=>
-                <ControllerUnitContainerTab unitID={unitState.unitID} tabTitle={unitState.title} tabDragging={this.getTabDraggingMsg} />
+                <ControllerUnitContainerTab unitID={unitState.unitID} tabTitle={unitState.title} showingToggle={unitState.showing} tabDragging={this.getTabDraggingMsg} />
             )
         )
     }
@@ -520,7 +534,7 @@ class ControllerUnitContainer extends Component {
     }
 
     extendAreaMouseDown=(e)=>{
-        console.log('extendArea mouse down')
+        //console.log('extendArea mouse down')
         //console.log(this.getSubView())
         e.stopPropagation()
 
@@ -603,7 +617,7 @@ class ControllerUnitContainer extends Component {
     }
 
     render() {    
-        console.log('Container render')
+        //console.log('Container render')
         const containerWindow = {
             width:this.state.divSize.width,
             height:this.state.divSize.height,
@@ -654,7 +668,7 @@ class ControllerUnitContainer extends Component {
 
         return (
             <div style={containerWindow} ref={(refContainer) => {this.refContainer = refContainer}} >  
-                <div style={headerStyle} onMouseDown={this.headerMouseDown} onMouseUp={this.headerMouseUp} onMouseOver={this.headerMouseOver} onMouseOut={this.headerMouseOut} >
+                <div style={headerStyle} onMouseDown={this.headerMouseDown} onMouseUp={this.headerMouseUp} onDragEnter={this.onDragEnter} onMouseOut={this.headerMouseOut} >
                 {this.loadHeaderTaps()}
                     <div style={cancelIconStyle} onMouseDown={this.cancelIconMouseDown} onMouseOver={this.cancelIconHover} onMouseOut={this.cancelIconOut}>{'x'}</div>
                 </div>   

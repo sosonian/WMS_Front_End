@@ -12,17 +12,24 @@ class ShadowContainer extends Component{
     }
 
     sendTabDraggingComplete(){
-        console.log('ShadowContainer tabDragging complete !!')
+        //console.log('ShadowContainer tabDragging complete !!')
+    }
 
+    onDragEnd=()=>{
+        //console.log('ShadowContainer onDragEnd')
+        let msg ={
+            tabDragging:false
+        }
+        this.props.draggingMsg(msg)
     }
 
     render() {
         const shadowContainerStyle ={
-            width:this.props.width,
-            height:this.props.height,
+            width:this.props.containerSize.width,
+            height:this.props.containerSize.height,
             position:'absolute',
-            left:this.props.posX-this.props.refPosX,
-            top:this.props.posY-this.props.refPosY,
+            left:this.props.refPos.x,
+            top:this.props.refPos.y,
             zIndex:100,
             border:'1px dotted',
             borderColor:'gray',
@@ -41,6 +48,8 @@ class ShadowContainer extends Component{
 
         const tapStyle = {
             //width:'50px',
+            left:this.props.tabPos.x,
+            position:'absolute',
             borderTopRightRadius:10,
             borderRight:'1px solid',
             borderLeft:'1px solid',
@@ -56,7 +65,7 @@ class ShadowContainer extends Component{
 
 
         return(
-            <div style={shadowContainerStyle}> 
+            <div style={shadowContainerStyle} draggable={true} onDragEnd={this.onDragEnd}> 
                 <div style={headerStyle} >
                     <div style={tapStyle}>
                         {this.props.tabTitle}

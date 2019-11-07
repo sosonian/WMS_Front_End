@@ -12,18 +12,22 @@ class ControllerUnitLayout extends Component {
                 {
                     unitID:1,
                     containerUnitContainerID:1,
+                    showing:true
                 },
                 {
                     unitID:2,
                     containerUnitContainerID:2,
+                    showing:true
                 },
                 {
                     unitID:3,
                     containerUnitContainerID:3,
+                    showing:true
                 },
                 {
                     unitID:4,
                     containerUnitContainerID:3,
+                    showing:false
                 },
 
             ],
@@ -104,7 +108,7 @@ class ControllerUnitLayout extends Component {
     //}
 
     componentDidUpdate(prevProps, prevState){
-        console.log('ControllerUnitLayout componentDidUpdate')
+        //console.log('ControllerUnitLayout componentDidUpdate')
         // if(this.state.containerDragging.status)
         // {
         //     if(prevProps.mousePos !== this.props.mousePos)
@@ -141,7 +145,7 @@ class ControllerUnitLayout extends Component {
         if(this.state.tabDragging)
         {
             return(
-                <ShadowContainer  width={this.state.shadowContainer.width} height={this.state.shadowContainer.height} posX={this.state.mousePos.x} posY={this.state.mousePos.y} refPosX={this.state.shadowContainer.posX} refPosY={this.state.shadowContainer.posY} tabTitle={this.state.shadowContainer.tabTitle}/>
+                <ShadowContainer  containerSize={this.state.shadowContainer.divSize} mousePos={this.state.mousePos} refPos={this.state.shadowContainer.refPos} tabPos={this.state.shadowContainer.tabPos} tabTitle={this.state.shadowContainer.tabTitle} draggingMsg={this.onTabDragging}/>
             )
         }
         else
@@ -166,7 +170,11 @@ class ControllerUnitLayout extends Component {
           this.setState({
             tabDragging:false,
             needMousePos:false,
-            shadowContainer:{}
+            shadowContainer:{},
+            mousePos:{
+                x:0,
+                y:0
+            }
           })
         }
     }
@@ -284,7 +292,11 @@ class ControllerUnitLayout extends Component {
                     conID:conIDToken,
                     subView:msg.subView
                 },
-                needMousePos:false
+                needMousePos:false,
+                mousePos:{
+                    x:0,
+                    y:0
+                }
                 //refPos:msg.refPos
             })
         }
@@ -314,7 +326,11 @@ class ControllerUnitLayout extends Component {
                     status:false,
                     conID:conIDToken
                 },
-                needMousePos:false
+                needMousePos:false,
+                mousePos:{
+                    x:0,
+                    y:0
+                }
                 //refPos:msg.refPos
             })
         }
@@ -334,7 +350,7 @@ class ControllerUnitLayout extends Component {
     }
 
     onMouseDown = (e) => {
-        console.log('ControllerUnitLayout onMouseDown')
+        //console.log('ControllerUnitLayout onMouseDown')
         // this.setState({
         //     ThreeDLayerClick:false,
         // })
@@ -356,10 +372,15 @@ class ControllerUnitLayout extends Component {
 
     onMouseUp = () => {
         //console.log('ControllerUnitLayout tabDragging complete !!')
-        // this.setState({
-        //     tabDragging:false,
-        //     shadowContainer:{}
-        // })
+        this.setState({
+            needMousePos:false,
+            tabDragging:false,
+            mousePos:{
+                x:0,
+                y:0
+            },
+            shadowContainer:{}
+        })
     }
     
     changeCursorWhenTabDragging=()=>{
@@ -372,7 +393,7 @@ class ControllerUnitLayout extends Component {
     }
 
     render(){
-        console.log('ControllerUnitLayout render ')
+        //console.log('ControllerUnitLayout render ')
         const containerStyle = {
             width: '100%',
             height: '100%',
