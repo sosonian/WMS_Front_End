@@ -157,7 +157,10 @@ class ThreeDRender extends Component{
   }
 
   componentWillUnmount() {
-    cancelAnimationFrame(this.refPP)
+    
+    //console.log('ThreeDRender componentWillUnmount')
+ 
+    //cancelAnimationFrame(this.refPP)
     //this.mount.removeChild(this.renderer1.domElement)
     //this.subMount2.refDom.removeChild(this.renderer2.domElement)
   }

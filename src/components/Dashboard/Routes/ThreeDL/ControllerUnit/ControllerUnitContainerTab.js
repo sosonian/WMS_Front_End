@@ -58,6 +58,7 @@ class ControllerUnitContainerTab extends Component{
     }
 
     render() {
+        //console.log('ControllerUnitContainerTab render')
         //this.sendFrontViewToggle()
         const tapStyle = {
             //width:'50px',

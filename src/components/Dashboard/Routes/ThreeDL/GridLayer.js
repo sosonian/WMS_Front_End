@@ -68,6 +68,8 @@ class GridLayer extends Component {
   componentWillUnmount(){
   //  console.log('Layer would nmount in seconds!!')
     let tempLayouts = this.refGridLayout.current.state.layout
+    //console.log('tempLayouts :')
+    //console.log(tempLayouts)
     localStorage.setItem('WMSLayoutSetting', JSON.stringify(tempLayouts))
   }
 
