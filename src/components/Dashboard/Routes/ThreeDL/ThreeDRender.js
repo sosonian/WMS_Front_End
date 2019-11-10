@@ -32,15 +32,6 @@ class ThreeDRender extends Component{
       rotationValue:0.01,      
     }
   }
-
-  // shouldComponentUpdate(nextProps, nextState){
-  //   if((nextState.canvasSize !== this.state.canvasSize) || (nextState.offset !== this.state.offset)||(nextProps.containerSize !== this.props.containerSize) || (nextState.needMousePos))
-  //   {
-  //     return true
-  //   }
-    
-    
-  // }
   
   componentDidMount(){
     this.mousePos = {
@@ -327,13 +318,7 @@ class ThreeDRender extends Component{
 
   threeDLayerMouseDown = (e) => {
     //console.log('ThreeDRender Mouse Down')
-    // if(this.cameraControl !== undefined)
-    // {
-    // }
-    // else
-    // {
-    // }
-
+   
     if(e.altKey)
     {
       this.setState({orbitControlMode : true})
@@ -360,13 +345,14 @@ class ThreeDRender extends Component{
   }
 
   threeDLayerMouseUp = (e) => {
-    if(e.altKey)
-    {
-      this.setState({orbitControlMode : false})
-    }
-    else
-    {
-    }
+    this.setState({orbitControlMode : false})
+    // if(e.altKey)
+    // {
+    //   this.setState({orbitControlMode : false})
+    // }
+    // else
+    // {
+    // }
     //this.setState({orbitControlMode : false})
   }
 
@@ -381,10 +367,6 @@ class ThreeDRender extends Component{
     {   
       this.setState({
         orbitControlMode : true
-        // mousePos:{
-        //   x:e.clientX-this.rect.left,
-        //   y:e.clientY-this.rect.top
-        // }
       })
     }
   }
@@ -435,33 +417,6 @@ class ThreeDRender extends Component{
       this.frontViewRef = refDom
     }
   }
-
-  needMousePos=(msg)=>{
-    if(msg)
-    {
-      //this.rect = this.mount.getBoundingClientRect()
-      this.setState({
-        needMousePos:true,
-      })
-    }
-    else
-    {
-      // this.mousePos = {
-      //   x:0,
-      //   y:0
-      // }
-      this.setState({
-        needMousePos:false,
-        
-        mousePos:{
-          x:0,
-          y:0
-        }     
-      })
-    }
-  }
-
-
 
   render(){
   //  console.log('ThreeDRender render')

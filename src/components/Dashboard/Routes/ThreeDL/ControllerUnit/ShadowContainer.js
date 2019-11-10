@@ -16,7 +16,7 @@ class ShadowContainer extends Component{
     }
 
     onDragEnd=()=>{
-        //console.log('ShadowContainer onDragEnd')
+        console.log('ShadowContainer onDragEnd')
         let msg ={
             tabDragging:false
         }
@@ -26,28 +26,29 @@ class ShadowContainer extends Component{
     render() {
         const shadowContainerStyle ={
             width:this.props.containerSize.width,
-            height:this.props.containerSize.height,
+            height:this.props.containerSize.height-25,
             position:'absolute',
             left:this.props.refPos.x,
-            top:this.props.refPos.y,
+            top:this.props.refPos.y+25,
             zIndex:100,
             border:'1px dotted',
             borderColor:'gray',
             boxSizing:'border-box',
         }
 
-        const headerStyle = {
-            width:'100%',
-            height:'25px',
-            borderBottom:'1px dotted',
-            borderColor:'gray',
-            display:'flex',
-            paddingTop:'2px',
-            userSelect:'none'    
-        }
+        // const headerStyle = {
+        //     width:'100%',
+        //     height:'25px',
+        //     borderBottom:'1px dotted',
+        //     borderColor:'gray',
+        //     display:'flex',
+        //     paddingTop:'2px',
+        //     userSelect:'none'    
+        // }
 
         const tapStyle = {
             //width:'50px',
+            top:-24,
             left:this.props.tabPos.x,
             position:'absolute',
             borderTopRightRadius:10,
@@ -65,13 +66,10 @@ class ShadowContainer extends Component{
 
 
         return(
-            <div style={shadowContainerStyle} draggable={true} onDragEnd={this.onDragEnd}> 
-                <div style={headerStyle} >
-                    <div style={tapStyle}>
-                        {this.props.tabTitle}
-                    </div>
-
-                </div>
+            <div style={shadowContainerStyle} draggable={true} onDragEnd={this.onDragEnd}>            
+                <div style={tapStyle}>
+                    {this.props.tabTitle}
+                </div>       
             </div>
         )
     }
