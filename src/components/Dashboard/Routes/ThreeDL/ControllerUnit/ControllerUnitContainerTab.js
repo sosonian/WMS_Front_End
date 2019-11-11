@@ -100,6 +100,16 @@ class ControllerUnitContainerTab extends Component{
         }
     }
 
+    onDragOver=(e)=>{
+        e.preventDefault()
+    }
+
+    onDrop=()=>{
+        this.setState({
+            tabHover:false
+        })
+    }
+
     transWidth=()=>{
         if(this.state.tabHover)
         {
@@ -143,7 +153,7 @@ class ControllerUnitContainerTab extends Component{
             //animationFillMode:'forwards'
         }
         return(
-            <div style={tabContainerStyle} onDragEnter={this.onDragEnter} onDragLeave={this.onDragLeave} onMouseDown={this.tabMouseDown} onMouseUp={this.tabMouseUP}>
+            <div style={tabContainerStyle} onDragEnter={this.onDragEnter} onDragLeave={this.onDragLeave} onDragOver={this.onDragOver} onDrop={this.onDrop} onMouseDown={this.tabMouseDown} onMouseUp={this.tabMouseUP}>
                 <div style={emptyTabStyle} ></div>
                 <div style={tabStyle}  ref={(refDom)=>{this.refDom=refDom}}>
                     {this.props.tabTitle}

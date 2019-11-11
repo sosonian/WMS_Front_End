@@ -230,6 +230,16 @@ class ControllerUnitContainer extends Component {
         }
     }
 
+    onDragOver=(e)=>{
+        e.preventDefault()
+    }
+
+    onDrop=()=>{
+        this.setState({
+            headerMergeSingnal:false
+        })
+    }
+
     sendContainerZIndexUpdate=()=>{
         let msg ={
             conID:this.props.conID,
@@ -588,7 +598,8 @@ class ControllerUnitContainer extends Component {
 
         return (
             <div style={containerWindow} ref={(refContainer) => {this.refContainer = refContainer}} >  
-                <div style={headerStyle} onMouseDown={this.headerMouseDown} onMouseUp={this.headerMouseUp} onDragEnter={this.onDragEnter} onDragLeave={this.onDragLeave} onMouseOut={this.headerMouseOut} >
+                <div style={headerStyle} onMouseDown={this.headerMouseDown} onMouseUp={this.headerMouseUp} onDragEnter={this.onDragEnter} onDragLeave={this.onDragLeave} 
+                onDragOver={this.onDragOver} onDrop={this.onDrop} onMouseOut={this.headerMouseOut} >
                 {this.loadHeaderTaps()}
                     <div style={cancelIconStyle} onMouseDown={this.cancelIconMouseDown} onMouseOver={this.cancelIconHover} onMouseOut={this.cancelIconOut}>{'x'}</div>
                 </div>   
