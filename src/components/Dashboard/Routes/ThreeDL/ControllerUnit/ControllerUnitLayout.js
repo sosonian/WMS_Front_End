@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ControllerUnitContainer from './ControllerUnitContainer'
 import ShadowContainer from './ShadowContainer'
 import TestContainer from './TestContainer'
+import LinkedList from '../../../../CommonUtilities/LinkedList'
 
 
 class ControllerUnitLayout extends Component {
@@ -243,11 +244,6 @@ class ControllerUnitLayout extends Component {
 
             if((this.state.tabDragging.oldConID !== this.state.tabDragging.newConID)&&(this.state.tabDragging.newConID !==0))
             {
-                // let tempControllerUnitState = this.state.controllerUnitState
-                // let stateLength = tempControllerUnitState.length
-                // let tempNewSequenceNumber = this.state.tabDragging.newSequenceNumber==0?
-                // tempNewSequenceNumber=stateLength:tempNewSequenceNumber=this.state.tabDragging.newSequenceNumber
-
                 let output = tempControllerUnitState.map((unitState=>{  
                     let unitStateObj ={} 
                     if(unitState.unitID===this.state.tabDragging.unitID)
