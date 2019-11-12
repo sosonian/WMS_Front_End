@@ -1,7 +1,7 @@
 
 class LinkedListNode {
-    constructor(data, next=null){
-        this.data=data;
+    constructor(data, next=null, index=null){
+        this.data=data
         this.next=next
     }
 }

@@ -46,7 +46,7 @@ class ControllerUnitLayout extends Component {
 
             ControllerUnitContainerState:[
                 {
-                    controllerUnitContainerID:1,
+                    containerID:1,
                     size:
                     {
                         width:200,
@@ -58,9 +58,10 @@ class ControllerUnitLayout extends Component {
                     },
                     zIndex:1,
                     showing:true,
+                    controllerUnitList:null
                 },
                 {
-                    controllerUnitContainerID:2,
+                    containerID:2,
                     size:
                     {
                         width:200,
@@ -72,9 +73,10 @@ class ControllerUnitLayout extends Component {
                     },
                     zIndex:2,
                     showing:true,
+                    controllerUnitList:null
                 },
                 {
-                    controllerUnitContainerID:3,
+                    containerID:3,
                     size:
                     {
                         width:200,
@@ -86,9 +88,10 @@ class ControllerUnitLayout extends Component {
                     },
                     zIndex:3,
                     showing:true,
+                    controllerUnitList:null
                 },
                 {
-                    controllerUnitContainerID:4,
+                    containerID:4,
                     size:
                     {
                         width:200,
@@ -100,6 +103,7 @@ class ControllerUnitLayout extends Component {
                     },
                     zIndex:4,
                     showing:false,
+                    controllerUnitList:null
                 }
             ],
 
@@ -378,7 +382,7 @@ class ControllerUnitLayout extends Component {
                     return container.showing == false
                 })
 
-                let tempNewConID = tempContainer.controllerUnitContainerID
+                let tempNewConID = tempContainer.containerID
 
                 if(tempNewConID==undefined)
                 {
@@ -523,7 +527,7 @@ class ControllerUnitLayout extends Component {
             let containerStateToken =[]
             this.state.ControllerUnitContainerState.map(containerState=>{
                 let stateObj = containerState
-                if(stateObj.controllerUnitContainerID===e.conID)
+                if(stateObj.containerID===e.conID)
                 {
                     stateObj.showing = false
                 }
@@ -612,7 +616,7 @@ class ControllerUnitLayout extends Component {
         let stateLength = arrayToken.length
         this.state.ControllerUnitContainerState.map(containerState=>{
             let stateObj = containerState
-            if(stateObj.controllerUnitContainerID===msg.conID)
+            if(stateObj.containerID===msg.conID)
             {
                 stateObj.zIndex = stateLength
             }
@@ -656,10 +660,10 @@ class ControllerUnitLayout extends Component {
             let temp = this.state.ControllerUnitContainerState
             let output = temp.map((containerState)=>{
                 let stateObj={}
-                if(containerState.controllerUnitContainerID===msg.conID)
+                if(containerState.containerID===msg.conID)
                 {
                     stateObj = {
-                        controllerUnitContainerID:containerState.controllerUnitContainerID,
+                        containerID:containerState.containerID,
                         size:containerState.size,
                         position:msg.position,
                         zIndex:containerState.zIndex,
@@ -702,8 +706,8 @@ class ControllerUnitLayout extends Component {
         //console.log('ControllerUnitLayout createControllerUnitContainer')
         return (
             this.state.ControllerUnitContainerState.map(container=> container.showing?
-                (<ControllerUnitContainer key={container.controllerUnitContainerID} conID={container.controllerUnitContainerID} initialPos={container.position} mousePos={this.state.mousePos} offset={this.props.offset}
-                controllerUnitStateProps={this.state.controllerUnitState} containerDragging={this.onContainerDragging} anyContainerDragging={this.state.containerDragging.status} anyContainerExtending={this.state.containerExtending.status} rotationValue={this.sendRotationValueBack} frontViewToggle={this.sendFrontViewToggle} sideViewToggle={this.sendSideViewToggle} containerExtending={this.onContainerExtending} getContainerNewSize={this.getContainerNewSize} onTabDragging={this.onTabDragging} tabDraggingBooling={this.state.tabDragging.status} getTabNewSequenceNumber={this.getTabNewSequenceNumber} tabNewConID={this.tabNewConID} containerShowing={this.controllerUnitToggle} zIndex={container.zIndex} unmountTest={this.unmountTest}/>):null
+                (<ControllerUnitContainer key={container.containerID} conID={container.containerID} initialPos={container.position} mousePos={this.state.mousePos} offset={this.props.offset}
+                controllerUnitList={container.controllerUnitList} containerDragging={this.onContainerDragging} anyContainerDragging={this.state.containerDragging.status} anyContainerExtending={this.state.containerExtending.status} rotationValue={this.sendRotationValueBack} frontViewToggle={this.sendFrontViewToggle} sideViewToggle={this.sendSideViewToggle} containerExtending={this.onContainerExtending} getContainerNewSize={this.getContainerNewSize} onTabDragging={this.onTabDragging} tabDraggingBooling={this.state.tabDragging.status} getTabNewSequenceNumber={this.getTabNewSequenceNumber} tabNewConID={this.tabNewConID} containerShowing={this.controllerUnitToggle} zIndex={container.zIndex} unmountTest={this.unmountTest}/>):null
             )
         )
     }

@@ -65,7 +65,7 @@ class ControllerUnitContainer extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         //console.log('ControllerUnitContainer componentDidUpdate conID ', this.props.conID)
-        if(prevProps.controllerUnitStateProps !== this.props.controllerUnitStateProps)
+        if(prevProps.controllerUnitList !== this.props.controllerUnitList)
         {
         }
         
@@ -110,11 +110,11 @@ class ControllerUnitContainer extends Component {
 
     loadControllerUnitState=()=>{
         let tempControllerUnitState = this.state.controllerUnitState
-        let tempControllerUnitStateProps = this.props.controllerUnitStateProps
+        let tempcontrollerUnitList = this.props.controllerUnitList
 
         let sequenceCount = 0
         let output = tempControllerUnitState.map(unitState=>{   
-            let result =  tempControllerUnitStateProps.find(e=>e.unitID===unitState.unitID)
+            let result =  tempcontrollerUnitList.find(e=>e.unitID===unitState.unitID)
             if(result.containerUnitContainerID === this.props.conID)
             {
                 sequenceCount = sequenceCount + 1
@@ -354,21 +354,20 @@ class ControllerUnitContainer extends Component {
     }
 
     loadControllerUnit=()=>{
-        let stateArray = this.props.controllerUnitStateProps
-        let unitFront = stateArray.find((unit)=>{
-            return (unit.showing == true && unit.containerUnitContainerID == this.props.conID)
-        })
-        
-        if(unitFront==undefined)
-        {
-            //console.log('unitFront not found!')
-            let unitFront2 = stateArray.find((unit)=>{
-                return unit.sequenceNumber == 0
+        let stateArray = this.props.controllerUnitList
+        if(stateArray)
+        { 
+            let unitFront = stateArray.find((unit)=>{
+                return (unit.showing == true && unit.containerUnitContainerID == this.props.conID)
             })
 
-            if(unitFront2 !== undefined)
+            if(unitFront==undefined)
             {
-            switch(unitFront2.unitID) {
+               return
+            }
+            else
+            {
+                switch(unitFront.unitID) {
                 case 1:
                     return(
                         this.loadDatGui()
@@ -385,29 +384,12 @@ class ControllerUnitContainer extends Component {
                     return(
                         this.loadTestUnit()
                     )
-            }
+                }
             }
         }
         else
         {
-            switch(unitFront.unitID) {
-                case 1:
-                    return(
-                        this.loadDatGui()
-                    )
-                case 2:
-                    return(
-                       this.loadFrontView()
-                    )
-                case 3:
-                    return(
-                        this.loadSideView()
-                    )
-                case 4:
-                    return(
-                        this.loadTestUnit()
-                    )
-            }
+            return
         }
     }
 
@@ -446,17 +428,25 @@ class ControllerUnitContainer extends Component {
     loadHeaderTaps=()=>{
 
         let unitStateArray = []
-        this.props.controllerUnitStateProps.map((unitState)=>{
-            if(unitState.containerUnitContainerID==this.props.conID)
-            {            
-                unitStateArray.push(unitState)         
-            }
-        })
-        unitStateArray.sort(function(a,b){return a.sequenceNumber-b.sequenceNumber})
-        return(unitStateArray.map(unitState=>
-                <ControllerUnitContainerTab unitID={unitState.unitID} sequenceNumber={unitState.sequenceNumber} tabTitle={unitState.title} showingToggle={unitState.showing} otherTabDragging={this.props.tabDraggingBooling} tabDragging={this.getTabDraggingMsg} getTabNewSequenceNumber={this.getTabNewSequenceNumber}/>
+        if(this.props.controllerUnitList)
+        {
+            this.props.controllerUnitList.map((unitState)=>{
+                if(unitState.containerUnitContainerID==this.props.conID)
+                {            
+                    unitStateArray.push(unitState)         
+                }
+            })
+            unitStateArray.sort(function(a,b){return a.sequenceNumber-b.sequenceNumber})
+            return(unitStateArray.map(unitState=>
+                    <ControllerUnitContainerTab unitID={unitState.unitID} sequenceNumber={unitState.sequenceNumber} tabTitle={unitState.title} showingToggle={unitState.showing} otherTabDragging={this.props.tabDraggingBooling} tabDragging={this.getTabDraggingMsg} getTabNewSequenceNumber={this.getTabNewSequenceNumber}/>
+                )
             )
-        )
+        }
+        else
+        {
+            return
+        }
+        
     }
 
     cancelIconMouseDown=()=>{
@@ -491,17 +481,17 @@ class ControllerUnitContainer extends Component {
 
     getSubView = () => {
         let msg = 'nonSubView'
-        if((this.props.controllerUnitStateProps[1].showing == true) && (this.props.controllerUnitStateProps[1].containerUnitContainerID == this.props.conID))
-        {
-            msg= 'frontView'
-        }
-        else if((this.props.controllerUnitStateProps[2].showing == true) && (this.props.controllerUnitStateProps[2].containerUnitContainerID == this.props.conID))
-        {
-            msg= 'sideView'
-        }
-        else
-        {
-        }
+        // if((this.props.controllerUnitList[1].showing == true) && (this.props.controllerUnitList[1].containerUnitContainerID == this.props.conID))
+        // {
+        //     msg= 'frontView'
+        // }
+        // else if((this.props.controllerUnitList[2].showing == true) && (this.props.controllerUnitList[2].containerUnitContainerID == this.props.conID))
+        // {
+        //     msg= 'sideView'
+        // }
+        // else
+        // {
+        // }
         //console.log('getSubView : ', msg)
         return msg
     }
@@ -597,7 +587,7 @@ class ControllerUnitContainer extends Component {
         }
 
         return (
-            <div style={containerWindow} ref={(refContainer) => {this.refContainer = refContainer}} >  
+            <div style={containerWindow} ref={(refContainer) => {this.refContainer = refContainer}}>  
                 <div style={headerStyle} onMouseDown={this.headerMouseDown} onMouseUp={this.headerMouseUp} onDragEnter={this.onDragEnter} onDragLeave={this.onDragLeave} 
                 onDragOver={this.onDragOver} onDrop={this.onDrop} onMouseOut={this.headerMouseOut} >
                 {this.loadHeaderTaps()}
