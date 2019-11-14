@@ -15,14 +15,14 @@ class ControllerUnitLayout extends Component {
                     name:'DatGui',
                     title:'旋轉控制',
                     containerUnitContainerID:1,
-                    sequenceNumber:4,
+                    sequenceNumber:1,
                     showing:true
                 },
                 {
                     unitID:2,
                     name:'SubViewFront',
                     title:'前視圖',
-                    sequenceNumber:4,
+                    sequenceNumber:1,
                     containerUnitContainerID:2,
                     showing:true
                 },
@@ -30,7 +30,7 @@ class ControllerUnitLayout extends Component {
                     unitID:3,
                     name:'SubViewFront',
                     title:'側視圖',
-                    sequenceNumber:3,
+                    sequenceNumber:1,
                     containerUnitContainerID:3,
                     showing:true
                 },
@@ -38,74 +38,14 @@ class ControllerUnitLayout extends Component {
                     unitID:4,
                     name:'TestUnit',
                     title:'測試控制',
-                    sequenceNumber:4,
+                    sequenceNumber:1,
                     containerUnitContainerID:3,
                     showing:false
                 }
             ],
+            containerNumber:4,
 
-            ControllerUnitContainerState:[
-                {
-                    containerID:1,
-                    size:
-                    {
-                        width:200,
-                        height:200
-                    },
-                    position:{
-                        x:0,
-                        y:0
-                    },
-                    zIndex:1,
-                    showing:true,
-                    controllerUnitList:null
-                },
-                {
-                    containerID:2,
-                    size:
-                    {
-                        width:200,
-                        height:200
-                    },
-                    position:{
-                        x:0,
-                        y:200
-                    },
-                    zIndex:2,
-                    showing:true,
-                    controllerUnitList:null
-                },
-                {
-                    containerID:3,
-                    size:
-                    {
-                        width:200,
-                        height:200
-                    },
-                    position:{
-                        x:0,
-                        y:400
-                    },
-                    zIndex:3,
-                    showing:true,
-                    controllerUnitList:null
-                },
-                {
-                    containerID:4,
-                    size:
-                    {
-                        width:200,
-                        height:200
-                    },
-                    position:{
-                        x:300,
-                        y:0
-                    },
-                    zIndex:4,
-                    showing:false,
-                    controllerUnitList:null
-                }
-            ],
+            ControllerUnitContainerState:[],
 
             mousePos:{
                 x:0,
@@ -140,6 +80,11 @@ class ControllerUnitLayout extends Component {
         }
     }
 
+    componentDidMount(){
+        let newContainerState= this.loadUnitStateToContainer(this.createContainerState())
+        this.setContainerState(newContainerState)
+    }
+
     componentDidUpdate(prevProps, prevState){
         //console.log('ControllerUnitLayout componentDidUpdate')
     }
@@ -161,7 +106,79 @@ class ControllerUnitLayout extends Component {
         }
     }
 
+    createContainerState=()=>{
+        let containerStateArray = []
     
+        for (var i=0; i<this.state.containerNumber; i++)
+        {
+            let posX=200*Math.floor(i/3)
+            let posY
+            if(i%3===0)
+            {
+                posY=0
+            }
+            else if(i%3===1)
+            {
+                posY=200
+            }
+            else if(i%3===2)
+            {
+                posY=400
+            }
+
+            let tempLinkedList =new LinkedList()
+            let containerStateObj={
+                containerID:i+1,
+                size:
+                {
+                    width:200,
+                    height:200
+                },
+                position:{
+                    x:posX,
+                    y:posY
+                },
+                zIndex:i+1,
+                showing:true,
+                controllerUnitList: tempLinkedList
+            }
+
+            containerStateArray.push(containerStateObj)
+        }
+
+        return containerStateArray
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////
+    loadUnitStateToContainer=(containerStateArray)=>{
+        let tempUnitArray = this.state.controllerUnitState   
+        let tempContainerArray = containerStateArray
+
+        tempUnitArray.map((unitState=>{
+            let newSequenceNumber = 0 
+            if(unitState.containerUnitContainerID>0 && unitState.containerUnitContainerID<Number(tempContainerArray.length+1))
+            {
+                let newUnitState = unitState
+                //newUnitState.sequenceNumber = newSequenceNumber
+                let index = unitState.containerUnitContainerID-1
+                let tempList = tempContainerArray[index].controllerUnitList
+                tempList.insertLast(newUnitState)
+                tempContainerArray[index].controllerUnitList = tempList
+            }
+        }))
+
+        return tempContainerArray
+    }
+
+    setContainerState=(newContainerState)=>{
+        if(this.state.ControllerUnitContainerState !== newContainerState)
+        {
+            this.setState({
+                ControllerUnitContainerState:newContainerState
+            })
+        }
+    }
 
     onTabDragging =(msg)=>{
         if(msg.tabDragging)
