@@ -215,7 +215,7 @@ class ControllerUnitContainer extends Component {
     onDragEnter=(e)=>{
         e.stopPropagation()
         e.preventDefault()
-        //console.log('ControllerUnitContainer onDragEnter : conID ', this.props.conID)
+        console.log('ControllerUnitContainer onDragEnter : conID ', this.props.conID)
         //console.log(this.state.tabChangeSequence)
         //if(this.props.tabDraggingBooling && this.state.tabChangeSequence == false)
         //{
@@ -234,7 +234,7 @@ class ControllerUnitContainer extends Component {
     onDragLeave=(e)=>{
         e.stopPropagation()
         e.preventDefault()
-        //console.log('ControllerUnitContainer onDragLeave: conID ', this.props.conID)
+        console.log('ControllerUnitContainer onDragLeave: conID ', this.props.conID)
         //console.log(this.state.tabChangeSequence)
 
         if(this.props.tabDraggingBooling)

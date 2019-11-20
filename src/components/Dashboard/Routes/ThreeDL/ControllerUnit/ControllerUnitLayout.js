@@ -100,6 +100,10 @@ class ControllerUnitLayout extends Component {
                 let tempShowingUnitID = container.controllerUnitList.head.data.unitID
                 container.showingUnitID = tempShowingUnitID
             }
+            else
+            {
+                container.showing = false
+            }
         }))
         return containerState
     }
@@ -315,12 +319,14 @@ class ControllerUnitLayout extends Component {
                     if(state.containerID==this.state.tabDragging.oldConID)
                     {
                         let tempShowingUnitID = 0 
+                        let showingBooling =true
                         if(originContainerList.head)
                         {
                             tempShowingUnitID = originContainerList.head.data.unitID
                         }
                         else
                         {
+                            showingBooling = false
                         }
 
                         leftShowingUnitID = tempShowingUnitID
@@ -330,7 +336,7 @@ class ControllerUnitLayout extends Component {
                             size:state.size,
                             position:state.position,
                             zIndex:state.zIndex,
-                            showing:state.showing,
+                            showing:showingBooling,
                             showingUnitID:tempShowingUnitID,
                             controllerUnitList:originContainerList
                         }
@@ -368,7 +374,8 @@ class ControllerUnitLayout extends Component {
                 let tempContainerArray = []
                 this.state.ControllerUnitContainerState.map(state=>{
                     if(state.containerID==this.state.tabDragging.oldConID)
-                    {
+                    { 
+                        let showingBooling =true
                         let tempShowingUnitID = 0 
                         if(originContainerList.head)
                         {
@@ -376,6 +383,7 @@ class ControllerUnitLayout extends Component {
                         }
                         else
                         {
+                            showingBooling = false
                         }
 
                         leftShowingUnitID = tempShowingUnitID
@@ -385,7 +393,7 @@ class ControllerUnitLayout extends Component {
                             size:state.size,
                             position:state.position,
                             zIndex:state.zIndex,
-                            showing:state.showing,
+                            showing:showingBooling,
                             showingUnitID:tempShowingUnitID,
                             controllerUnitList:originContainerList
                         }
@@ -412,6 +420,76 @@ class ControllerUnitLayout extends Component {
                 })
                 output = tempContainerArray
             }
+            else if(this.state.tabDragging.newConID === 0)
+            {       
+                console.log('open new container')
+                let validContainer = this.state.ControllerUnitContainerState.find(state=>state.showing===false)
+               
+                if(validContainer === undefined)
+                {
+                    output = this.state.ControllerUnitContainerState
+                }
+                else
+                { 
+                    let validContainerID = validContainer.containerID
+                    let originContainerList = this.state.ControllerUnitContainerState[this.state.tabDragging.oldConID-1].controllerUnitList.cloneList()
+                    let newContainerList = new LinkedList()
+
+                    let tempData = originContainerList.getAt(this.state.tabDragging.oldSequenceNumber)
+                    originContainerList.removeAt(this.state.tabDragging.oldSequenceNumber)
+                    newContainerList.insertLast(tempData)
+                    let tempShowingUnitID = 0 
+
+                    if(originContainerList.head)
+                    {
+                        console.log('originContainerList.head not null')
+                        let tempContainerArray = []
+                        this.state.ControllerUnitContainerState.map(state=>{
+                            if(state.containerID===this.state.tabDragging.oldConID)
+                            { 
+                                tempShowingUnitID = originContainerList.head.data.unitID
+                                leftShowingUnitID = tempShowingUnitID
+        
+                                let tempStateObj = {
+                                    containerID:state.containerID,
+                                    size:state.size,
+                                    position:state.position,
+                                    zIndex:state.zIndex,
+                                    showing:true,
+                                    showingUnitID:tempShowingUnitID,
+                                    controllerUnitList:originContainerList
+                                }
+                                tempContainerArray.push(tempStateObj)
+                            }
+                            else if(state.containerID===validContainerID)
+                            {
+                                
+                                let tempStateObj = {
+                                    containerID:state.containerID,
+                                    size:msg.divSize,
+                                    position:this.state.mousePos,
+                                    zIndex:state.zIndex,
+                                    showing:true,
+                                    showingUnitID:this.state.tabDragging.unitID,
+                                    controllerUnitList:newContainerList
+                                }
+                                tempContainerArray.push(tempStateObj)
+                            }       
+                            else
+                            {
+                                tempContainerArray.push(state)
+                            }        
+                        })
+                        output = tempContainerArray
+                    }
+                    else
+                    {
+                        output = this.state.ControllerUnitContainerState
+                    }
+                }
+            }
+
+
             else
             {
                 output = this.state.ControllerUnitContainerState
@@ -765,8 +843,74 @@ class ControllerUnitLayout extends Component {
         return cursor
     }
 
+    onDragEnter=(e)=>{
+        e.stopPropagation()
+        e.preventDefault()
+        console.log('layer drag enter')
+        
+        if(this.state.tabDragging.status)
+        {
+            
+            let newState = {
+                status:true,
+                targetUnitID:this.state.tabDragging.targetUnitID,
+                unitID:this.state.tabDragging.unitID,
+                oldConID:this.state.tabDragging.oldConID,
+                newConID:0,
+                oldSequenceNumber:this.state.tabDragging.oldSequenceNumber,
+                newSequenceNumber:this.state.tabDragging.newSequenceNumber,
+            }
+
+            this.setState({
+                tabDragging:newState
+            })
+        }
+    }
+
+    onDragLeave=(e)=>{
+        e.stopPropagation()
+        e.preventDefault()
+        console.log('layer drag leave')
+       
+        if(this.state.tabDragging.status)
+        {
+            
+            let newState = {
+                status:true,
+                targetUnitID:this.state.tabDragging.targetUnitID,
+                unitID:this.state.tabDragging.unitID,
+                oldConID:this.state.tabDragging.oldConID,
+                newConID:this.state.tabDragging.newConID,
+                oldSequenceNumber:this.state.tabDragging.oldSequenceNumber,
+                newSequenceNumber:this.state.tabDragging.newSequenceNumber,
+            }
+
+            this.setState({
+                tabDragging:newState
+            })
+        }
+    }
+
+    onDragOver=(e)=>{
+        e.preventDefault()
+        if(this.state.needMousePos)
+        {
+            this.setState({
+              mousePos:{
+                x:e.clientX-this.props.offset.x,
+                y:e.clientY-this.props.offset.y
+              }
+            })    
+        }   
+        
+    }
+
+    onDrop=()=>{
+
+    }
+
     render(){
-        console.log('ControllerUnitLayout render ')
+        //console.log('ControllerUnitLayout render ')
         const containerStyle = {
             width: '100%',
             height: '100%',
@@ -777,7 +921,7 @@ class ControllerUnitLayout extends Component {
         }
 
         return(
-            <div style={containerStyle}  ref={(refLayout)=>{this.refLayout=refLayout}} onMouseDown={this.onMouseDown} onMouseMove={this.onMouseMove} onMouseUp={this.onMouseUp}> 
+            <div style={containerStyle}  ref={(refLayout)=>{this.refLayout=refLayout}} onMouseDown={this.onMouseDown} onMouseMove={this.onMouseMove} onMouseUp={this.onMouseUp} onDragEnter={this.onDragEnter} onDragLeave={this.onDragLeave} onDragOver={this.onDragOver} onDrop={this.onDrop}> 
                 {this.createControllerUnitContainer()}
                 {/** <TestContainer mousePos={this.state.mousePos}/> **/}
                 {this.appendShadowContainer()}

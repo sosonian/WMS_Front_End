@@ -5,6 +5,10 @@ class ShadowContainer extends Component{
     constructor(props) {
         super(props)
         this.state = {
+            // pos:{
+            //     x:0,
+            //     y:0
+            // }
         } 
     }
 
@@ -19,7 +23,8 @@ class ShadowContainer extends Component{
         //console.log('ShadowContainer onDragEnd')
         let msg ={
             tabDragging:false,
-            divSize:this.props.containerSize
+            divSize:this.props.containerSize,
+            pos:this.props.refPos
         }
         this.props.draggingMsg(msg)
     }
@@ -33,6 +38,24 @@ class ShadowContainer extends Component{
         this.props.draggingMsg(msg)
 
     }
+
+    // onMouseMove = (e) => {
+    //     //console.log('ControllerUnitLayout onMouseMove')
+    //     e.stopPropagation()
+    //     e.preventDefault()
+
+    //     console.log('x ', e.clientX, '  y ',e.clientY)
+        
+    //         this.setState({
+    //           pos:{
+    //             x:e.clientX,
+    //             y:e.clientY
+    //           }
+    //         })   
+            
+        
+        
+    // }
 
     render() {
         const shadowContainerStyle ={
@@ -66,7 +89,7 @@ class ShadowContainer extends Component{
 
 
         return(
-            <div style={shadowContainerStyle} draggable={true} onDragEnd={this.onDragEnd} onMouseUp={this.onMouseUp}>            
+            <div style={shadowContainerStyle} draggable={true} onDragEnd={this.onDragEnd} onMouseUp={this.onMouseUp} >            
                 <div style={tapStyle}>
                     {this.props.tabTitle}
                 </div>       
