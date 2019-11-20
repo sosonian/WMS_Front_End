@@ -1,0 +1,32 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[remote "origin"]
+	url = https://github.com/sosonian/WMS_Front_End.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "master"]
+	remote = origin
+	merge = refs/heads/master
+[branch "ChangeReactGridLayerSourceCodeVersion0"]
+	remote = origin
+	merge = refs/heads/ChangeReactGridLayerSourceCodeVersion0
+[branch "multiViewports"]
+	remote = origin
+	merge = refs/heads/multiViewports
+[branch "SubWindowVersion"]
+	remote = origin
+	merge = refs/heads/SubWindowVersion
+[branch "mergeableSubwindow"]
+	remote = origin
+	merge = refs/heads/mergeableSubwindow
+[branch "removePos&SizePropsFromContainer"]
+	remote = origin
+	merge = refs/heads/removePos&SizePropsFromContainer
+[branch "moveControllerUnitState"]
+	remote = origin
+	merge = refs/heads/moveControllerUnitState
+[branch "adaptLinkListToStoreUnitState"]
+	remote = origin
+	merge = refs/heads/adaptLinkListToStoreUnitState

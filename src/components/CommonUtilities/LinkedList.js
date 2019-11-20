@@ -41,7 +41,7 @@ class LinkedList {
         // Index Over Range, stop the function
         if(index>this.length)
         {
-            console.log('Index Over Range')
+            //console.log('Index Over Range')
         }
         // Insert at index[0], means insert first
         else if(index===0)
@@ -51,7 +51,7 @@ class LinkedList {
         // Index is negtive, not valid, stop function
         else if(index<0)
         {
-            console.log('Index is negtive, not valid')
+            //console.log('Index is negtive, not valid')
         }
         else
         {
@@ -77,19 +77,85 @@ class LinkedList {
     getAt(index) {
         let current = this.head
         let count = 0
+        let outputData
 
         while(current)
         {
             if(count == index)
             {
                 //console.log(current.data)
-                return current.data
+                return outputData= {...current.data}
             }
             count++
             current= current.next
         }
 
         return null
+    }
+
+    shiftTo(index, targetIndex){
+        // console.log('length : ',this.length)
+        if(index<0 || targetIndex <0 || index>this.length || targetIndex> this.length)
+        {
+            return 
+        }
+        else
+        {
+            if(index===targetIndex)
+            {
+                return
+            }
+            else
+            {
+                let tempData = this.getAt(index)
+                this.removeAt(index)
+                this.insertAt(tempData, targetIndex)
+            }
+        }
+    }
+
+     //// BigO = (n)
+
+     shiftToLast(index){
+        if(index<0 || index > this.length-1)
+        {
+            const errMsg = new Error('index not valid (out of length or is negtive)')
+            throw errMsg
+        }
+        else
+        {
+            if(index === this.length-1)
+            {
+                return
+            }
+            else if(index === 0)
+            {
+                let tempData= this.head.data
+                this.head=this.head.next
+                this.insertLast(tempData)
+                this.length--
+            }
+            else
+            {
+                let tempNode = new LinkedListNode();
+                let previous = null
+                let current = this.head
+                let count = 0
+
+               while(current.next)
+                {
+                    if(count === index)
+                    {
+                        tempNode.data = current.data
+                        previous.next=current.next
+                    }
+                    count++
+                    previous = current
+                    current = current.next
+                }
+                current.next = tempNode
+            }
+        }
     }
 
     removeLast(){
@@ -122,7 +188,22 @@ class LinkedList {
         }
     }
 
+    //// BigO = (n)
 
+    cloneList(){
+        let clone = new LinkedList()
+        let current = this.head
+        
+        while(current)
+        {
+            let tempNodeData = {...current.data}
+            clone.insertLast(tempNodeData)
+            current = current.next
+        }
+
+        return clone
+
+    }
 
 
     printList(){

@@ -1,0 +1,4 @@
+0000000000000000000000000000000000000000 79fa31589187a67667c4ef84f480a143e145eba6 sosonian <sosonian@gmail.com> 1573125447 +0000	branch: Created from HEAD
+79fa31589187a67667c4ef84f480a143e145eba6 6461afe57ba97f4726fa7f5331df5a7b6b8d5777 sosonian <sosonian@gmail.com> 1573218350 +0000	commit: improved Container Extension
+6461afe57ba97f4726fa7f5331df5a7b6b8d5777 ebe28035f7ae12f1d0408927b906068d345be54a sosonian <sosonian@gmail.com> 1573423814 +0000	commit: improve Cross Container Tab Dragging
+ebe28035f7ae12f1d0408927b906068d345be54a 63c91c65f6675ab02892266f16adc1872c8b109d sosonian <sosonian@gmail.com> 1573473995 +0000	commit: improved tab and header ondrag

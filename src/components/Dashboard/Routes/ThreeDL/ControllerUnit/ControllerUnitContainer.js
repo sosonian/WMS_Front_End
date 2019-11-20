@@ -19,13 +19,14 @@ class ControllerUnitContainer extends Component {
                 y:0
             },
             divSize:{
-                width:200,
-                height:200,
+                width:0,
+                height:0,
             },
             refDivSize:{
                 width:0,
                 height:0
             },
+            //showingUnitID:0,
             containerDragging:false,
             containerExtending:false,
             tabDragging:false,
@@ -39,6 +40,7 @@ class ControllerUnitContainer extends Component {
 
     componentDidMount() {
         this.loadContainerPosition()
+        this.loadContainerSize()
     }
 
     shouldComponentUpdate(nextProps, nextState){
@@ -83,6 +85,10 @@ class ControllerUnitContainer extends Component {
                 this.setNewContainerSize()
             } 
         }
+        else if(prevProps.size !== this.props.size)
+        {
+            this.loadContainerSize()
+        }
     }
     
     componentWillUnmount() {
@@ -98,6 +104,12 @@ class ControllerUnitContainer extends Component {
         }
         this.setState({
             position:newPos
+        })
+    }
+
+    loadContainerSize=()=>{
+        this.setState({
+            divSize:this.props.size
         })
     }
 
@@ -147,6 +159,8 @@ class ControllerUnitContainer extends Component {
 
         let width = this.state.refDivSize.width+(this.props.mousePos.x-this.state.refPos.x)
         let height = this.state.refDivSize.height+(this.props.mousePos.y-this.state.refPos.y)
+
+       
         let newSize = {
             width:width,
             height:height
@@ -171,6 +185,7 @@ class ControllerUnitContainer extends Component {
 
         let msg ={
             conID:this.props.conID,
+            unitID:this.props.showingUnitID,
             zIndex:this.props.zIndex,
             containerDragging:true,
         }
@@ -189,6 +204,7 @@ class ControllerUnitContainer extends Component {
 
         let msg ={
             conID:this.props.conID,
+            unitID:this.props.showingUnitID,
             zIndex:this.props.zIndex,
             containerDragging:false,
             position:this.state.position
@@ -196,31 +212,38 @@ class ControllerUnitContainer extends Component {
         this.props.containerDragging(msg)
     }
 
-    onDragEnter=()=>{
-        console.log('ControllerUnitContainer onDragEnter : conID ', this.props.conID)
-        console.log(this.state.tabChangeSequence)
-        if(this.props.tabDraggingBooling && this.state.tabChangeSequence == false)
-        {
+    onDragEnter=(e)=>{
+        e.stopPropagation()
+        e.preventDefault()
+        //console.log('ControllerUnitContainer onDragEnter : conID ', this.props.conID)
+        //console.log(this.state.tabChangeSequence)
+        //if(this.props.tabDraggingBooling && this.state.tabChangeSequence == false)
+        //{
             this.setState({
                 headerMergeSingnal:true
             })
+
             let msg = {
+                enterHeader:true,
                 newConID:this.props.conID
             }
             this.props.tabNewConID(msg)  
-        }
+        //}
     }
 
-    onDragLeave=()=>{
-        console.log('ControllerUnitContainer onDragLeave: conID ', this.props.conID)
-        console.log(this.state.tabChangeSequence)
+    onDragLeave=(e)=>{
+        e.stopPropagation()
+        e.preventDefault()
+        //console.log('ControllerUnitContainer onDragLeave: conID ', this.props.conID)
+        //console.log(this.state.tabChangeSequence)
 
         if(this.props.tabDraggingBooling)
         {   
             if(this.state.tabChangeSequence == false)
             { 
                 let msg = {
-                    newConID:0
+                    enterHeader:false,
+                    newConID:this.props.conID
                 }
                 this.props.tabNewConID(msg) 
             }
@@ -235,6 +258,7 @@ class ControllerUnitContainer extends Component {
     }
 
     onDrop=()=>{
+        //console.log('ControllerUnitContainer onDrop: conID ', this.props.conID)
         this.setState({
             headerMergeSingnal:false
         })
@@ -250,13 +274,11 @@ class ControllerUnitContainer extends Component {
     }
 
     headerMouseOut=()=>{
-        //console.log('ControllerUnitContainer headerMouseOut: conID ', this.props.conID)
-        // this.setState({
-        //     headerMergeSingnal:false
-        // })
+
     }
 
     getTabDraggingMsg=(msg)=>{
+        
         let tabDraggingMsg={
             unitID:msg.unitID,
             conID:this.props.conID,
@@ -276,14 +298,14 @@ class ControllerUnitContainer extends Component {
         if(msg.tabDragging)
         {
             this.setState({
-                tabDragging:true
+                tabDragging:true,
             })
             this.props.onTabDragging(tabDraggingMsg)
         }
         else
         {
             this.setState({
-                tabDragging:false
+                tabDragging:false,
             })
             this.props.onTabDragging(tabDraggingMsg)
         }
@@ -293,22 +315,17 @@ class ControllerUnitContainer extends Component {
         
         this.setState({
             tabChangeSequence:msg.tabChangeSequence,
-            headerMergeSingnal:false
         },()=>{
             let newMsg = {
-                //unitID:msg.unitID,
+                tabChangeSequence:msg.tabChangeSequence,
+                unitID:msg.unitID,
                 newConID:this.props.conID,
                 newSequenceNumber:msg.sequenceNumber,
             }
     
-            //console.log('ControllerUnitContainer getTabNewSequenceNumber')
-            //console.log(newMsg)
-
             this.props.getTabNewSequenceNumber(newMsg)
         })
     }
-
-    
 
     cancelIconHover =()=>{
         this.setState({
@@ -354,42 +371,35 @@ class ControllerUnitContainer extends Component {
     }
 
     loadControllerUnit=()=>{
-        let stateArray = this.props.controllerUnitList
-        if(stateArray)
-        { 
-            // let unitFront = stateArray.find((unit)=>{
-            //     return (unit.showing == true && unit.containerUnitContainerID == this.props.conID)
-            // })
-
-            // if(unitFront==undefined)
-            // {
-            //    return
-            // }
-            // else
-            // {
-            //     switch(unitFront.unitID) {
-            //     case 1:
-            //         return(
-            //             this.loadDatGui()
-            //         )
-            //     case 2:
-            //         return(
-            //            this.loadFrontView()
-            //         )
-            //     case 3:
-            //         return(
-            //             this.loadSideView()
-            //         )
-            //     case 4:
-            //         return(
-            //             this.loadTestUnit()
-            //         )
-            //     }
-            // }
-        }
-        else
+        
+        let tempUnitID = 0 
+        if(this.props.showingUnitID == 0)
         {
-            return
+        }
+        else 
+        {
+            tempUnitID = this.props.showingUnitID
+        }
+
+        switch(tempUnitID) {
+            case 1:
+                return(
+                    this.loadDatGui()
+                )
+            case 2:
+                return(
+                    this.loadFrontView()
+                )
+            case 3:
+                return(
+                    this.loadSideView()
+                )
+            case 4:
+                return(
+                    this.loadTestUnit()
+                )
+            default:
+                return    
         }
     }
 
@@ -427,18 +437,16 @@ class ControllerUnitContainer extends Component {
 
     createTabJSX=(unitState, sNumber)=>{
         return(
-            <ControllerUnitContainerTab unitID={unitState.unitID} sequenceNumber={sNumber} tabTitle={unitState.title} showingToggle={unitState.showing} otherTabDragging={this.props.tabDraggingBooling} tabDragging={this.getTabDraggingMsg} getTabNewSequenceNumber={this.getTabNewSequenceNumber}/>
+            <ControllerUnitContainerTab unitID={unitState.unitID} sequenceNumber={sNumber} tabTitle={unitState.title} showingUnitID={this.props.showingUnitID} otherTabDragging={this.props.tabDraggingBooling} tabDragging={this.getTabDraggingMsg} getTabNewSequenceNumber={this.getTabNewSequenceNumber}/>
         )
     }
 
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
     loadHeaderTabs=()=>{
 
         let unitStateArray = []
         if(this.props.controllerUnitList.head)
         {
-            //console.log(this.props.controllerUnitList)
             let tempList = this.props.controllerUnitList
             let currentNode = tempList.head
             let indexCount=0
@@ -449,18 +457,7 @@ class ControllerUnitContainer extends Component {
                 currentNode = currentNode.next
                 indexCount ++
             }
-
-            
-            // //unitStateArray.sort(function(a,b){return a.sequenceNumber-b.sequenceNumber})
-            // let result =unitStateArray.map((unitState)=>
-            //         {
-            //             indexCount = indexCount+1
-            //             return(
-            //             <ControllerUnitContainerTab unitID={unitState.unitID} sequenceNumber={indexCount} tabTitle={unitState.title} showingToggle={unitState.showing} otherTabDragging={this.props.tabDraggingBooling} tabDragging={this.getTabDraggingMsg} getTabNewSequenceNumber={this.getTabNewSequenceNumber}/>
-            //             )
-            //         }
-            //     )
-            // console.log(result)
+   
             return unitStateArray
         }
         else
@@ -479,9 +476,8 @@ class ControllerUnitContainer extends Component {
     }
 
     extendAreaMouseDown=(e)=>{
-
+        // console.log('extendAreaMouseDown')
         e.stopPropagation()
-
         this.setState({
             containerExtending:true,
             refPos:{
@@ -493,6 +489,7 @@ class ControllerUnitContainer extends Component {
 
         let msg ={
             conID:this.props.conID,
+            unitID:this.props.showingUnitID,
             zIndex:this.props.zIndex,
             containerExtending:true,
             subView:this.getSubView()
@@ -502,29 +499,27 @@ class ControllerUnitContainer extends Component {
 
     getSubView = () => {
         let msg = 'nonSubView'
-        // if((this.props.controllerUnitList[1].showing == true) && (this.props.controllerUnitList[1].containerUnitContainerID == this.props.conID))
-        // {
-        //     msg= 'frontView'
-        // }
-        // else if((this.props.controllerUnitList[2].showing == true) && (this.props.controllerUnitList[2].containerUnitContainerID == this.props.conID))
-        // {
-        //     msg= 'sideView'
-        // }
-        // else
-        // {
-        // }
-        //console.log('getSubView : ', msg)
+
+        if(this.props.showingUnitID===2)
+        {
+            msg= 'frontView'
+        }
+        else if(this.props.showingUnitID===3)
+        {
+            msg= 'sideView'
+        }
         return msg
     }
 
     extendAreaMouseUp=(e)=>{
         e.stopPropagation()
-        let width = this.state.refDivSize.width+(this.props.mousePos.x-this.state.refPos.x)
-        let height = this.state.refDivSize.height+(this.props.mousePos.y-this.state.refPos.y)
-        let newSize = {
-            width:width,
-            height:height
-        }
+        // console.log('extendAreaMouseUp')
+        // let width = this.state.refDivSize.width+(this.props.mousePos.x-this.state.refPos.x)
+        // let height = this.state.refDivSize.height+(this.props.mousePos.y-this.state.refPos.y)
+        // let newSize = {
+        //     width:width,
+        //     height:height
+        // }
 
         this.setState({
             containerExtending:false,
@@ -532,13 +527,14 @@ class ControllerUnitContainer extends Component {
                 x:0,
                 y:0
             },
-            divSize:newSize
+            //divSize:newSize
         })  
 
         
 
         let msg ={
             conID:this.props.conID,
+            unitID:this.props.showingUnitID,
             zIndex:this.props.zIndex,
             containerExtending:false,
             subView:'nonSubView'
@@ -550,10 +546,6 @@ class ControllerUnitContainer extends Component {
 
     getRotationValue=(value)=>{
         this.props.rotationValue(value)
-    }
-
-    onMouseOut=(e)=>{
-        e.stopPropagation()
     }
 
     render() {    
@@ -583,6 +575,7 @@ class ControllerUnitContainer extends Component {
             cursor:this.headerCursorChangeHandler(),
             display:'flex',
             paddingTop:'2px',
+            paddingLeft:'2px',
             userSelect:'none'    
         }
 
@@ -614,7 +607,7 @@ class ControllerUnitContainer extends Component {
                 {this.loadHeaderTabs()}
                     <div style={cancelIconStyle} onMouseDown={this.cancelIconMouseDown} onMouseOver={this.cancelIconHover} onMouseOut={this.cancelIconOut}>{'x'}</div>
                 </div>   
-                <div style={extendFunctionAreaStyle} onMouseDown={this.extendAreaMouseDown}  onMouseUp={this.extendAreaMouseUp} onMouseOut={this.onMouseOut}>
+                <div style={extendFunctionAreaStyle} onMouseDown={this.extendAreaMouseDown}  onMouseUp={this.extendAreaMouseUp}>
                     &#9499;
                 </div>         
                 {this.loadControllerUnit()}         

@@ -38,22 +38,43 @@ class ControllerUnitContainerTab extends Component{
         
     }
 
-    tabShowingToggle = () =>{
-        if(this.state.tabHover)
+    tabShowingToggle = (property) =>{
+        if(property==='backgroundColor')
         {
-            return '#42ff32'
-        }
-        else
-        {
-            if(this.props.showingToggle)
+            if(this.state.tabHover)
             {
-                return '#9fe8df'
+                return '#42ff32'
             }
             else
             {
-                return '#9FC5E8'
+                if(this.props.showingUnitID==this.props.unitID)
+                {
+                    return '#9fe8df'
+                }
+                else
+                {
+                    return '#9FC5E8'
+                }
             }
         }
+        else if(property==='borderBottom')
+        {
+            if(this.state.tabHover)
+            {
+                return '1px solid #42ff32'
+            }
+            else
+            {
+                if(this.props.showingUnitID==this.props.unitID)
+                {
+                    return '1px solid #9fe8df'
+                }
+                else
+                {
+                    return '1px solid #9FC5E8'
+                }
+            }
+        }    
     }
 
     tabMouseUP=(e)=>{
@@ -66,8 +87,10 @@ class ControllerUnitContainerTab extends Component{
         this.props.tabDragging(tabMsg)
     }
 
-    onDragEnter=()=>{
-        //console.log('ControllerUnitContainer onDragEnter : conID ', this.props.conID)
+    onDragEnter=(e)=>{
+        e.stopPropagation()
+        e.preventDefault()
+        console.log('ControllerUnitTab onDragEnter : unitID ', this.props.unitID)
         
         if(this.props.otherTabDragging)
         {
@@ -83,8 +106,10 @@ class ControllerUnitContainerTab extends Component{
         }
     }
 
-    onDragLeave=()=>{
-        //console.log('ControllerUnitContainer onDragLeave: conID ', this.props.conID)
+    onDragLeave=(e)=>{
+        e.stopPropagation()
+        e.preventDefault()
+        console.log('ControllerUnitTab onDragLeave: unitID ', this.props.unitID)
 
         if(this.props.otherTabDragging)
         {
@@ -93,8 +118,8 @@ class ControllerUnitContainerTab extends Component{
             })
             let msg = {
                 tabChangeSequence : false,
-                unitID:0,
-                sequenceNumber:0,
+                unitID:this.props.unitID,
+                sequenceNumber:-1,
             }
             this.props.getTabNewSequenceNumber(msg) 
         }
@@ -135,8 +160,9 @@ class ControllerUnitContainerTab extends Component{
             borderRight:'1px solid',
             borderLeft:'1px solid',
             borderTop:'1px solid',
+            //borderBottom:this.tabShowingToggle('borderBottom'),
             borderColor:'gray',
-            backgroundColor:this.tabShowingToggle(),
+            backgroundColor:this.tabShowingToggle('backgroundColor'),
             padding:'1px',
             float:'left',
             whiteSpace: 'nowrap',
@@ -148,16 +174,25 @@ class ControllerUnitContainerTab extends Component{
         const emptyTabStyle ={
             transition:'width 0.5s',
             width:this.transWidth(),
+            //width:0,
             float:'left',
             pointerEvents:'none'
             //animationFillMode:'forwards'
         }
+
+        const compartmentArea = {
+            float:'left',
+            display:'flex',
+            overflow: 'hidden',
+        }
         return(
+            <div style={compartmentArea}>
             <div style={tabContainerStyle} onDragEnter={this.onDragEnter} onDragLeave={this.onDragLeave} onDragOver={this.onDragOver} onDrop={this.onDrop} onMouseDown={this.tabMouseDown} onMouseUp={this.tabMouseUP}>
                 <div style={emptyTabStyle} ></div>
                 <div style={tabStyle}  ref={(refDom)=>{this.refDom=refDom}}>
                     {this.props.tabTitle}
                 </div>
+            </div>
             </div>
         )
     }

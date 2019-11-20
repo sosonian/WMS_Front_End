@@ -16,11 +16,22 @@ class ShadowContainer extends Component{
     }
 
     onDragEnd=()=>{
-        console.log('ShadowContainer onDragEnd')
+        //console.log('ShadowContainer onDragEnd')
         let msg ={
-            tabDragging:false
+            tabDragging:false,
+            divSize:this.props.containerSize
         }
         this.props.draggingMsg(msg)
+    }
+
+    onMouseUp=()=>{
+        //console.log('ShadowContainer onMouseUp')
+        let msg ={
+            tabDragging:false,
+            divSize:this.props.containerSize
+        }
+        this.props.draggingMsg(msg)
+
     }
 
     render() {
@@ -36,18 +47,7 @@ class ShadowContainer extends Component{
             boxSizing:'border-box',
         }
 
-        // const headerStyle = {
-        //     width:'100%',
-        //     height:'25px',
-        //     borderBottom:'1px dotted',
-        //     borderColor:'gray',
-        //     display:'flex',
-        //     paddingTop:'2px',
-        //     userSelect:'none'    
-        // }
-
         const tapStyle = {
-            //width:'50px',
             top:-24,
             left:this.props.tabPos.x,
             position:'absolute',
@@ -66,7 +66,7 @@ class ShadowContainer extends Component{
 
 
         return(
-            <div style={shadowContainerStyle} draggable={true} onDragEnd={this.onDragEnd}>            
+            <div style={shadowContainerStyle} draggable={true} onDragEnd={this.onDragEnd} onMouseUp={this.onMouseUp}>            
                 <div style={tapStyle}>
                     {this.props.tabTitle}
                 </div>       

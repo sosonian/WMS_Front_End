@@ -3,6 +3,7 @@ import ControllerUnitContainer from './ControllerUnitContainer'
 import ShadowContainer from './ShadowContainer'
 import TestContainer from './TestContainer'
 import LinkedList from '../../../../CommonUtilities/LinkedList'
+import { stat } from 'fs';
 
 
 class ControllerUnitLayout extends Component {
@@ -16,7 +17,6 @@ class ControllerUnitLayout extends Component {
                     title:'旋轉控制',
                     containerUnitContainerID:1,
                     sequenceNumber:1,
-                    showing:true
                 },
                 {
                     unitID:2,
@@ -24,7 +24,6 @@ class ControllerUnitLayout extends Component {
                     title:'前視圖',
                     sequenceNumber:1,
                     containerUnitContainerID:2,
-                    showing:true
                 },
                 {
                     unitID:3,
@@ -32,7 +31,6 @@ class ControllerUnitLayout extends Component {
                     title:'側視圖',
                     sequenceNumber:1,
                     containerUnitContainerID:3,
-                    showing:true
                 },
                 {
                     unitID:4,
@@ -40,7 +38,6 @@ class ControllerUnitLayout extends Component {
                     title:'測試控制',
                     sequenceNumber:1,
                     containerUnitContainerID:3,
-                    showing:false
                 }
             ],
             containerNumber:4,
@@ -59,11 +56,12 @@ class ControllerUnitLayout extends Component {
             orbitControlMode:false,
             tabDragging:{
                 status:false,
+                targetUnitID:0,
                 unitID:0,
                 oldConID:0,
                 newConID:0,
-                oldSequenceNumber:0,
-                newSequenceNumber:0,
+                oldSequenceNumber:-1,
+                newSequenceNumber:-1,
             },
             
             containerDragging:{
@@ -81,8 +79,10 @@ class ControllerUnitLayout extends Component {
     }
 
     componentDidMount(){
-        let newContainerState= this.loadUnitStateToContainer(this.createContainerState())
-        this.setContainerState(newContainerState)
+        let tempContainerState= this.loadUnitStateToContainer(this.createContainerState())
+        let outputContainerState = this.initialShowingUnitID(tempContainerState)
+    
+        this.setContainerState(outputContainerState)
     }
 
     componentDidUpdate(prevProps, prevState){
@@ -91,6 +91,17 @@ class ControllerUnitLayout extends Component {
 
     componentWillUnmount() {
         //console.log('ControllerUnitLayout componentWillUnmount : ', this.state.unmountTest)
+    }
+
+    initialShowingUnitID = (containerState) =>{
+        containerState.map((container=>{
+            if(container.controllerUnitList.head)
+            {
+                let tempShowingUnitID = container.controllerUnitList.head.data.unitID
+                container.showingUnitID = tempShowingUnitID
+            }
+        }))
+        return containerState
     }
 
     appendShadowContainer=()=>{
@@ -140,6 +151,7 @@ class ControllerUnitLayout extends Component {
                 },
                 zIndex:i+1,
                 showing:true,
+                showingUnitID:0,
                 controllerUnitList: tempLinkedList
             }
 
@@ -154,9 +166,9 @@ class ControllerUnitLayout extends Component {
     loadUnitStateToContainer=(containerStateArray)=>{
         let tempUnitArray = this.state.controllerUnitState   
         let tempContainerArray = containerStateArray
+         
 
         tempUnitArray.map((unitState=>{
-            let newSequenceNumber = 0 
             if(unitState.containerUnitContainerID>0 && unitState.containerUnitContainerID<Number(tempContainerArray.length+1))
             {
                 let newUnitState = unitState
@@ -181,59 +193,22 @@ class ControllerUnitLayout extends Component {
     }
 
     onTabDragging =(msg)=>{
+
         if(msg.tabDragging)
         {
-            let tempControllerUnitState = this.state.controllerUnitState
-            
-            let output = tempControllerUnitState.map((unitState=>{  
-                let unitStateObj ={} 
-                if(unitState.containerUnitContainerID === msg.conID)
-                {
-                    if(unitState.unitID === msg.unitID)
-                    {
-                        unitStateObj = {
-                            containerUnitContainerID:unitState.containerUnitContainerID,
-                            unitID:unitState.unitID,
-                            name:unitState.name,
-                            title:unitState.title,
-                            sequenceNumber:unitState.sequenceNumber,
-                            showing:true    
-                        }
-                        return unitStateObj
-                    }
-                    else
-                    {
-                        unitStateObj = {
-                            containerUnitContainerID:unitState.containerUnitContainerID,
-                            unitID:unitState.unitID,
-                            name:unitState.name,
-                            title:unitState.title,
-                            sequenceNumber:unitState.sequenceNumber,
-                            showing:false   
-                        }
-                        return unitStateObj
-                    }
-                }
-                else
-                {
-                    return unitState
-                }
-                
-            }))
-
             this.setState({
                 tabDragging:
                 {
                     status:true,
                     unitID:msg.unitID,
+                    targetUnitID:0,
                     oldConID:msg.conID,
                     newConID:msg.conID,
                     oldSequenceNumber:msg.sequenceNumber,
-                    newSequenceNumber:0,
+                    newSequenceNumber:msg.sequenceNumber,
                 },
                 needMousePos:true,
                 shadowContainer:msg,
-                controllerUnitState:output,
                 ControllerUnitContainerState:this.setNewContainerZIndex(msg)
             })
             
@@ -248,235 +223,209 @@ class ControllerUnitLayout extends Component {
         }
         else
         {
-            let tempControllerUnitState = this.state.controllerUnitState
-            let stateLength = tempControllerUnitState.length
-            let tempNewSequenceNumber = 0
-            if(this.state.tabDragging.newSequenceNumber==0)
+            // change the status of unit sequnce, possible scenarios:
+            //
+            // 1.no change : oldConID === newConID && oldSeqNum === newSeqNum
+            // 2.the same container, shift to the last : oldConID === newConID && newSeqNum === -1
+            // 3.the same container, shift with other unit : oldConID === newConID && oldSeqNum !== newSeqNum
+            // 4.different container, place to the last : oldConID !== newConID && newSeqNum === -1
+            // 5.different container, replace the place of other unit : oldConID !== newConID && newSeqNum !== -1
+            // 6.place to an all new container (default is no show, toggle to showing) : newConID === 0
+            //
+            let output =[]
+            let leftShowingUnitID
+          
+
+            if(this.state.tabDragging.oldConID === this.state.tabDragging.newConID && this.state.tabDragging.oldSequenceNumber === this.state.tabDragging.newSequenceNumber)
             {
-                tempNewSequenceNumber=stateLength
+                output = this.state.ControllerUnitContainerState
+            } 
+            else if(this.state.tabDragging.oldConID === this.state.tabDragging.newConID && this.state.tabDragging.newSequenceNumber === -1)
+            {
+
+                let index = this.state.tabDragging.oldConID-1
+                let originContainerList = this.state.ControllerUnitContainerState[index].controllerUnitList.cloneList()
+                let unitIndex = this.state.tabDragging.oldSequenceNumber    
+                originContainerList.shiftToLast(unitIndex)        
+
+                let tempContainerArray = []
+                this.state.ControllerUnitContainerState.map(state=>{
+                    if(state.containerID==this.state.tabDragging.oldConID)
+                    {
+                        let tempStateObj = {
+                            containerID:state.containerID,
+                            size:state.size,
+                            position:state.position,
+                            zIndex:state.zIndex,
+                            showing:state.showing,
+                            showingUnitID:this.state.tabDragging.unitID,
+                            controllerUnitList:originContainerList
+                        }
+                        tempContainerArray.push(tempStateObj)
+                    }
+                    else
+                    {
+                        tempContainerArray.push(state)
+                    }        
+                })
+
+                output = tempContainerArray
+             
+            }
+            else if(this.state.tabDragging.oldConID === this.state.tabDragging.newConID && this.state.tabDragging.newSequenceNumber !== this.state.tabDragging.oldSequenceNumber && this.state.tabDragging.newSequenceNumber !== -1)
+            {
+                let index = this.state.tabDragging.oldConID-1
+                let originContainerList = this.state.ControllerUnitContainerState[index].controllerUnitList.cloneList()
+                originContainerList.shiftTo(this.state.tabDragging.newSequenceNumber,this.state.tabDragging.oldSequenceNumber)
+                
+                let tempContainerArray = []
+                this.state.ControllerUnitContainerState.map(state=>{
+                    if(state.containerID==this.state.tabDragging.oldConID)
+                    {
+                        let tempStateObj = {
+                            containerID:state.containerID,
+                            size:state.size,
+                            position:state.position,
+                            zIndex:state.zIndex,
+                            showing:state.showing,
+                            showingUnitID:this.state.tabDragging.unitID,
+                            controllerUnitList:originContainerList
+                        }
+                        tempContainerArray.push(tempStateObj)
+                    }
+                    else
+                    {
+                        tempContainerArray.push(state)
+                    }        
+                })
+
+                output = tempContainerArray
+
+            }
+            else if(this.state.tabDragging.oldConID !== this.state.tabDragging.newConID && this.state.tabDragging.newConID !== 0 && this.state.tabDragging.newSequenceNumber === -1)
+            {
+                let originContainerList = this.state.ControllerUnitContainerState[this.state.tabDragging.oldConID-1].controllerUnitList.cloneList()
+                let newContainerList = this.state.ControllerUnitContainerState[this.state.tabDragging.newConID-1].controllerUnitList.cloneList()
+                let tempData = originContainerList.getAt(this.state.tabDragging.oldSequenceNumber)
+                originContainerList.removeAt(this.state.tabDragging.oldSequenceNumber)
+                newContainerList.insertLast(tempData)
+
+                let tempContainerArray = []
+                this.state.ControllerUnitContainerState.map(state=>{
+                    if(state.containerID==this.state.tabDragging.oldConID)
+                    {
+                        let tempShowingUnitID = 0 
+                        if(originContainerList.head)
+                        {
+                            tempShowingUnitID = originContainerList.head.data.unitID
+                        }
+                        else
+                        {
+                        }
+
+                        leftShowingUnitID = tempShowingUnitID
+
+                        let tempStateObj = {
+                            containerID:state.containerID,
+                            size:state.size,
+                            position:state.position,
+                            zIndex:state.zIndex,
+                            showing:state.showing,
+                            showingUnitID:tempShowingUnitID,
+                            controllerUnitList:originContainerList
+                        }
+                        tempContainerArray.push(tempStateObj)
+                    }
+                    else if(state.containerID==this.state.tabDragging.newConID)
+                    {
+                        let tempStateObj = {
+                            containerID:state.containerID,
+                            size:msg.divSize,
+                            position:state.position,
+                            zIndex:state.zIndex,
+                            showing:state.showing,
+                            showingUnitID:this.state.tabDragging.unitID,
+                            controllerUnitList:newContainerList
+                        }
+                        tempContainerArray.push(tempStateObj)
+                    }       
+                    else
+                    {
+                        tempContainerArray.push(state)
+                    }        
+                })
+                output = tempContainerArray
+            }
+            else if(this.state.tabDragging.oldConID !== this.state.tabDragging.newConID && this.state.tabDragging.newConID !== 0 && this.state.tabDragging.newSequenceNumber !== -1)
+            {
+                let originContainerList = this.state.ControllerUnitContainerState[this.state.tabDragging.oldConID-1].controllerUnitList.cloneList()
+                let newContainerList = this.state.ControllerUnitContainerState[this.state.tabDragging.newConID-1].controllerUnitList.cloneList()
+                let tempData = originContainerList.getAt(this.state.tabDragging.oldSequenceNumber)
+                originContainerList.removeAt(this.state.tabDragging.oldSequenceNumber)
+
+                newContainerList.insertAt(tempData,this.state.tabDragging.newSequenceNumber)
+
+                let tempContainerArray = []
+                this.state.ControllerUnitContainerState.map(state=>{
+                    if(state.containerID==this.state.tabDragging.oldConID)
+                    {
+                        let tempShowingUnitID = 0 
+                        if(originContainerList.head)
+                        {
+                            tempShowingUnitID = originContainerList.head.data.unitID
+                        }
+                        else
+                        {
+                        }
+
+                        leftShowingUnitID = tempShowingUnitID
+
+                        let tempStateObj = {
+                            containerID:state.containerID,
+                            size:state.size,
+                            position:state.position,
+                            zIndex:state.zIndex,
+                            showing:state.showing,
+                            showingUnitID:tempShowingUnitID,
+                            controllerUnitList:originContainerList
+                        }
+                        tempContainerArray.push(tempStateObj)
+                    }
+                    else if(state.containerID==this.state.tabDragging.newConID)
+                    {
+                        
+                        let tempStateObj = {
+                            containerID:state.containerID,
+                            size:msg.divSize,
+                            position:state.position,
+                            zIndex:state.zIndex,
+                            showing:state.showing,
+                            showingUnitID:this.state.tabDragging.unitID,
+                            controllerUnitList:newContainerList
+                        }
+                        tempContainerArray.push(tempStateObj)
+                    }       
+                    else
+                    {
+                        tempContainerArray.push(state)
+                    }        
+                })
+                output = tempContainerArray
             }
             else
             {
-                tempNewSequenceNumber=this.state.tabDragging.newSequenceNumber
+                output = this.state.ControllerUnitContainerState
             }
-            console.log('tempNewSequenceNumber : ',tempNewSequenceNumber)
-            // this.state.tabDragging.newSequenceNumber==0?tempNewSequenceNumber=stateLength:tempNewSequenceNumber=this.state.tabDragging.newSequenceNumber
-            let finalState=[]
-
-            if((this.state.tabDragging.oldConID !== this.state.tabDragging.newConID)&&(this.state.tabDragging.newConID !==0))
-            {
-                let output = tempControllerUnitState.map((unitState=>{  
-                    let unitStateObj ={} 
-                    if(unitState.unitID===this.state.tabDragging.unitID)
-                    {
-                        unitStateObj = {
-                            containerUnitContainerID:this.state.tabDragging.newConID,
-                            unitID:unitState.unitID,
-                            name:unitState.name,
-                            title:unitState.title,
-                            sequenceNumber:tempNewSequenceNumber,
-                            showing:true    
-                        }
-                        return unitStateObj
-                    }
-                    else
-                    {
-                        if(unitState.containerUnitContainerID === this.state.tabDragging.newConID)
-                        {
-                            if(unitState.sequenceNumber>tempNewSequenceNumber)
-                            {
-                                unitStateObj = {
-                                    containerUnitContainerID:unitState.containerUnitContainerID,
-                                    unitID:unitState.unitID,
-                                    name:unitState.name,
-                                    title:unitState.title,
-                                    sequenceNumber:unitState.sequenceNumber,
-                                    showing:false   
-                                }
-                                return unitStateObj
-                            }
-                            else
-                            {
-                                unitStateObj = {
-                                    containerUnitContainerID:unitState.containerUnitContainerID,
-                                    unitID:unitState.unitID,
-                                    name:unitState.name,
-                                    title:unitState.title,
-                                    sequenceNumber:unitState.sequenceNumber-1,
-                                    showing:false   
-                                }
-                                return unitStateObj
-                            }
-                        }
-                        else if(unitState.containerUnitContainerID === this.state.tabDragging.oldConID)
-                        {
-                            if(unitState.sequenceNumber>this.state.tabDragging.oldSequenceNumber)
-                            {
-                                return unitState
-                            }
-                            else if(unitState.sequenceNumber == this.state.tabDragging.oldSequenceNumber-1)
-                            {
-                                unitStateObj = {
-                                    containerUnitContainerID:unitState.containerUnitContainerID,
-                                    unitID:unitState.unitID,
-                                    name:unitState.name,
-                                    title:unitState.title,
-                                    sequenceNumber:unitState.sequenceNumber+1,
-                                    showing:true 
-                                }
-                                return unitStateObj
-                            }
-                            else
-                            {
-                                unitStateObj = {
-                                    containerUnitContainerID:unitState.containerUnitContainerID,
-                                    unitID:unitState.unitID,
-                                    name:unitState.name,
-                                    title:unitState.title,
-                                    sequenceNumber:unitState.sequenceNumber+1,
-                                    showing:false 
-                                }
-                                return unitStateObj
-                            }
-                        }
-                        else
-                        {
-                            return unitState
-                        }
-                    }
-                }))
-
-                finalState= output
-            }
-            else if(this.state.tabDragging.oldConID == this.state.tabDragging.newConID)
-            {
-                let output = tempControllerUnitState.map((unitState=>{  
-                    let unitStateObj ={} 
-                    if(unitState.unitID===this.state.tabDragging.unitID)
-                    {
-                        unitStateObj = {
-                            containerUnitContainerID:this.state.tabDragging.newConID,
-                            unitID:unitState.unitID,
-                            name:unitState.name,
-                            title:unitState.title,
-                            sequenceNumber:tempNewSequenceNumber,
-                            showing:true    
-                        }
-                        return unitStateObj
-                    }
-                    else
-                    {
-                        if(unitState.containerUnitContainerID === this.state.tabDragging.oldConID)
-                        {
-                            if(unitState.sequenceNumber>tempNewSequenceNumber)
-                            {
-                                return unitState
-                            }
-                            else
-                            {
-                                unitStateObj = {
-                                    containerUnitContainerID:unitState.containerUnitContainerID,
-                                    unitID:unitState.unitID,
-                                    name:unitState.name,
-                                    title:unitState.title,
-                                    sequenceNumber:unitState.sequenceNumber-1,
-                                    showing:false   
-                                }
-                                return unitStateObj
-                            }
-                        }
-                        else
-                        {
-                            return unitState
-                        }
-                    }
-                }))
-                finalState= output
-            }
-            else if(this.state.tabDragging.newConID ==0)
-            {
-                let tempContainer = this.state.ControllerUnitContainerState.find((container)=>{
-                    return container.showing == false
-                })
-
-                let tempNewConID = tempContainer.containerID
-
-                if(tempNewConID==undefined)
-                {
-                    finalState = this.state.controllerUnitState
-                }
-                else
-                {
-                    let output = tempControllerUnitState.map((unitState=>{  
-                        let unitStateObj ={} 
-                        if(unitState.unitID===this.state.tabDragging.unitID)
-                        {
-                            unitStateObj = {
-                                containerUnitContainerID:tempNewConID,
-                                unitID:unitState.unitID,
-                                name:unitState.name,
-                                title:unitState.title,
-                                sequenceNumber:stateLength,
-                                showing:true    
-                            }
-                            return unitStateObj
-                        }
-                        else
-                        {
-                            if(unitState.containerUnitContainerID === this.state.tabDragging.oldConID)
-                            {
-                                if(unitState.sequenceNumber>tempNewSequenceNumber)
-                                {
-                                    return unitState
-                                }
-                                else if(unitState.sequenceNumber == this.state.tabDragging.oldSequenceNumber-1)
-                                {
-                                    unitStateObj = {
-                                        containerUnitContainerID:unitState.containerUnitContainerID,
-                                        unitID:unitState.unitID,
-                                        name:unitState.name,
-                                        title:unitState.title,
-                                        sequenceNumber:unitState.sequenceNumber+1,
-                                        showing:true 
-                                    }
-                                    return unitStateObj
-                                }
-                                else
-                                {
-                                    unitStateObj = {
-                                        containerUnitContainerID:unitState.containerUnitContainerID,
-                                        unitID:unitState.unitID,
-                                        name:unitState.name,
-                                        title:unitState.title,
-                                        sequenceNumber:unitState.sequenceNumber+1,
-                                        showing:false   
-                                    }
-                                    return unitStateObj
-                                }
-                            }
-                            else
-                            {
-                                return unitState
-                            }
-                        }
-                    }))
-                    finalState= output
-                }
-            }
-
-            console.log('fianlState')
-            console.log(finalState)
-
-           
-  ///////////////////////////////////////////////////////////////////////////////////          
+          
             this.setState({
                 tabDragging: {
                     status:false,
+                    targetUnitID:0,
                     unitID:0,
                     oldConID:0,
                     newConID:0,
-                    oldSequenceNumber:0,
-                    newSequenceNumber:0,
+                    oldSequenceNumber:-1,
+                    newSequenceNumber:-1,
                 },
                 needMousePos:false,
                 shadowContainer:{},
@@ -484,22 +433,46 @@ class ControllerUnitLayout extends Component {
                     x:0,
                     y:0
                 },
-                controllerUnitState:finalState
+                ControllerUnitContainerState:output
             })
+            
+            if(leftShowingUnitID == 2)
+            {
+                this.props.frontViewSizeChange(msg.divSize)
+            }
+            else if(leftShowingUnitID == 3)
+            {
+                this.props.sideViewSizeChange(msg.divSize)
+            }
+
         }
     }
 
     tabNewConID = (msg) =>{
         //console.log('ControllerUnitLayout tabNewConID')
         //console.log(this.state.tabDragging.newSequenceNumber)
+        let tempNewSeqNum = -1
+        let tempNewConID = 0
+        if(msg.enterHeader)
+        {
+            tempNewSeqNum = -1
+            tempNewConID = msg.newConID
+        }
+        else
+        {
+            tempNewSeqNum = this.state.tabDragging.oldSequenceNumber
+            tempNewConID = this.state.tabDragging.oldConID
+        }
+
         this.setState({
             tabDragging: {
                 status:true,
+                targetUnitID:0,
                 unitID:this.state.tabDragging.unitID,
                 oldConID:this.state.tabDragging.oldConID,
-                newConID:msg.newConID,
+                newConID:tempNewConID,
                 oldSequenceNumber:this.state.tabDragging.oldSequenceNumber,
-                newSequenceNumber:this.state.tabDragging.newSequenceNumber,
+                newSequenceNumber:tempNewSeqNum,
             }
         }, ()=>{
             //console.log('ControllerUnitLayout tabNewConID setState Finished')
@@ -509,19 +482,44 @@ class ControllerUnitLayout extends Component {
     getTabNewSequenceNumber=(msg)=>{
         //console.log('ControllerUnitLayout getTabNewSequenceNumber')
         //console.log(msg.newSequenceNumber)
-        this.setState({
-            tabDragging: {
-                status:true,
-                unitID:this.state.tabDragging.unitID,
-                oldConID:this.state.tabDragging.oldConID,
-                newConID:msg.newConID,
-                oldSequenceNumber:this.state.tabDragging.oldSequenceNumber,
-                newSequenceNumber:msg.newSequenceNumber,
-            }
-        },()=>{
+        if(msg.tabChangeSequence)
+        {
+            this.setState({
+                tabDragging: {
+                    status:true,
+                    targetUnitID:msg.unitID,
+                    unitID:this.state.tabDragging.unitID,
+                    oldConID:this.state.tabDragging.oldConID,
+                    newConID:msg.newConID,
+                    oldSequenceNumber:this.state.tabDragging.oldSequenceNumber,
+                    newSequenceNumber:msg.newSequenceNumber,
+                }
+                },()=>{
             //console.log('ControllerUnitLayout getTabNewSequenceNumber setState Finished')
-        })
+            })
         //console.log(this.state.tabDragging.newSequenceNumber)
+        }
+        else
+        {
+            if(msg.unitID===this.state.tabDragging.targetUnitID)
+            {
+                this.setState({
+                    tabDragging: {
+                        status:true,
+                        targetUnitID:0,
+                        unitID:this.state.tabDragging.unitID,
+                        oldConID:this.state.tabDragging.oldConID,
+                        newConID:this.state.tabDragging.oldConID,
+                        //newConID:msg.newConID,
+                        oldSequenceNumber:this.state.tabDragging.oldSequenceNumber,
+                        newSequenceNumber:this.state.tabDragging.oldSequenceNumber
+                        //newSequenceNumber:-1,
+                    }
+                    },()=>{
+                //console.log('ControllerUnitLayout getTabNewSequenceNumber setState Finished')
+                })
+            }
+        }
     }
 
     sendRotationValueBack=(value)=>{
@@ -574,18 +572,6 @@ class ControllerUnitLayout extends Component {
         else
         {
         }
-
-        // if(msg.conID ==2)
-        // {
-        //     this.props.frontViewSizeChange(msg)
-        //     //console.log('ControllerUnitLayout getContainerNewSize')
-        //     //console.log('width : '+msg.width)
-        //     //console.log('height : '+msg.height)
-        // }
-        // else if(msg.conID ==3)
-        // {
-        //     this.props.sideViewSizeChange(msg)
-        // }
     }
 
     onContainerExtending = (msg)=>{
@@ -627,15 +613,18 @@ class ControllerUnitLayout extends Component {
 
     }
 
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     setNewContainerZIndex = (msg) =>{
         let containerStateToken =[]
         let arrayToken = this.state.ControllerUnitContainerState
         let stateLength = arrayToken.length
         this.state.ControllerUnitContainerState.map(containerState=>{
-            let stateObj = containerState
+            let stateObj = {...containerState}
             if(stateObj.containerID===msg.conID)
             {
                 stateObj.zIndex = stateLength
+                stateObj.showingUnitID = msg.unitID
             }
             else
             {
@@ -646,11 +635,7 @@ class ControllerUnitLayout extends Component {
             }
             containerStateToken.push(stateObj)
         })
-        // this.setState({
-        //     ControllerUnitContainerState:containerStateToken
-        // })
         return containerStateToken
-
     }
 
     onContainerDragging = (msg) => {
@@ -684,7 +669,9 @@ class ControllerUnitLayout extends Component {
                         size:containerState.size,
                         position:msg.position,
                         zIndex:containerState.zIndex,
-                        showing:containerState.showing
+                        showing:containerState.showing,
+                        showingUnitID:containerState.showingUnitID,
+                        controllerUnitList: containerState.controllerUnitList
                     }
                     return stateObj
                 }
@@ -723,8 +710,8 @@ class ControllerUnitLayout extends Component {
         //console.log('ControllerUnitLayout createControllerUnitContainer')
         return (
             this.state.ControllerUnitContainerState.map(container=> container.showing?
-                (<ControllerUnitContainer key={container.containerID} conID={container.containerID} initialPos={container.position} mousePos={this.state.mousePos} offset={this.props.offset}
-                controllerUnitList={container.controllerUnitList} containerDragging={this.onContainerDragging} anyContainerDragging={this.state.containerDragging.status} anyContainerExtending={this.state.containerExtending.status} rotationValue={this.sendRotationValueBack} frontViewToggle={this.sendFrontViewToggle} sideViewToggle={this.sendSideViewToggle} containerExtending={this.onContainerExtending} getContainerNewSize={this.getContainerNewSize} onTabDragging={this.onTabDragging} tabDraggingBooling={this.state.tabDragging.status} getTabNewSequenceNumber={this.getTabNewSequenceNumber} tabNewConID={this.tabNewConID} containerShowing={this.controllerUnitToggle} zIndex={container.zIndex} unmountTest={this.unmountTest}/>):null
+                (<ControllerUnitContainer key={container.containerID} conID={container.containerID} initialPos={container.position} mousePos={this.state.mousePos} offset={this.props.offset} size={container.size}
+                controllerUnitList={container.controllerUnitList} showingUnitID={container.showingUnitID} containerDragging={this.onContainerDragging} anyContainerDragging={this.state.containerDragging.status} anyContainerExtending={this.state.containerExtending.status} rotationValue={this.sendRotationValueBack} frontViewToggle={this.sendFrontViewToggle} sideViewToggle={this.sendSideViewToggle} containerExtending={this.onContainerExtending} getContainerNewSize={this.getContainerNewSize} onTabDragging={this.onTabDragging} tabDraggingBooling={this.state.tabDragging.status} getTabNewSequenceNumber={this.getTabNewSequenceNumber} tabNewConID={this.tabNewConID} containerShowing={this.controllerUnitToggle} zIndex={container.zIndex} unmountTest={this.unmountTest}/>):null
             )
         )
     }
@@ -779,7 +766,7 @@ class ControllerUnitLayout extends Component {
     }
 
     render(){
-        //console.log('ControllerUnitLayout render ')
+        console.log('ControllerUnitLayout render ')
         const containerStyle = {
             width: '100%',
             height: '100%',
