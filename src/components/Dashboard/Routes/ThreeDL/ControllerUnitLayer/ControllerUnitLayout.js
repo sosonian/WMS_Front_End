@@ -13,8 +13,8 @@ class ControllerUnitLayout extends Component {
             controllerUnitState:[
                 {
                     unitID:1,
-                    name:'DatGui',
-                    title:'旋轉控制',
+                    name:'MenuBar',
+                    title:'工具列',
                     containerUnitContainerID:1,
                     sequenceNumber:1,
                 },
@@ -38,6 +38,13 @@ class ControllerUnitLayout extends Component {
                     title:'測試控制',
                     sequenceNumber:1,
                     containerUnitContainerID:3,
+                },
+                {
+                    unitID:5,
+                    name:'DatGui',
+                    title:'旋轉控制',
+                    sequenceNumber:1,
+                    containerUnitContainerID:4,
                 }
             ],
             containerNumber:4,
@@ -310,11 +317,15 @@ class ControllerUnitLayout extends Component {
             {
                 let originContainerList = this.state.ControllerUnitContainerState[this.state.tabDragging.oldConID-1].controllerUnitList.cloneList()
                 let newContainerList = this.state.ControllerUnitContainerState[this.state.tabDragging.newConID-1].controllerUnitList.cloneList()
+                
+                let newContainerZIndex = this.state.ControllerUnitContainerState[this.state.tabDragging.newConID-1].zIndex
+
                 let tempData = originContainerList.getAt(this.state.tabDragging.oldSequenceNumber)
                 originContainerList.removeAt(this.state.tabDragging.oldSequenceNumber)
                 newContainerList.insertLast(tempData)
 
                 let tempContainerArray = []
+
                 this.state.ControllerUnitContainerState.map(state=>{
                     if(state.containerID==this.state.tabDragging.oldConID)
                     {
@@ -335,7 +346,7 @@ class ControllerUnitLayout extends Component {
                             containerID:state.containerID,
                             size:state.size,
                             position:state.position,
-                            zIndex:state.zIndex,
+                            zIndex:state.zIndex-1,
                             showing:showingBooling,
                             showingUnitID:tempShowingUnitID,
                             controllerUnitList:originContainerList
@@ -348,7 +359,7 @@ class ControllerUnitLayout extends Component {
                             containerID:state.containerID,
                             size:msg.divSize,
                             position:state.position,
-                            zIndex:state.zIndex,
+                            zIndex:this.state.ControllerUnitContainerState.length,
                             showing:state.showing,
                             showingUnitID:this.state.tabDragging.unitID,
                             controllerUnitList:newContainerList
@@ -357,7 +368,24 @@ class ControllerUnitLayout extends Component {
                     }       
                     else
                     {
-                        tempContainerArray.push(state)
+                        let tempStateObj = {}
+                        if(state.zIndex > newContainerZIndex )
+                        {
+                            tempStateObj = {
+                                containerID:state.containerID,
+                                size:state.size,
+                                position:state.position,
+                                zIndex:state.zIndex-1,
+                                showing:state.showing,
+                                showingUnitID:state.showingUnitID,
+                                controllerUnitList:state.controllerUnitList
+                            }
+                        }
+                        else
+                        {
+                            tempStateObj = state
+                        }
+                        tempContainerArray.push(tempStateObj)
                     }        
                 })
                 output = tempContainerArray
@@ -366,6 +394,9 @@ class ControllerUnitLayout extends Component {
             {
                 let originContainerList = this.state.ControllerUnitContainerState[this.state.tabDragging.oldConID-1].controllerUnitList.cloneList()
                 let newContainerList = this.state.ControllerUnitContainerState[this.state.tabDragging.newConID-1].controllerUnitList.cloneList()
+
+                let newContainerZIndex = this.state.ControllerUnitContainerState[this.state.tabDragging.newConID-1].zIndex
+
                 let tempData = originContainerList.getAt(this.state.tabDragging.oldSequenceNumber)
                 originContainerList.removeAt(this.state.tabDragging.oldSequenceNumber)
 
@@ -392,7 +423,7 @@ class ControllerUnitLayout extends Component {
                             containerID:state.containerID,
                             size:state.size,
                             position:state.position,
-                            zIndex:state.zIndex,
+                            zIndex:state.zIndex-1,
                             showing:showingBooling,
                             showingUnitID:tempShowingUnitID,
                             controllerUnitList:originContainerList
@@ -406,7 +437,7 @@ class ControllerUnitLayout extends Component {
                             containerID:state.containerID,
                             size:msg.divSize,
                             position:state.position,
-                            zIndex:state.zIndex,
+                            zIndex:this.state.ControllerUnitContainerState.length,
                             showing:state.showing,
                             showingUnitID:this.state.tabDragging.unitID,
                             controllerUnitList:newContainerList
@@ -415,7 +446,24 @@ class ControllerUnitLayout extends Component {
                     }       
                     else
                     {
-                        tempContainerArray.push(state)
+                        let tempStateObj = {}
+                        if(state.zIndex > newContainerZIndex )
+                        {
+                            tempStateObj = {
+                                containerID:state.containerID,
+                                size:state.size,
+                                position:state.position,
+                                zIndex:state.zIndex-1,
+                                showing:state.showing,
+                                showingUnitID:state.showingUnitID,
+                                controllerUnitList:state.controllerUnitList
+                            }
+                        }
+                        else
+                        {
+                            tempStateObj = state
+                        }
+                        tempContainerArray.push(tempStateObj)
                     }        
                 })
                 output = tempContainerArray
@@ -433,6 +481,9 @@ class ControllerUnitLayout extends Component {
                 { 
                     let validContainerID = validContainer.containerID
                     let originContainerList = this.state.ControllerUnitContainerState[this.state.tabDragging.oldConID-1].controllerUnitList.cloneList()
+
+                    let newContainerZIndex = this.state.ControllerUnitContainerState[validContainerID-1].zIndex
+
                     let newContainerList = new LinkedList()
 
                     let tempData = originContainerList.getAt(this.state.tabDragging.oldSequenceNumber)
@@ -454,7 +505,7 @@ class ControllerUnitLayout extends Component {
                                     containerID:state.containerID,
                                     size:state.size,
                                     position:state.position,
-                                    zIndex:state.zIndex,
+                                    zIndex:state.zIndex-1,
                                     showing:true,
                                     showingUnitID:tempShowingUnitID,
                                     controllerUnitList:originContainerList
@@ -468,7 +519,7 @@ class ControllerUnitLayout extends Component {
                                     containerID:state.containerID,
                                     size:msg.divSize,
                                     position:this.state.mousePos,
-                                    zIndex:state.zIndex,
+                                    zIndex:this.state.ControllerUnitContainerState.length,
                                     showing:true,
                                     showingUnitID:this.state.tabDragging.unitID,
                                     controllerUnitList:newContainerList
@@ -477,7 +528,24 @@ class ControllerUnitLayout extends Component {
                             }       
                             else
                             {
-                                tempContainerArray.push(state)
+                                let tempStateObj = {}
+                                if(state.zIndex > newContainerZIndex )
+                                {
+                                    tempStateObj = {
+                                        containerID:state.containerID,
+                                        size:state.size,
+                                        position:state.position,
+                                        zIndex:state.zIndex-1,
+                                        showing:state.showing,
+                                        showingUnitID:state.showingUnitID,
+                                        controllerUnitList:state.controllerUnitList
+                                    }
+                                }
+                                else
+                                {
+                                    tempStateObj = state
+                                }
+                                tempContainerArray.push(tempStateObj)
                             }        
                         })
                         output = tempContainerArray

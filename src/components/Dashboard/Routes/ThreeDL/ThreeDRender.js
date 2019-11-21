@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import Stats from 'stats.js';
 import orbControls from './OrbitControls';
 import StorageLayer from './ThreeDObjects/StorageLayer';
-import ControllerUnitLayout from './ControllerUnit/ControllerUnitLayout'
+import ControllerUnitLayout from './ControllerUnitLayer/ControllerUnitLayout'
 
 class ThreeDRender extends Component{
   constructor(props) {

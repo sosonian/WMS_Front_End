@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import ControllerUnitContainerTab from './ControllerUnitContainerTab'
-import TestRotationControllerUnit from './TestRotationControllerUnit'
-import SubFrontViewControllerUnit from './SubFrontViewControllerUnit'
-import SubSideViewControllerUnit from './SubSideViewControllerUnit'
-import TestControllerUnit from './TestControllerUnit'
+import TestRotationControllerUnit from './ControllerUnitElements/TestRotationControllerUnit'
+import SubFrontViewControllerUnit from './ControllerUnitElements/SubFrontViewControllerUnit'
+import SubSideViewControllerUnit from './ControllerUnitElements/SubSideViewControllerUnit'
+import TestControllerUnit from './ControllerUnitElements/TestControllerUnit'
 
 
 class ControllerUnitContainer extends Component {
@@ -384,7 +384,7 @@ class ControllerUnitContainer extends Component {
         switch(tempUnitID) {
             case 1:
                 return(
-                    this.loadDatGui()
+                    this.loadMenuBar()
                 )
             case 2:
                 return(
@@ -398,9 +398,17 @@ class ControllerUnitContainer extends Component {
                 return(
                     this.loadTestUnit()
                 )
+            case 5:
+                return(
+                    this.loadDatGui()
+                )
             default:
                 return    
         }
+    }
+
+    loadMenuBar=()=>{
+
     }
 
     loadTestUnit=()=>{
@@ -549,8 +557,10 @@ class ControllerUnitContainer extends Component {
     }
 
     render() {    
-        //console.log('Container render')
+        console.log('Container render conID  : ',this.props.conID)
         //console.log('conID : ',this.props.conID, ' zIndex : ',this.props.zIndex)
+        console.log(this.state.divSize)
+
         const containerWindow = {
             width:this.state.divSize.width,
             height:this.state.divSize.height,
