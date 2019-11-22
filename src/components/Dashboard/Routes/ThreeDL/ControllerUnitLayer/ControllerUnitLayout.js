@@ -3,50 +3,14 @@ import ControllerUnitContainer from './ControllerUnitContainer'
 import ShadowContainer from './ShadowContainer'
 import TestContainer from './TestContainer'
 import LinkedList from '../../../../CommonUtilities/LinkedList'
-import { stat } from 'fs';
+import ControllerUnitElementsInitialState from './ControllerUnitElements/ControllerUnitElementsInitialState'
 
 
 class ControllerUnitLayout extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            controllerUnitState:[
-                {
-                    unitID:1,
-                    name:'MenuBar',
-                    title:'工具列',
-                    containerUnitContainerID:1,
-                    sequenceNumber:1,
-                },
-                {
-                    unitID:2,
-                    name:'SubViewFront',
-                    title:'前視圖',
-                    sequenceNumber:1,
-                    containerUnitContainerID:2,
-                },
-                {
-                    unitID:3,
-                    name:'SubViewFront',
-                    title:'側視圖',
-                    sequenceNumber:1,
-                    containerUnitContainerID:3,
-                },
-                {
-                    unitID:4,
-                    name:'TestUnit',
-                    title:'測試控制',
-                    sequenceNumber:1,
-                    containerUnitContainerID:3,
-                },
-                {
-                    unitID:5,
-                    name:'DatGui',
-                    title:'旋轉控制',
-                    sequenceNumber:1,
-                    containerUnitContainerID:4,
-                }
-            ],
+            controllerUnitState:this.getInitialState(),
             containerNumber:4,
 
             ControllerUnitContainerState:[],
@@ -113,6 +77,13 @@ class ControllerUnitLayout extends Component {
             }
         }))
         return containerState
+    }
+
+    getInitialState=()=>{
+        let state = new ControllerUnitElementsInitialState()
+
+        return state.state
+                    
     }
 
     appendShadowContainer=()=>{
@@ -470,7 +441,7 @@ class ControllerUnitLayout extends Component {
             }
             else if(this.state.tabDragging.newConID === 0)
             {       
-                console.log('open new container')
+                //console.log('open new container')
                 let validContainer = this.state.ControllerUnitContainerState.find(state=>state.showing===false)
                
                 if(validContainer === undefined)
@@ -481,10 +452,10 @@ class ControllerUnitLayout extends Component {
                 { 
                     let validContainerID = validContainer.containerID
                     let originContainerList = this.state.ControllerUnitContainerState[this.state.tabDragging.oldConID-1].controllerUnitList.cloneList()
-
+                    let newContainerList = this.state.ControllerUnitContainerState[validContainerID-1].controllerUnitList.cloneList()
+                    //let newContainerList = new LinkedList()
+    
                     let newContainerZIndex = this.state.ControllerUnitContainerState[validContainerID-1].zIndex
-
-                    let newContainerList = new LinkedList()
 
                     let tempData = originContainerList.getAt(this.state.tabDragging.oldSequenceNumber)
                     originContainerList.removeAt(this.state.tabDragging.oldSequenceNumber)
@@ -493,7 +464,7 @@ class ControllerUnitLayout extends Component {
 
                     if(originContainerList.head)
                     {
-                        console.log('originContainerList.head not null')
+                        //console.log('originContainerList.head not null')
                         let tempContainerArray = []
                         this.state.ControllerUnitContainerState.map(state=>{
                             if(state.containerID===this.state.tabDragging.oldConID)
@@ -517,6 +488,7 @@ class ControllerUnitLayout extends Component {
                                 
                                 let tempStateObj = {
                                     containerID:state.containerID,
+            //////////////////////////////////////////////////////////////////////////
                                     size:msg.divSize,
                                     position:this.state.mousePos,
                                     zIndex:this.state.ControllerUnitContainerState.length,
@@ -556,7 +528,6 @@ class ControllerUnitLayout extends Component {
                     }
                 }
             }
-
 
             else
             {
@@ -914,7 +885,7 @@ class ControllerUnitLayout extends Component {
     onDragEnter=(e)=>{
         e.stopPropagation()
         e.preventDefault()
-        console.log('layer drag enter')
+        //console.log('layer drag enter')
         
         if(this.state.tabDragging.status)
         {
@@ -938,7 +909,7 @@ class ControllerUnitLayout extends Component {
     onDragLeave=(e)=>{
         e.stopPropagation()
         e.preventDefault()
-        console.log('layer drag leave')
+        //console.log('layer drag leave')
        
         if(this.state.tabDragging.status)
         {
@@ -970,7 +941,6 @@ class ControllerUnitLayout extends Component {
               }
             })    
         }   
-        
     }
 
     onDrop=()=>{

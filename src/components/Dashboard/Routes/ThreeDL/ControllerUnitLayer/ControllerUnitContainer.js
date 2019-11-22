@@ -174,7 +174,7 @@ class ControllerUnitContainer extends Component {
 
     headerMouseDown=(e)=>{   
         e.stopPropagation()
-        //console.log('ControllerUnitContainer headerMouseDown')
+        console.log('ControllerUnitContainer headerMouseDown')
         this.setState({
             containerDragging:true,
             refPos:{
@@ -475,13 +475,16 @@ class ControllerUnitContainer extends Component {
         
     }
 
-    cancelIconMouseDown=()=>{
+    cancelIconMouseDown=(e)=>{
+        e.stopPropagation()
         const msg = {
             conID:this.props.conID,
             showing:false
         }
         this.props.containerShowing(msg)
     }
+
+    
 
     extendAreaMouseDown=(e)=>{
         // console.log('extendAreaMouseDown')
@@ -557,9 +560,9 @@ class ControllerUnitContainer extends Component {
     }
 
     render() {    
-        console.log('Container render conID  : ',this.props.conID)
+        //console.log('Container render conID  : ',this.props.conID)
         //console.log('conID : ',this.props.conID, ' zIndex : ',this.props.zIndex)
-        console.log(this.state.divSize)
+        //console.log(this.state.divSize)
 
         const containerWindow = {
             width:this.state.divSize.width,
@@ -615,7 +618,7 @@ class ControllerUnitContainer extends Component {
                 <div style={headerStyle} onMouseDown={this.headerMouseDown} onMouseUp={this.headerMouseUp} onDragEnter={this.onDragEnter} onDragLeave={this.onDragLeave} 
                 onDragOver={this.onDragOver} onDrop={this.onDrop} onMouseOut={this.headerMouseOut} >
                 {this.loadHeaderTabs()}
-                    <div style={cancelIconStyle} onMouseDown={this.cancelIconMouseDown} onMouseOver={this.cancelIconHover} onMouseOut={this.cancelIconOut}>{'x'}</div>
+                    <div style={cancelIconStyle} onMouseDown={this.cancelIconMouseDown}  onMouseOver={this.cancelIconHover} onMouseOut={this.cancelIconOut}>{'x'}</div>
                 </div>   
                 <div style={extendFunctionAreaStyle} onMouseDown={this.extendAreaMouseDown}  onMouseUp={this.extendAreaMouseUp}>
                     &#9499;
