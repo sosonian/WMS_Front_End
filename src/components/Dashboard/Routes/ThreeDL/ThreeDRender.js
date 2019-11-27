@@ -29,7 +29,18 @@ class ThreeDRender extends Component{
         width:200-4,
         height:200-29
       },
-      rotationValue:0.01,      
+      rotationValue:0.01,    
+      objectSelect:{
+        activate:false,
+        objectID:undefined,
+        objectName:undefined,
+        objectType:undefined,
+        eventType:undefined,
+        pos:{
+          x:undefined,
+          y:undefined
+        }
+      }  
     }
   }
   
@@ -68,10 +79,6 @@ class ThreeDRender extends Component{
     this.camera1.position.x =0
     this.camera1.position.y =1
 
-    
-
-    
-
     if(this.state.orbitControlMode)
     {
       if(this.cameraControl !== undefined)
@@ -101,6 +108,7 @@ class ThreeDRender extends Component{
     const material = new THREE.MeshBasicMaterial({ color: 0x0000ff})
     this.plane = new THREE.Mesh(this.planeGeo.layout, material)
     this.plane.material.side = THREE.DoubleSide
+    this.plane.name = 'the O plane'
     this.scene.add(this.plane)
 
     this.mount.appendChild(this.renderer1.domElement)
@@ -112,8 +120,6 @@ class ThreeDRender extends Component{
   
     
   }
-
-  
 
   componentDidUpdate(preProps, preState){
     //console.log('ThreeDRender componentDidUpdate')
@@ -219,8 +225,6 @@ class ThreeDRender extends Component{
     }
   }
 
-  
-
   getSideView =(refDom)=>{
     if(refDom==undefined)
     {
@@ -314,7 +318,7 @@ class ThreeDRender extends Component{
         this.camera3.aspect = width2 / height2;
         this.camera3.updateProjectionMatrix();
      }
-   }
+  }
 
   threeDLayerMouseDown = (e) => {
     //console.log('ThreeDRender Mouse Down')
@@ -325,22 +329,80 @@ class ThreeDRender extends Component{
     }
     else
     {
-      //console.log('ThreeDRender Mouse Down without alt key')
-      const rayCaster = new THREE.Raycaster()
-      const mouseToken = new THREE.Vector2()
-      this.rect = this.mount.getBoundingClientRect()
-      mouseToken.x = ((e.clientX-this.rect.left)/this.mount.clientWidth)*2-1
-      mouseToken.y = -((e.clientY-this.rect.top)/this.mount.clientHeight)*2+1
-      rayCaster.setFromCamera(mouseToken, this.camera1)
+      console.log('ThreeDRender Mouse Down without alt key')
+      console.log(e.button)
+      if(e.button === 0)
+      {
+        let result = this.detectObjectSelectedOrNot(e)
+        if(result !== null)
+        {
+          this.setState({
+            objectSelect:{
+              activate:true,
+              objectID:result.uuid,
+              objectName:result.name,
+              objectType:result.type,
+              eventType:'select',
+              pos:{
+                x:e.clientX-this.rect.left,
+                y:e.clientY-this.rect.top
+              }
+            }  
+          })
+        }
+        else
+        {
+          this.setState({
+            objectSelect:{
+              activate:false,
+              objectID:undefined,
+              objectName:undefined,
+              objectType:undefined,
+              eventType:undefined,
+              pos:{
+                x:undefined,
+                y:undefined
+              }
+            }  
+          })
+        }
+      }
+    }
+  }
 
-      let intersects = rayCaster.intersectObjects(this.scene.children)
+  detectObjectSelectedOrNot=(e)=>{
+    const rayCaster = new THREE.Raycaster()
+    const mouseToken = new THREE.Vector2()
+    this.rect = this.mount.getBoundingClientRect()
+    mouseToken.x = ((e.clientX-this.rect.left)/this.mount.clientWidth)*2-1
+    mouseToken.y = -((e.clientY-this.rect.top)/this.mount.clientHeight)*2+1
+    rayCaster.setFromCamera(mouseToken, this.camera1)
+
+    let intersects = rayCaster.intersectObjects(this.scene.children)
+    
+    if(intersects.length>0)
+    {
+      console.log('intersects.length :', intersects.length)
       for(var i =0; i <intersects.length; i++)
       {
         if(intersects[i].object.type == 'Mesh')
         {
           intersects[i].object.material.color.set(0x13D73F)
-        }        
+          console.log(intersects[i].object)
+          return intersects[i].object
+        }   
+        else
+        {
+          if(i===intersects.length-1)
+          {
+            return null
+          }
+        }
       }
+    }
+    else
+    {
+      return null
     }
   }
 
@@ -418,6 +480,12 @@ class ThreeDRender extends Component{
     }
   }
 
+  onContextMenu=(e)=>{
+    e.stopPropagation()
+    e.preventDefault()
+    console.log('menu open !!')
+  }
+
   render(){
   //  console.log('ThreeDRender render')
   //  console.log('ThreeDRender render receive sizeProps :')
@@ -431,10 +499,11 @@ class ThreeDRender extends Component{
         onMouseDown={this.threeDLayerMouseDown}
         onMouseMove={this.ThreeDLayerMouseMove}
         onMouseUp={this.threeDLayerMouseUp}
+        onContextMenu={this.onContextMenu}
         style={myStyle}
         ref={(mount) => { this.mount = mount }}
       >
-        <ControllerUnitLayout ref={(refDom)=>{this.refControllerUnitLayout=refDom}}  offset={this.state.offset} rotationValue={this.getRotationValue} frontView={this.getFrontView} sideView={this.getSideView}  frontViewSizeChange={this.frontViewSizeChange}  sideViewSizeChange={this.sideViewSizeChange}/> 
+        <ControllerUnitLayout ref={(refDom)=>{this.refControllerUnitLayout=refDom}}  offset={this.state.offset} rotationValue={this.getRotationValue} frontView={this.getFrontView} sideView={this.getSideView}  frontViewSizeChange={this.frontViewSizeChange}  sideViewSizeChange={this.sideViewSizeChange} objectSelect={this.state.objectSelect}/> 
       </div>  
     )
   }

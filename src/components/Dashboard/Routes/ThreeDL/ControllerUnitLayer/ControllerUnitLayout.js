@@ -4,7 +4,7 @@ import ShadowContainer from './ShadowContainer'
 import TestContainer from './TestContainer'
 import LinkedList from '../../../../CommonUtilities/LinkedList'
 import ControllerUnitElementsInitialState from './ControllerUnitElements/ControllerUnitElementsInitialState'
-
+import ContextMenu from './ContextMenu'
 
 class ControllerUnitLayout extends Component {
     constructor(props) {
@@ -947,6 +947,25 @@ class ControllerUnitLayout extends Component {
 
     }
 
+    appendContextMenu=()=>{
+        if(this.props.objectSelect.activate)
+        {
+            return(
+                <ContextMenu objectInfo={this.props.objectSelect}/>
+            )
+        }
+        else
+        {
+            return ('')
+        }
+    }
+
+    // onContextMenu=(e)=>{
+    //     e.preventDefault();
+    //     console.log('menu open !!')
+
+    // }
+
     render(){
         //console.log('ControllerUnitLayout render ')
         const containerStyle = {
@@ -959,10 +978,11 @@ class ControllerUnitLayout extends Component {
         }
 
         return(
-            <div style={containerStyle}  ref={(refLayout)=>{this.refLayout=refLayout}} onMouseDown={this.onMouseDown} onMouseMove={this.onMouseMove} onMouseUp={this.onMouseUp} onDragEnter={this.onDragEnter} onDragLeave={this.onDragLeave} onDragOver={this.onDragOver} onDrop={this.onDrop}> 
+            <div style={containerStyle}  ref={(refLayout)=>{this.refLayout=refLayout}} onMouseDown={this.onMouseDown} onMouseMove={this.onMouseMove} onMouseUp={this.onMouseUp} onDragEnter={this.onDragEnter} onDragLeave={this.onDragLeave} onDragOver={this.onDragOver} onDrop={this.onDrop} > 
                 {this.createControllerUnitContainer()}
                 {/** <TestContainer mousePos={this.state.mousePos}/> **/}
                 {this.appendShadowContainer()}
+                {this.appendContextMenu()}
             </div>
         )
     }
