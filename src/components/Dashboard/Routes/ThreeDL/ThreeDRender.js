@@ -101,7 +101,7 @@ class ThreeDRender extends Component{
     const axes = new THREE.AxesHelper(20)
     this.scene.add(axes)
 
-    this.sceneGrid = new THREE.GridHelper(10,10)
+    this.sceneGrid = new THREE.GridHelper(20,20)
     this.scene.add(this.sceneGrid)
     
     this.planeGeo = new StorageLayer()
@@ -251,7 +251,7 @@ class ThreeDRender extends Component{
   animate = () => {
     
     this.stats.begin();
-    this.plane.rotation.x += this.state.rotationValue
+    //this.plane.rotation.x += this.state.rotationValue
  
     let c1Background = new THREE.Color('rgb(255,255,255)')
     this.renderer1.setClearColor(c1Background)
