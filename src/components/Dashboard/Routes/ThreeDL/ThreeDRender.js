@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import Stats from 'stats.js';
 import orbControls from './OrbitControls';
 import StorageLayer from './ThreeDObjects/StorageLayer';
+import sideRuler from './ThreeDObjects/SideRuler';
 import ControllerUnitLayout from './ControllerUnitLayer/ControllerUnitLayout'
 
 class ThreeDRender extends Component{
@@ -105,11 +106,21 @@ class ThreeDRender extends Component{
     this.scene.add(this.sceneGrid)
     
     this.planeGeo = new StorageLayer()
-    const material = new THREE.MeshBasicMaterial({ color: 0x0000ff})
-    this.plane = new THREE.Mesh(this.planeGeo.layout, material)
+    const material1 = new THREE.MeshBasicMaterial({ color: 0x0000ff})
+    this.plane = new THREE.Mesh(this.planeGeo.layout, material1)
     this.plane.material.side = THREE.DoubleSide
     this.plane.name = 'the O plane'
     this.scene.add(this.plane)
+
+    let tempRuler = new sideRuler('test')
+    const material2 = new THREE.MeshBasicMaterial({
+      color:0xff7391
+    })
+    
+    this.sideRuler = new THREE.Mesh(tempRuler.ruler, material2)
+    this.sideRuler.material.side = THREE.DoubleSide
+    this.sideRuler.name = 'sideRuler'
+    this.scene.add(this.sideRuler)
 
     this.mount.appendChild(this.renderer1.domElement)
     
