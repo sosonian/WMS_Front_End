@@ -112,15 +112,7 @@ class ThreeDRender extends Component{
     this.plane.name = 'the O plane'
     this.scene.add(this.plane)
 
-    let tempRuler = new sideRuler('test')
-    const material2 = new THREE.MeshBasicMaterial({
-      color:0xff7391
-    })
     
-    this.sideRuler = new THREE.Mesh(tempRuler.ruler, material2)
-    this.sideRuler.material.side = THREE.DoubleSide
-    this.sideRuler.name = 'sideRuler'
-    this.scene.add(this.sideRuler)
 
     this.mount.appendChild(this.renderer1.domElement)
     
@@ -337,6 +329,7 @@ class ThreeDRender extends Component{
     if(e.altKey)
     {
       this.setState({orbitControlMode : true})
+      console.log(this.camera1)
     }
     else
     {
@@ -347,6 +340,7 @@ class ThreeDRender extends Component{
         let result = this.detectObjectSelectedOrNot(e)
         if(result !== null)
         {
+          this.showSideRuler(result)
           this.setState({
             objectSelect:{
               activate:true,
@@ -379,6 +373,22 @@ class ThreeDRender extends Component{
         }
       }
     }
+  }
+
+  showSideRuler=(result)=>{
+    let cameraDistance = result.position.distanceTo(this.camera1.position)
+    let tempRuler = new sideRuler(result.geometry.vertices[0],result.geometry.vertices[1],cameraDistance)
+    const material2 = new THREE.MeshBasicMaterial({
+      color:0xff7391
+    })
+    
+    
+    
+    this.sideRuler = new THREE.Mesh(tempRuler.ruler, material2)
+    this.sideRuler.material.side = THREE.DoubleSide
+    this.sideRuler.name = 'sideRuler'
+    this.scene.add(this.sideRuler)
+
   }
 
   detectObjectSelectedOrNot=(e)=>{
