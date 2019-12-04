@@ -1,0 +1,6 @@
+0000000000000000000000000000000000000000 c92d614cfeaccd41d51282908dcaa81869ef21fd sosonian <sosonian@gmail.com> 1571659452 +0000	branch: Created from HEAD
+c92d614cfeaccd41d51282908dcaa81869ef21fd 00b8ea0a62dde85f11f901ba80cf66909168a074 sosonian <sosonian@gmail.com> 1571835302 +0000	commit: createMergeableControllerUnitDefaultLayout
+00b8ea0a62dde85f11f901ba80cf66909168a074 0e1150e40b0e299cc380dd05e8706065c3e5ef0b sosonian <sosonian@gmail.com> 1572091158 +0000	commit: subControllerUnitContainerImproved
+0e1150e40b0e299cc380dd05e8706065c3e5ef0b 5582a2224c9c0f0b9375944ad07cf22355ff3d53 sosonian <sosonian@gmail.com> 1572269489 +0000	commit: add extention function, add shadow container
+5582a2224c9c0f0b9375944ad07cf22355ff3d53 ca015f8b2efd1addea63a9f37ad343d7a53c4cca sosonian <sosonian@gmail.com> 1572590554 +0000	commit: improve state dataflow match react pattern
+ca015f8b2efd1addea63a9f37ad343d7a53c4cca 9e5403431a0e67d4f6ab7ee8038f0014ee2cc695 sosonian <sosonian@gmail.com> 1572604567 +0000	commit: improved subView extension

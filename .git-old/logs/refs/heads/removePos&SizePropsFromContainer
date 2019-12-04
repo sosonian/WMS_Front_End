@@ -1,0 +1,9 @@
+0000000000000000000000000000000000000000 9e5403431a0e67d4f6ab7ee8038f0014ee2cc695 sosonian <sosonian@gmail.com> 1572611348 +0000	branch: Created from mergeableSubwindow
+9e5403431a0e67d4f6ab7ee8038f0014ee2cc695 d962c6070f4b694aaa98c3bee450513811684331 sosonian <sosonian@gmail.com> 1572611389 +0000	commit: readyToRewrite
+d962c6070f4b694aaa98c3bee450513811684331 64bf1a5d52018c119b42e42a7aa732af93265eab sosonian <sosonian@gmail.com> 1572612152 +0000	commit: tempSave
+64bf1a5d52018c119b42e42a7aa732af93265eab a94af1b7804046aced1209055dc1e5bff4ce7e88 sosonian <sosonian@gmail.com> 1572862129 +0000	commit: improvedCode
+a94af1b7804046aced1209055dc1e5bff4ce7e88 87ed50f3b44cf0d72189ddc3e52e1f7f9430d0fe sosonian <sosonian@gmail.com> 1572936413 +0000	commit: improvedCode
+87ed50f3b44cf0d72189ddc3e52e1f7f9430d0fe 9666ce3490f87f82a215fc3fd194cb8010c3f8dc sosonian <sosonian@gmail.com> 1572944926 +0000	commit: improvedCode
+9666ce3490f87f82a215fc3fd194cb8010c3f8dc e4224a4c4f9ad673ebaff31a3708df5025073d62 sosonian <sosonian@gmail.com> 1572948980 +0000	commit: improvedCode
+e4224a4c4f9ad673ebaff31a3708df5025073d62 58bcf0091d2bef8430b055634b0acebb9c1bb540 sosonian <sosonian@gmail.com> 1573113604 +0000	commit: mousePos product by layout complete
+58bcf0091d2bef8430b055634b0acebb9c1bb540 79fa31589187a67667c4ef84f480a143e145eba6 sosonian <sosonian@gmail.com> 1573125386 +0000	commit: tabDragging use onDragEnter
