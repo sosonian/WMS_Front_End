@@ -387,34 +387,8 @@ class ThreeDRender extends Component{
     console.log('showSideRuler : ')
     let cameraDistance = result.position.distanceTo(this.camera1.position)
     let tempRuler = new sideRuler(result.geometry.vertices[0],result.geometry.vertices[1],cameraDistance,result.uuid)
-    let tempRulerGeo =  await tempRuler.createMeasureMainProcess(tempRuler.rulerPoint1,tempRuler.rulerPoint2,tempRuler.length,tempRuler.rulerMainGeometry)
-    //console.log('showSideRuler tempRulerGeo')
-    //console.log(tempRulerGeo)
-
-    
-
-    let material = new THREE.MeshBasicMaterial({
-      color:0xff7391
-    })
-
-    let rulerMesh = new THREE.Mesh(tempRulerGeo, material)
-    rulerMesh.name = tempRuler.rulerMeshName
-  
-    //this.sideRuler = new THREE.Mesh(tempRuler.ruler, material2)
-    //this.sideRuler.material.side = THREE.DoubleSide
-    //this.sideRuler.name = 'sideRuler'
-    //this.scene.add(this.sideRuler)
-
-    //let newTest = new testSideRuler()
-    //newTest.createMeasureMainPointsNumber(this.scene)
-    //console.log('newTest')
-    //console.log(newTest)
-    //console.log('output')
-    //console.log (output)
-    //this.scene.add(output)
+    let rulerMesh =  await tempRuler.createMeasureMainProcess(tempRuler.rulerPoint1,tempRuler.rulerPoint2,tempRuler.length,tempRuler.rulerMainGeometry)
     this.scene.add(rulerMesh)
-  
-
   }
 
   detectObjectSelectedOrNot=(e)=>{
@@ -435,7 +409,7 @@ class ThreeDRender extends Component{
         if(intersects[i].object.type == 'Mesh')
         {
           intersects[i].object.material.color.set(0x13D73F)
-          //console.log(intersects[i].object)
+          console.log(intersects[i].object)
           return intersects[i].object
         }   
         else
