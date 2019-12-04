@@ -107,7 +107,7 @@ class ThreeDRender extends Component{
     this.scene.add(this.sceneGrid)
     
     this.planeGeo = new StorageLayer()
-    const material1 = new THREE.MeshBasicMaterial({ color: 0x0000ff})
+    const material1 = new THREE.MeshBasicMaterial({color: 0x0000ff})
     this.plane = new THREE.Mesh(this.planeGeo.layout, material1)
     this.plane.material.side = THREE.DoubleSide
     this.plane.name = 'the O plane'
@@ -339,11 +339,12 @@ class ThreeDRender extends Component{
         let result = this.detectObjectSelectedOrNot(e)
         if(result !== null && this.state.objectSelect.activate !== true)
         {
+          this.selectedObjectPaintedOrNot(result, true)
           this.showSideRuler(result)
           this.setState({
             objectSelect:{
               activate:true,
-              objectID:result.uuid,
+              objectID:result.id,
               objectName:result.name,
               objectType:result.type,
               eventType:'select',
@@ -356,6 +357,15 @@ class ThreeDRender extends Component{
         }
         else if(result === null)
         {
+          if(this.state.objectSelect.activate)
+          {
+            console.log('objectID : ',this.state.objectSelect.objectID)
+            let object = this.scene.getObjectById(this.state.objectSelect.objectID)
+            console.log('object')
+            console.log(object)
+            this.selectedObjectPaintedOrNot(object, false)
+          }
+          
           this.removeSideRuler('sideRuler'+this.state.objectSelect.objectID)
           this.setState({
             objectSelect:{
@@ -375,6 +385,18 @@ class ThreeDRender extends Component{
     }
   }
 
+  selectedObjectPaintedOrNot(object3D,toggle)
+  {
+    if(toggle)
+    {
+      object3D.material.color.set(0x13D73F)
+    }
+    else
+    {
+      object3D.material.color.set(0x0000ff)
+    }
+  }
+
   removeSideRuler=(rulerName)=>{
     console.log('removeSideRuler rulerName: ',rulerName)
 
@@ -386,7 +408,7 @@ class ThreeDRender extends Component{
   showSideRuler= async (result)=>{
     console.log('showSideRuler : ')
     let cameraDistance = result.position.distanceTo(this.camera1.position)
-    let tempRuler = new sideRuler(result.geometry.vertices[0],result.geometry.vertices[1],cameraDistance,result.uuid)
+    let tempRuler = new sideRuler(result.geometry.vertices[0],result.geometry.vertices[1],cameraDistance,result.id)
     let rulerMesh =  await tempRuler.createMeasureMainProcess(tempRuler.rulerPoint1,tempRuler.rulerPoint2,tempRuler.length,tempRuler.rulerMainGeometry)
     this.scene.add(rulerMesh)
   }
@@ -408,7 +430,7 @@ class ThreeDRender extends Component{
       {
         if(intersects[i].object.type == 'Mesh')
         {
-          intersects[i].object.material.color.set(0x13D73F)
+          //intersects[i].object.material.color.set(0x13D73F)
           console.log(intersects[i].object)
           return intersects[i].object
         }   

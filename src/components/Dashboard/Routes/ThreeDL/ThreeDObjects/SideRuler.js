@@ -9,7 +9,7 @@ import * as THREE from 'three';
 //   point1         : origin point of one side of target object3D
 //   point2         : end point of one side of target object3D 
 //   cameraDistance : distance from camera to target obejct3D, used to calculate the proper size of ruler
-//   objectID       : the uuid of target object3D, used to identical the target which ruler attached to.
+//   objectID       : the id of target object3D, used to identical the target which ruler attached to.
 //
 // use createMeasureMainProcess() function to get output ruler mesh (object3D)
 //

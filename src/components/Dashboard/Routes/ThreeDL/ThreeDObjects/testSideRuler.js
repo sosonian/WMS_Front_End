@@ -3,21 +3,6 @@ import * as THREE from 'three';
 
 
 
-////////// some features of sideRuler class //////////
-//
-// input :
-//   point1         : origin point of one side of target object3D
-//   point2         : end point of one side of target object3D 
-//   cameraDistance : distance from camera to target obejct3D, used to calculate the proper size of ruler
-//   objectID       : the uuid of target object3D, used to identical the target which ruler attached to.
-//
-// use createMeasureMainProcess() function to get output ruler mesh (object3D)
-//
-// so far, numerics of measrure unit are produced by fontLoader, which is expensive. 
-// considering to build 26 alphabets and 9 numerics object3D first.  
-//
-//
-
 
 class testSideRuler extends THREE.Mesh {
     constructor(point1,point2,cameraDistance,objectID){    
