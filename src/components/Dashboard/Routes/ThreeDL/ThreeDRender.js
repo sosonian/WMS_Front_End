@@ -5,10 +5,7 @@ import orbControls from './OrbitControls';
 import StorageLayer from './ThreeDObjects/StorageLayer';
 import sideRuler from './ThreeDObjects/SideRuler';
 import ControllerUnitLayout from './ControllerUnitLayer/ControllerUnitLayout'
-<<<<<<< HEAD
 import testSideRuler from './ThreeDObjects/testSideRuler'
-=======
->>>>>>> EstablishObjectCreationModule
 
 class ThreeDRender extends Component{
   constructor(props) {
@@ -116,11 +113,6 @@ class ThreeDRender extends Component{
     this.plane.name = 'the O plane'
     this.scene.add(this.plane)
 
-<<<<<<< HEAD
-=======
-    
-
->>>>>>> EstablishObjectCreationModule
     this.mount.appendChild(this.renderer1.domElement)
     
     this.setFrontView()
@@ -128,10 +120,6 @@ class ThreeDRender extends Component{
     this.animate()
     //this.handleResize()
   
-<<<<<<< HEAD
-=======
-    
->>>>>>> EstablishObjectCreationModule
   }
 
   componentDidUpdate(preProps, preState){
@@ -176,7 +164,6 @@ class ThreeDRender extends Component{
   }
 
   setFrontView=()=>{
-<<<<<<< HEAD
     this.camera2 = new THREE.PerspectiveCamera(
       70,
       200 / 200,
@@ -189,20 +176,6 @@ class ThreeDRender extends Component{
     this.camera2.lookAt(0,0,0)
     this.renderer2 = new THREE.WebGLRenderer()
     this.renderer2.setClearColor(0xeeeeee, 1.0) 
-=======
-      this.camera2 = new THREE.PerspectiveCamera(
-        70,
-        200 / 200,
-        0.1,
-        1000
-      )
-      this.camera2.position.z =10
-      this.camera2.position.x =0
-      this.camera2.position.y =1
-      this.camera2.lookAt(0,0,0)
-      this.renderer2 = new THREE.WebGLRenderer()
-      this.renderer2.setClearColor(0xeeeeee, 1.0) 
->>>>>>> EstablishObjectCreationModule
   }
   
   updateFrontView=()=>{
@@ -350,10 +323,7 @@ class ThreeDRender extends Component{
 
   threeDLayerMouseDown = (e) => {
     //console.log('ThreeDRender Mouse Down')
-<<<<<<< HEAD
     e.stopPropagation()
-=======
->>>>>>> EstablishObjectCreationModule
    
     if(e.altKey)
     {
@@ -367,11 +337,7 @@ class ThreeDRender extends Component{
       if(e.button === 0)
       {
         let result = this.detectObjectSelectedOrNot(e)
-<<<<<<< HEAD
         if(result !== null && this.state.objectSelect.activate !== true)
-=======
-        if(result !== null)
->>>>>>> EstablishObjectCreationModule
         {
           this.showSideRuler(result)
           this.setState({
@@ -388,14 +354,9 @@ class ThreeDRender extends Component{
             }  
           })
         }
-<<<<<<< HEAD
         else if(result === null)
         {
           this.removeSideRuler('sideRuler'+this.state.objectSelect.objectID)
-=======
-        else
-        {
->>>>>>> EstablishObjectCreationModule
           this.setState({
             objectSelect:{
               activate:false,
@@ -414,7 +375,6 @@ class ThreeDRender extends Component{
     }
   }
 
-<<<<<<< HEAD
   removeSideRuler=(rulerName)=>{
     console.log('removeSideRuler rulerName: ',rulerName)
 
@@ -454,21 +414,6 @@ class ThreeDRender extends Component{
     //this.scene.add(output)
     this.scene.add(rulerMesh)
   
-=======
-  showSideRuler=(result)=>{
-    let cameraDistance = result.position.distanceTo(this.camera1.position)
-    let tempRuler = new sideRuler(result.geometry.vertices[0],result.geometry.vertices[1],cameraDistance)
-    const material2 = new THREE.MeshBasicMaterial({
-      color:0xff7391
-    })
-    
-    
-    
-    this.sideRuler = new THREE.Mesh(tempRuler.ruler, material2)
-    this.sideRuler.material.side = THREE.DoubleSide
-    this.sideRuler.name = 'sideRuler'
-    this.scene.add(this.sideRuler)
->>>>>>> EstablishObjectCreationModule
 
   }
 
@@ -484,21 +429,13 @@ class ThreeDRender extends Component{
     
     if(intersects.length>0)
     {
-<<<<<<< HEAD
       //console.log('intersects.length :', intersects.length)
-=======
-      console.log('intersects.length :', intersects.length)
->>>>>>> EstablishObjectCreationModule
       for(var i =0; i <intersects.length; i++)
       {
         if(intersects[i].object.type == 'Mesh')
         {
           intersects[i].object.material.color.set(0x13D73F)
-<<<<<<< HEAD
           //console.log(intersects[i].object)
-=======
-          console.log(intersects[i].object)
->>>>>>> EstablishObjectCreationModule
           return intersects[i].object
         }   
         else
@@ -593,11 +530,7 @@ class ThreeDRender extends Component{
   onContextMenu=(e)=>{
     e.stopPropagation()
     e.preventDefault()
-<<<<<<< HEAD
     //console.log('menu open !!')
-=======
-    console.log('menu open !!')
->>>>>>> EstablishObjectCreationModule
   }
 
   render(){
