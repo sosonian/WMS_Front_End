@@ -1,24 +1,37 @@
 import * as THREE from 'three';
+import RulerClass from './ObjectCustomizedClass/RulerClass'
 
 
 
+////////// some features of sideRuler class //////////
+//
+// input :
+//   point1         : origin point of one side of target object3D
+//   point2         : end point of one side of target object3D 
+//   cameraDistance : distance from camera to target obejct3D, used to calculate the proper size of ruler
+//   objectID       : the id of target object3D, used to identical the target which ruler attached to.
+//
+// use createMeasureMainProcess() function to get output ruler mesh (object3D)
+//
+// so far, numerics of measrure unit are produced by fontLoader, which is expensive. 
+// considering to build 26 alphabets and 9 numerics object3D first.  
+//
+//
 
 
-class testSideRuler extends THREE.Mesh {
-    constructor(point1,point2,cameraDistance,objectID){    
+class testSideRuler {
+    constructor(point1,point2,cameraDistance,objectID,font){    
         //console.log('sideRuler testParameter : ',point1, point2, cameraDistance)
-        super()
         this.rulerPoint1 = new THREE.Vector3(point1.x-1,point1.y,point1.z)
         this.rulerPoint2 = new THREE.Vector3(point2.x-1,point2.y,point2.z)
         this.length = point1.distanceTo(point2)
+        this.font = font
         this.material = new THREE.MeshBasicMaterial({
             color:0xff7391
         })
 
-        //this.rulerMainGeometry = this.createRuler(this.rulerPoint1,this.rulerPoint2)
-        this.geometry = 
+        this.rulerMainGeometry = this.createRuler(this.rulerPoint1,this.rulerPoint2)
         this.rulerMeshName = 'sideRuler'+objectID
-        this.class = 'sideRuler'
     
     }
 
@@ -34,7 +47,7 @@ class testSideRuler extends THREE.Mesh {
         return ruler
     }
 
-    createMeasureMainProcess= async (point1,point2,length,rulerGeometry, name) =>{
+    createMeasureMainProcess= (point1,point2,length,rulerGeometry) =>{
         
         if(length && length >0)
         {
@@ -45,11 +58,10 @@ class testSideRuler extends THREE.Mesh {
                let unitPoints = this.calculatePointsOnZAxis(point1,point2)
                //console.log('unitPoints : ')
                //console.log(unitPoints)
-               let output = await this.createMeasureMainPoints(point1,unitPoints,rulerGeometry)
-            //    let rulerMesh = new THREE.Mesh(output, this.material)
-            //    rulerMesh.name = this.rulerMeshName
-            //    return rulerMesh
-            return output
+               let output =  this.createMeasureMainPoints(point1,unitPoints,rulerGeometry)
+               let rulerMesh = new RulerClass(output, this.material)
+               rulerMesh.name = this.rulerMeshName
+               return rulerMesh
            }
         }
     }
@@ -66,7 +78,7 @@ class testSideRuler extends THREE.Mesh {
         return measureUnitPoints
     }
 
-    createMeasureMainPoints= async (point1,pointArray,mergeRulerGeometry)=>{
+    createMeasureMainPoints= (point1,pointArray,mergeRulerGeometry)=>{
         let count = 0
         while(count<pointArray.length)
         {
@@ -84,7 +96,7 @@ class testSideRuler extends THREE.Mesh {
             mergeRulerGeometry.merge(measureUnitPoint)
             //console.log('createMeasureMainPoints mergeRulerGeometry 1')
             //console.log(mergeRulerGeometry)
-            let numberMesh = await this.createMeasureMainPointsNumber(pointArray[count],count)
+            let numberMesh = this.createMeasureMainPointsNumber(pointArray[count],count)
             //console.log('numberMesh : ', numberMesh)
 
             mergeRulerGeometry.mergeMesh(numberMesh)
@@ -102,22 +114,16 @@ class testSideRuler extends THREE.Mesh {
             side:THREE.DoubleSide
         })
 
-        let fontLoader = new THREE.FontLoader()
-        return new Promise(resolve => {
-            //console.log('createMeasureMainPointsNumber promise process')
-            fontLoader.load('Arial_Regular.json', function(font){
-                //console.log('createMeasureMainPointsNumber load process')
+        let message = index+'m'
+        let shapes = this.font.generateShapes(message,0.2)
+        let fontGeometry = new THREE.ShapeGeometry(shapes)        
+        let numberMesh = new THREE.Mesh(fontGeometry,material)
 
-                let message = index+'m'
-                let shapes = font.generateShapes(message,0.2)
-                let fontGeometry = new THREE.ShapeGeometry(shapes)        
-                let numberMesh = new THREE.Mesh(fontGeometry,material)
+        numberMesh.rotateX(-Math.PI/2)
+        numberMesh.position.set(point.x-0.5,point.y,point.z-0.2)
 
-                numberMesh.rotateX(-Math.PI/2)
-                numberMesh.position.set(point.x-0.5,point.y,point.z-0.2)
-                resolve(numberMesh)
-            })
-        })
+        return numberMesh
+
     }
 
     detectLineDirectionType=(point1,point2)=>{

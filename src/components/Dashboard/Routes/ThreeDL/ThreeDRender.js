@@ -7,6 +7,7 @@ import sideRuler from './ThreeDObjects/SideRuler';
 import ControllerUnitLayout from './ControllerUnitLayer/ControllerUnitLayout'
 import testSideRuler from './ThreeDObjects/testSideRuler'
 
+
 class ThreeDRender extends Component{
   constructor(props) {
     super(props)
@@ -42,7 +43,8 @@ class ThreeDRender extends Component{
           x:undefined,
           y:undefined
         }
-      }  
+      },
+      font:null
     }
   }
   
@@ -54,6 +56,10 @@ class ThreeDRender extends Component{
     this.rotationValue = 0.01
 
     this.deployState();
+    this.setFontToState()
+
+    //console.log('ThreeDRender componentDidMount')
+    //console.log(font)
 
     this.rect = this.mount.getBoundingClientRect()
     this.renderer1 = new THREE.WebGLRenderer()
@@ -161,6 +167,24 @@ class ThreeDRender extends Component{
     //cancelAnimationFrame(this.refPP)
     //this.mount.removeChild(this.renderer1.domElement)
     //this.subMount2.refDom.removeChild(this.renderer2.domElement)
+  }
+
+  setFontToState = async() =>{
+    let font = await this.getFontLoaderReady()
+    this.setState({
+      font : font
+    })
+  }
+
+  getFontLoaderReady= async()=> {
+    let fontLoader = new THREE.FontLoader()
+    return new Promise(resolve => {
+      console.log('getFontLoaderReady')
+      fontLoader.load('Arial_Regular.json', function(font){
+        console.log('getFontLoaderReady font ready')
+        resolve(font)
+      })
+    })
   }
 
   setFrontView=()=>{
@@ -408,9 +432,16 @@ class ThreeDRender extends Component{
   showSideRuler= async (result)=>{
     console.log('showSideRuler : ')
     let cameraDistance = result.position.distanceTo(this.camera1.position)
-    let tempRuler = new sideRuler(result.geometry.vertices[0],result.geometry.vertices[1],cameraDistance,result.id)
-    let rulerMesh =  await tempRuler.createMeasureMainProcess(tempRuler.rulerPoint1,tempRuler.rulerPoint2,tempRuler.length,tempRuler.rulerMainGeometry)
-    this.scene.add(rulerMesh)
+    // let tempRuler = new sideRuler(result.geometry.vertices[0],result.geometry.vertices[1],cameraDistance,result.id)
+    // let rulerMesh =  await tempRuler.createMeasureMainProcess(tempRuler.rulerPoint1,tempRuler.rulerPoint2,tempRuler.length,tempRuler.rulerMainGeometry)
+
+    // this.scene.add(rulerMesh)
+    if(this.state.font)
+    {
+      let tempRuler = new testSideRuler(result.geometry.vertices[0],result.geometry.vertices[1],cameraDistance,result.id, this.state.font)
+      let rulerMesh =  tempRuler.createMeasureMainProcess(tempRuler.rulerPoint1,tempRuler.rulerPoint2,tempRuler.length,tempRuler.rulerMainGeometry)
+      this.scene.add (rulerMesh)
+    }
   }
 
   detectObjectSelectedOrNot=(e)=>{
@@ -428,7 +459,7 @@ class ThreeDRender extends Component{
       //console.log('intersects.length :', intersects.length)
       for(var i =0; i <intersects.length; i++)
       {
-        if(intersects[i].object.type == 'Mesh')
+        if(intersects[i].object.type == 'Mesh' && intersects[i].object.class !== 'sideRuler')
         {
           //intersects[i].object.material.color.set(0x13D73F)
           console.log(intersects[i].object)

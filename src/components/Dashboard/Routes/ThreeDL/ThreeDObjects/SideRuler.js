@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-
+import RulerClass from './ObjectCustomizedClass/RulerClass'
 
 
 
@@ -59,7 +59,7 @@ class sideRuler {
                //console.log('unitPoints : ')
                //console.log(unitPoints)
                let output = await this.createMeasureMainPoints(point1,unitPoints,rulerGeometry)
-               let rulerMesh = new THREE.Mesh(output, this.material)
+               let rulerMesh = new RulerClass(output, this.material)
                rulerMesh.name = this.rulerMeshName
                return rulerMesh
            }
