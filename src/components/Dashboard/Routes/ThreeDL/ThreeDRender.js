@@ -352,7 +352,7 @@ class ThreeDRender extends Component{
     if(e.altKey)
     {
       this.setState({orbitControlMode : true})
-      console.log(this.camera1)
+      //console.log(this.camera1)
     }
     else
     {
@@ -383,10 +383,10 @@ class ThreeDRender extends Component{
         {
           if(this.state.objectSelect.activate)
           {
-            console.log('objectID : ',this.state.objectSelect.objectID)
+            //console.log('objectID : ',this.state.objectSelect.objectID)
             let object = this.scene.getObjectById(this.state.objectSelect.objectID)
-            console.log('object')
-            console.log(object)
+            //console.log('object')
+            //console.log(object)
             this.selectedObjectPaintedOrNot(object, false)
           }
           
@@ -422,16 +422,29 @@ class ThreeDRender extends Component{
   }
 
   removeSideRuler=(rulerName)=>{
-    console.log('removeSideRuler rulerName: ',rulerName)
+    //console.log('removeSideRuler rulerName: ',rulerName)
 
     let removeObject =this.scene.getObjectByName(rulerName)
-    console.log(removeObject)
-    this.scene.remove(removeObject)
+    if(removeObject)
+    {
+      //console.log(removeObject)
+      removeObject.geometry.dispose()
+      this.scene.remove(removeObject)
+     
+      //removeObject.geometry.dispose()
+      
+    }
+    else
+    {
+      console.log('target couldnt be found')
+    }
+    
   }
 
-  showSideRuler= async (result)=>{
+  showSideRuler= (result)=>{
     console.log('showSideRuler : ')
     let cameraDistance = result.position.distanceTo(this.camera1.position)
+    // let cameraDistance = 5
     // let tempRuler = new sideRuler(result.geometry.vertices[0],result.geometry.vertices[1],cameraDistance,result.id)
     // let rulerMesh =  await tempRuler.createMeasureMainProcess(tempRuler.rulerPoint1,tempRuler.rulerPoint2,tempRuler.length,tempRuler.rulerMainGeometry)
 
@@ -439,8 +452,12 @@ class ThreeDRender extends Component{
     if(this.state.font)
     {
       let tempRuler = new testSideRuler(result.geometry.vertices[0],result.geometry.vertices[1],cameraDistance,result.id, this.state.font)
-      let rulerMesh =  tempRuler.createMeasureMainProcess(tempRuler.rulerPoint1,tempRuler.rulerPoint2,tempRuler.length,tempRuler.rulerMainGeometry)
+      let rulerGeometry = tempRuler.createRuler(tempRuler.rulerPoint1,tempRuler.rulerPoint2)
+      let rulerMesh =  tempRuler.createMeasureMainProcess(tempRuler.rulerPoint1,tempRuler.rulerPoint2,tempRuler.length,rulerGeometry)
       this.scene.add (rulerMesh)
+      rulerGeometry.dispose()
+      cameraDistance = null
+      tempRuler = null 
     }
   }
 
@@ -462,7 +479,7 @@ class ThreeDRender extends Component{
         if(intersects[i].object.type == 'Mesh' && intersects[i].object.class !== 'sideRuler')
         {
           //intersects[i].object.material.color.set(0x13D73F)
-          console.log(intersects[i].object)
+          //console.log(intersects[i].object)
           return intersects[i].object
         }   
         else

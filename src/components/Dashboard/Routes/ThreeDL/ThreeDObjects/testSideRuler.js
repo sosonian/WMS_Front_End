@@ -14,9 +14,14 @@ import RulerClass from './ObjectCustomizedClass/RulerClass'
 // use createMeasureMainProcess() function to get output ruler mesh (object3D)
 //
 // so far, numerics of measrure unit are produced by fontLoader, which is expensive. 
-// considering to build 26 alphabets and 9 numerics object3D first.  
+// considering to build 26 alphabets and 9 numerics geometry first.  
+//
+// geometry.dispose() is not a fully complete function, beware of memory leak issues.
+//
+// console.log() would block the GC process, could make memory leak worse.
 //
 //
+///////////////////////////////////////////////////////
 
 
 class testSideRuler {
@@ -30,7 +35,7 @@ class testSideRuler {
             color:0xff7391
         })
 
-        this.rulerMainGeometry = this.createRuler(this.rulerPoint1,this.rulerPoint2)
+        //this.rulerMainGeometry = this.createRuler(this.rulerPoint1,this.rulerPoint2)
         this.rulerMeshName = 'sideRuler'+objectID
     
     }
@@ -61,6 +66,9 @@ class testSideRuler {
                let output =  this.createMeasureMainPoints(point1,unitPoints,rulerGeometry)
                let rulerMesh = new RulerClass(output, this.material)
                rulerMesh.name = this.rulerMeshName
+               unitPoints = null
+               rulerGeometry.dispose()
+               output.dispose()
                return rulerMesh
            }
         }
@@ -74,12 +82,14 @@ class testSideRuler {
             let point = new THREE.Vector3(point2.x, point2.y, Number(count))
             measureUnitPoints.push(point)
             count = count -1
+            point = null
         }
         return measureUnitPoints
     }
 
     createMeasureMainPoints= (point1,pointArray,mergeRulerGeometry)=>{
         let count = 0
+        //let measureUnitPoint = new THREE.Geometry()
         while(count<pointArray.length)
         {
             //console.log('createMeasureMainPoints while loop count : ', count)
@@ -97,13 +107,27 @@ class testSideRuler {
             //console.log('createMeasureMainPoints mergeRulerGeometry 1')
             //console.log(mergeRulerGeometry)
             let numberMesh = this.createMeasureMainPointsNumber(pointArray[count],count)
-            //console.log('numberMesh : ', numberMesh)
+            //console.log('numberMesh s: ', numberMesh)
 
             mergeRulerGeometry.mergeMesh(numberMesh)
+            
             count = count +1
+
+            measureUnitP1 = null
+            measureUnitP2 = null
+            measureUnitP3 = null
+            measureUnitP4 = null 
+            measureUnitPoint.dispose()
+            face1 = null
+            face2 = null
+            numberMesh.geometry.dispose()
+            numberMesh.material.dispose()
+            numberMesh = null
+            //console.log('numberMesh e: ', numberMesh)
         }
         //console.log('createMeasureMainPoints mergeRulerGeometry 2')
         //console.log(mergeRulerGeometry)
+        
         return mergeRulerGeometry
     }
 
@@ -116,12 +140,20 @@ class testSideRuler {
 
         let message = index+'m'
         let shapes = this.font.generateShapes(message,0.2)
-        let fontGeometry = new THREE.ShapeGeometry(shapes)        
+        //console.log(shapes)
+        let fontGeometry = new THREE.ShapeGeometry(shapes)    
+        //console.log(fontGeometry)    
         let numberMesh = new THREE.Mesh(fontGeometry,material)
 
         numberMesh.rotateX(-Math.PI/2)
         numberMesh.position.set(point.x-0.5,point.y,point.z-0.2)
+        //console.log(numberMesh)
 
+        shapes = null
+        material = null
+        message = null
+        fontGeometry.dispose()
+        
         return numberMesh
 
     }
