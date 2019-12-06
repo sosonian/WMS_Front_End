@@ -6,6 +6,7 @@ import StorageLayer from './ThreeDObjects/StorageLayer';
 import SideRuler from './ThreeDObjects/SideRuler';
 import ControllerUnitLayout from './ControllerUnitLayer/ControllerUnitLayout'
 import testSideRuler from './ThreeDObjects/testSideRuler'
+import testRulerClass from './ThreeDObjects/ObjectCustomizedClass/testRulerClass'
 
 
 class ThreeDRender extends Component{
@@ -112,12 +113,13 @@ class ThreeDRender extends Component{
     this.sceneGrid = new THREE.GridHelper(20,20)
     this.scene.add(this.sceneGrid)
     
-    this.planeGeo = new StorageLayer()
-    const material1 = new THREE.MeshBasicMaterial({color: 0x0000ff})
-    this.plane = new THREE.Mesh(this.planeGeo.layout, material1)
-    this.plane.material.side = THREE.DoubleSide
-    this.plane.name = 'the O plane'
-    this.scene.add(this.plane)
+    this.getObjectLoaderReady()
+    // this.planeGeo = new StorageLayer()
+    // const material1 = new THREE.MeshBasicMaterial({color: 0x0000ff})
+    // this.plane = new THREE.Mesh(this.planeGeo.layout, material1)
+    // this.plane.material.side = THREE.DoubleSide
+    // this.plane.name = 'the O plane'
+    // this.scene.add(this.plane)
 
     this.mount.appendChild(this.renderer1.domElement)
     
@@ -157,6 +159,7 @@ class ThreeDRender extends Component{
     
     this.updateFrontView()
     this.updateSideView()
+    
 
   }
 
@@ -168,6 +171,39 @@ class ThreeDRender extends Component{
     //this.mount.removeChild(this.renderer1.domElement)
     //this.subMount2.refDom.removeChild(this.renderer2.domElement)
   }
+
+  // getCanvas=()=>{
+  //   this.canvas = this.mount.lastChild
+  //   console.log('ThreeDRender getCanvas')
+  //   console.log(this.canvas)
+  // }
+
+  getObjectLoaderReady=()=>{
+    let position1 = {
+      x:0,
+      y:0,
+      z:0
+    }
+    let planeGeo1 = new StorageLayer(position1,7)
+    let material1 = new THREE.MeshBasicMaterial({color: 0x0000ff})
+    let plane1 = new THREE.Mesh(planeGeo1.layout, material1)
+    plane1.material.side = THREE.DoubleSide
+    plane1.name = 'the O plane'
+    this.scene.add(plane1)
+
+    let position2 = {
+      x:10,
+      y:0,
+      z:-10
+    }
+    let planeGeo2 = new StorageLayer(position2,5)
+    let material2 = new THREE.MeshBasicMaterial({color: 0x0000ff})
+    let plane2 = new THREE.Mesh(planeGeo2.layout, material2)
+    plane2.material.side = THREE.DoubleSide
+    plane2.name = 'the 1 plane'
+    this.scene.add(plane2)
+  }
+
 
   setFontToState = async() =>{
     let font = await this.getFontLoaderReady()
@@ -430,6 +466,7 @@ class ThreeDRender extends Component{
     {
       //console.log(removeObject)
       removeObject.geometry.dispose()
+      removeObject.material.dispose()
       this.scene.remove(removeObject)
      
       //removeObject.geometry.dispose()
@@ -444,18 +481,27 @@ class ThreeDRender extends Component{
 
   showSideRuler= (result)=>{
     console.log('showSideRuler : ')
+    console.log(result)
     let cameraDistance = result.position.distanceTo(this.camera1.position)
 
     if(this.state.font)
     {
-      let tempRuler = new SideRuler(result.geometry.vertices[0],result.geometry.vertices[1],cameraDistance,result.id, this.state.font)
-      let rulerGeometry = tempRuler.createRuler(tempRuler.rulerPoint1,tempRuler.rulerPoint2)
-      let rulerMesh =  tempRuler.createMeasureMainProcess(tempRuler.rulerPoint1,tempRuler.rulerPoint2,tempRuler.length,rulerGeometry)
-      this.scene.add (rulerMesh)
-      rulerGeometry.dispose()
-      cameraDistance = null
-      tempRuler = null 
+      //let tempRuler = new SideRuler(result.geometry.vertices[0],result.geometry.vertices[1],cameraDistance,result.id, this.state.font)
+      //let rulerGeometry = tempRuler.createRuler(tempRuler.rulerPoint1,tempRuler.rulerPoint2)
+      //let rulerMesh =  tempRuler.createMeasureMainProcess(tempRuler.rulerPoint1,tempRuler.rulerPoint2,tempRuler.length,rulerGeometry)
+      //this.scene.add (rulerMesh)
+      //rulerGeometry.dispose()
+      //cameraDistance = null
+      //tempRuler = null 
+
+      let tempRuler = new testRulerClass("","",result.geometry.vertices[0],result.geometry.vertices[1],cameraDistance,result.id, this.state.font)
+      this.scene.add (tempRuler)
+      this.putTextOnCanvas()
     }
+  }
+
+  putTextOnCanvas=()=>{
+    
   }
 
   detectObjectSelectedOrNot=(e)=>{
@@ -582,6 +628,12 @@ class ThreeDRender extends Component{
       width: '100%',
       height: '100%',
     }
+
+    const canvasSize = {
+      width : this.state.canvasSize.width,
+      height : this.state.canvasSize.height,
+    }
+
     return(
       <div 
         onMouseDown={this.threeDLayerMouseDown}
@@ -591,7 +643,9 @@ class ThreeDRender extends Component{
         style={myStyle}
         ref={(mount) => { this.mount = mount }}
       >
+        
         <ControllerUnitLayout ref={(refDom)=>{this.refControllerUnitLayout=refDom}}  offset={this.state.offset} rotationValue={this.getRotationValue} frontView={this.getFrontView} sideView={this.getSideView}  frontViewSizeChange={this.frontViewSizeChange}  sideViewSizeChange={this.sideViewSizeChange} objectSelect={this.state.objectSelect}/> 
+        
       </div>  
     )
   }
