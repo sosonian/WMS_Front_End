@@ -34,10 +34,15 @@ class testSideRuler {
         this.material = new THREE.MeshBasicMaterial({
             color:0xff7391
         })
-
+        this.sizeToken = this.getSizeToken(cameraDistance)
         //this.rulerMainGeometry = this.createRuler(this.rulerPoint1,this.rulerPoint2)
         this.rulerMeshName = 'sideRuler'+objectID
     
+    }
+
+    getSizeToken=(cameraDistance)=>{
+        let output = 1
+        return output
     }
 
     createRuler=(point1,point2)=>{

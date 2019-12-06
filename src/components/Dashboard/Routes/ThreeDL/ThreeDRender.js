@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import Stats from 'stats.js';
 import orbControls from './OrbitControls';
 import StorageLayer from './ThreeDObjects/StorageLayer';
-import sideRuler from './ThreeDObjects/SideRuler';
+import SideRuler from './ThreeDObjects/SideRuler';
 import ControllerUnitLayout from './ControllerUnitLayer/ControllerUnitLayout'
 import testSideRuler from './ThreeDObjects/testSideRuler'
 
@@ -301,7 +301,8 @@ class ThreeDRender extends Component{
       if(this.cameraControl !== undefined)
       {       
         this.cameraControl.enabled = true
-        this.cameraControl.update();
+
+        //this.cameraControl.update();
       }
     }
     
@@ -444,14 +445,10 @@ class ThreeDRender extends Component{
   showSideRuler= (result)=>{
     console.log('showSideRuler : ')
     let cameraDistance = result.position.distanceTo(this.camera1.position)
-    // let cameraDistance = 5
-    // let tempRuler = new sideRuler(result.geometry.vertices[0],result.geometry.vertices[1],cameraDistance,result.id)
-    // let rulerMesh =  await tempRuler.createMeasureMainProcess(tempRuler.rulerPoint1,tempRuler.rulerPoint2,tempRuler.length,tempRuler.rulerMainGeometry)
 
-    // this.scene.add(rulerMesh)
     if(this.state.font)
     {
-      let tempRuler = new testSideRuler(result.geometry.vertices[0],result.geometry.vertices[1],cameraDistance,result.id, this.state.font)
+      let tempRuler = new SideRuler(result.geometry.vertices[0],result.geometry.vertices[1],cameraDistance,result.id, this.state.font)
       let rulerGeometry = tempRuler.createRuler(tempRuler.rulerPoint1,tempRuler.rulerPoint2)
       let rulerMesh =  tempRuler.createMeasureMainProcess(tempRuler.rulerPoint1,tempRuler.rulerPoint2,tempRuler.length,rulerGeometry)
       this.scene.add (rulerMesh)

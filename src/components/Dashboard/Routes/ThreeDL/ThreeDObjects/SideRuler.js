@@ -3,7 +3,7 @@ import RulerClass from './ObjectCustomizedClass/RulerClass'
 
 
 
-////////// some features of sideRuler class //////////
+////////// some features of SideRuler class //////////
 //
 // input :
 //   point1         : origin point of one side of target object3D
@@ -14,25 +14,35 @@ import RulerClass from './ObjectCustomizedClass/RulerClass'
 // use createMeasureMainProcess() function to get output ruler mesh (object3D)
 //
 // so far, numerics of measrure unit are produced by fontLoader, which is expensive. 
-// considering to build 26 alphabets and 9 numerics object3D first.  
+// considering to build 26 alphabets and 9 numerics geometry first.  
+//
+// geometry.dispose() is not a fully complete function, beware of memory leak issues.
+//
+// console.log() would block the GC process, could make memory leak worse.
 //
 //
+///////////////////////////////////////////////////////
 
 
-class sideRuler {
-    constructor(point1,point2,cameraDistance,objectID){    
+class SideRuler {
+    constructor(point1,point2,cameraDistance,objectID,font){    
         //console.log('sideRuler testParameter : ',point1, point2, cameraDistance)
         this.rulerPoint1 = new THREE.Vector3(point1.x-1,point1.y,point1.z)
         this.rulerPoint2 = new THREE.Vector3(point2.x-1,point2.y,point2.z)
         this.length = point1.distanceTo(point2)
+        this.font = font
         this.material = new THREE.MeshBasicMaterial({
             color:0xff7391
         })
-
-        this.group = new THREE.Group()
-        this.rulerMainGeometry = this.createRuler(this.rulerPoint1,this.rulerPoint2)
+        this.sizeToken = this.getSizeToken(cameraDistance)
+        //this.rulerMainGeometry = this.createRuler(this.rulerPoint1,this.rulerPoint2)
         this.rulerMeshName = 'sideRuler'+objectID
     
+    }
+
+    getSizeToken=(cameraDistance)=>{
+        let output = 1
+        return output
     }
 
     createRuler=(point1,point2)=>{
@@ -47,7 +57,7 @@ class sideRuler {
         return ruler
     }
 
-    createMeasureMainProcess= async (point1,point2,length,rulerGeometry, name) =>{
+    createMeasureMainProcess= (point1,point2,length,rulerGeometry) =>{
         
         if(length && length >0)
         {
@@ -58,9 +68,12 @@ class sideRuler {
                let unitPoints = this.calculatePointsOnZAxis(point1,point2)
                //console.log('unitPoints : ')
                //console.log(unitPoints)
-               let output = await this.createMeasureMainPoints(point1,unitPoints,rulerGeometry)
+               let output =  this.createMeasureMainPoints(point1,unitPoints,rulerGeometry)
                let rulerMesh = new RulerClass(output, this.material)
                rulerMesh.name = this.rulerMeshName
+               unitPoints = null
+               rulerGeometry.dispose()
+               output.dispose()
                return rulerMesh
            }
         }
@@ -74,12 +87,14 @@ class sideRuler {
             let point = new THREE.Vector3(point2.x, point2.y, Number(count))
             measureUnitPoints.push(point)
             count = count -1
+            point = null
         }
         return measureUnitPoints
     }
 
-    createMeasureMainPoints= async (point1,pointArray,mergeRulerGeometry)=>{
+    createMeasureMainPoints= (point1,pointArray,mergeRulerGeometry)=>{
         let count = 0
+        //let measureUnitPoint = new THREE.Geometry()
         while(count<pointArray.length)
         {
             //console.log('createMeasureMainPoints while loop count : ', count)
@@ -96,14 +111,28 @@ class sideRuler {
             mergeRulerGeometry.merge(measureUnitPoint)
             //console.log('createMeasureMainPoints mergeRulerGeometry 1')
             //console.log(mergeRulerGeometry)
-            let numberMesh = await this.createMeasureMainPointsNumber(pointArray[count],count)
-            //console.log('numberMesh : ', numberMesh)
+            let numberMesh = this.createMeasureMainPointsNumber(pointArray[count],count)
+            //console.log('numberMesh s: ', numberMesh)
 
             mergeRulerGeometry.mergeMesh(numberMesh)
+            
             count = count +1
+
+            measureUnitP1 = null
+            measureUnitP2 = null
+            measureUnitP3 = null
+            measureUnitP4 = null 
+            measureUnitPoint.dispose()
+            face1 = null
+            face2 = null
+            numberMesh.geometry.dispose()
+            numberMesh.material.dispose()
+            numberMesh = null
+            //console.log('numberMesh e: ', numberMesh)
         }
         //console.log('createMeasureMainPoints mergeRulerGeometry 2')
         //console.log(mergeRulerGeometry)
+        
         return mergeRulerGeometry
     }
 
@@ -114,22 +143,24 @@ class sideRuler {
             side:THREE.DoubleSide
         })
 
-        let fontLoader = new THREE.FontLoader()
-        return new Promise(resolve => {
-            //console.log('createMeasureMainPointsNumber promise process')
-            fontLoader.load('Arial_Regular.json', function(font){
-                //console.log('createMeasureMainPointsNumber load process')
+        let message = index+'m'
+        let shapes = this.font.generateShapes(message,0.2)
+        //console.log(shapes)
+        let fontGeometry = new THREE.ShapeGeometry(shapes)    
+        //console.log(fontGeometry)    
+        let numberMesh = new THREE.Mesh(fontGeometry,material)
 
-                let message = index+'m'
-                let shapes = font.generateShapes(message,0.2)
-                let fontGeometry = new THREE.ShapeGeometry(shapes)        
-                let numberMesh = new THREE.Mesh(fontGeometry,material)
+        numberMesh.rotateX(-Math.PI/2)
+        numberMesh.position.set(point.x-0.5,point.y,point.z-0.2)
+        //console.log(numberMesh)
 
-                numberMesh.rotateX(-Math.PI/2)
-                numberMesh.position.set(point.x-0.5,point.y,point.z-0.2)
-                resolve(numberMesh)
-            })
-        })
+        shapes = null
+        material = null
+        message = null
+        fontGeometry.dispose()
+        
+        return numberMesh
+
     }
 
     detectLineDirectionType=(point1,point2)=>{
@@ -155,4 +186,4 @@ class sideRuler {
 
 }
 
-export default sideRuler
+export default SideRuler
