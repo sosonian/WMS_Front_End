@@ -94,7 +94,6 @@ class testSideRuler {
 
     createMeasureMainPoints= (point1,pointArray,mergeRulerGeometry)=>{
         let count = 0
-        //let measureUnitPoint = new THREE.Geometry()
         while(count<pointArray.length)
         {
             //console.log('createMeasureMainPoints while loop count : ', count)
