@@ -7,7 +7,7 @@ class testRulerClass extends THREE.Mesh {
         this.class = 'sideRuler'
         this.rulerPoint1 = new THREE.Vector3(point1.x-1,point1.y,point1.z)
         this.rulerPoint2 = new THREE.Vector3(point2.x-1,point2.y,point2.z)
-        this.rulerLength = point1.distanceTo(point2)
+        this.rulerLength = this.getRulerLength(point1,point2)
         this.rulerFont = font
         this.material = new THREE.MeshBasicMaterial({
             color:0xff7391
@@ -15,6 +15,15 @@ class testRulerClass extends THREE.Mesh {
         //this.sizeToken = this.getSizeToken(cameraDistance)
         this.geometry = this.createMeasureMainProcess(this.rulerPoint1,this.rulerPoint2,this.rulerLength)
         this.name = 'sideRuler'+objectID
+    }
+
+    getRulerLength=(p1,p2)=>{
+        let dx = p1.x-p2.x
+        let dy = p1.y-p2.y
+        let dz = p1.z-p2.z
+
+        return Math.sqrt(dx*dx+dy*dy+dz*dz)
+
     }
 
     changeSize=(cameraDistance)=>{
@@ -76,10 +85,10 @@ class testRulerClass extends THREE.Mesh {
         while(count<pointArray.length)
         {
             //console.log('createMeasureMainPoints while loop count : ', count)
-            let measureUnitP1 = new THREE.Vector3(pointArray[count].x-0.2,pointArray[count].y,pointArray[count].z-0.1)
+            let measureUnitP1 = new THREE.Vector3(pointArray[count].x-0.2,pointArray[count].y,pointArray[count].z-0.05)
             let measureUnitP2 = new THREE.Vector3(pointArray[count].x-0.2,pointArray[count].y,pointArray[count].z)
             let measureUnitP3 = new THREE.Vector3(pointArray[count].x,pointArray[count].y,pointArray[count].z)
-            let measureUnitP4 = new THREE.Vector3(pointArray[count].x,pointArray[count].y,pointArray[count].z-0.1)
+            let measureUnitP4 = new THREE.Vector3(pointArray[count].x,pointArray[count].y,pointArray[count].z-0.05)
             let measureUnitPoint = new THREE.Geometry()
             measureUnitPoint.vertices.push(measureUnitP1, measureUnitP2, measureUnitP3, measureUnitP4)
  
@@ -122,14 +131,14 @@ class testRulerClass extends THREE.Mesh {
         })
 
         let message = index+'m'
-        let shapes = this.rulerFont.generateShapes(message,0.2)
+        let shapes = this.rulerFont.generateShapes(message,0.15)
         //console.log(shapes)
         let fontGeometry = new THREE.ShapeGeometry(shapes)    
         //console.log(fontGeometry)    
         let numberMesh = new THREE.Mesh(fontGeometry,material)
 
         numberMesh.rotateX(-Math.PI/2)
-        numberMesh.position.set(point.x-0.5,point.y,point.z-0.2)
+        numberMesh.position.set(point.x-0.4,point.y,point.z-0.1)
         //console.log(numberMesh)
 
         shapes = null

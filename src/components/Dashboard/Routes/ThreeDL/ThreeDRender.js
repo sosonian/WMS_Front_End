@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import Stats from 'stats.js';
 import orbControls from './OrbitControls';
 import StorageLayer from './ThreeDObjects/StorageLayer';
+import testStorageLayer from './ThreeDObjects/testStorageLayer'
 import SideRuler from './ThreeDObjects/SideRuler';
 import ControllerUnitLayout from './ControllerUnitLayer/ControllerUnitLayout'
 import testSideRuler from './ThreeDObjects/testSideRuler'
@@ -169,43 +170,28 @@ class ThreeDRender extends Component{
     
     //console.log('ThreeDRender componentWillUnmount')
  
-    //cancelAnimationFrame(this.refPP)
-    //this.mount.removeChild(this.renderer1.domElement)
-    //this.subMount2.refDom.removeChild(this.renderer2.domElement)
   }
 
-  // getCanvas=()=>{
-  //   this.canvas = this.mount.lastChild
-  //   console.log('ThreeDRender getCanvas')
-  //   console.log(this.canvas)
-  // }
-
   getObjectLoaderReady=()=>{
-    let position1 = {
-      x:0,
-      y:0,
-      z:0
-    }
-    let planeGeo1 = new StorageLayer(position1,7)
-    let material1 = new THREE.MeshBasicMaterial({color: 0x0000ff})
-    let plane1 = new THREE.Mesh(planeGeo1.layout, material1)
-    plane1.material.side = THREE.DoubleSide
-    plane1.name = 'the O plane'
+
+    ////
+    ////  Need to figure out mechanics of updateMatrixWorld()
+    ////
+
+    let plane1 = new testStorageLayer("","",7)
+    plane1.name = 'the 1 plane'
     this.scene.add(plane1)
     plane1.position.set(0,0,0)
+    this.scene.updateMatrixWorld();
+    plane1.getPointWorldPosition()
 
-    let position2 = {
-      x:10,
-      y:0,
-      z:-10
-    }
-    let planeGeo2 = new StorageLayer(position2,5)
-    let material2 = new THREE.MeshBasicMaterial({color: 0x0000ff})
-    let plane2 = new THREE.Mesh(planeGeo2.layout, material2)
-    plane2.material.side = THREE.DoubleSide
-    plane2.name = 'the 1 plane'
+    let plane2 = new testStorageLayer("","",5)
+    plane2.name = 'the 2 plane'
     this.scene.add(plane2)
     plane2.position.set(10,0,-10)
+    this.scene.updateMatrixWorld();
+    plane2.getPointWorldPosition()
+
   }
 
 
@@ -500,20 +486,15 @@ class ThreeDRender extends Component{
 
     if(this.state.font)
     {
-      //let tempRuler = new SideRuler(result.geometry.vertices[0],result.geometry.vertices[1],cameraDistance,result.id, this.state.font)
-      //let rulerGeometry = tempRuler.createRuler(tempRuler.rulerPoint1,tempRuler.rulerPoint2)
-      //let rulerMesh =  tempRuler.createMeasureMainProcess(tempRuler.rulerPoint1,tempRuler.rulerPoint2,tempRuler.length,rulerGeometry)
-      //this.scene.add (rulerMesh)
-      //rulerGeometry.dispose()
-      //cameraDistance = null
-      //tempRuler = null 
-      //this.scene.updateMatrix()
-      let p1 = new THREE.Vector3(result.geometry.vertices[0].x,result.geometry.vertices[0].y,result.geometry.vertices[0].z)
-      let p2 = new THREE.Vector3(result.geometry.vertices[1].x,result.geometry.vertices[1].y,result.geometry.vertices[1].z)
+      
+      // let p1 = new THREE.Vector3(result.geometry.vertices[0].x,result.geometry.vertices[0].y,result.geometry.vertices[0].z)
+      // let p2 = new THREE.Vector3(result.geometry.vertices[1].x,result.geometry.vertices[1].y,result.geometry.vertices[1].z)
+      // let tempRuler = new testRulerClass("","",result.localToWorld(p1),result.localToWorld(p2),cameraDistance,result.id, this.state.font)
 
-      // Beware of Mesh.localToWorld(), this function would change the Vertice of Geometry !!! Use a new clone Vertice to the position transformation
+      let p1 = result.p1
+      let p2 = result.p2
 
-      let tempRuler = new testRulerClass("","",result.localToWorld(p1),result.localToWorld(p2),cameraDistance,result.id, this.state.font)
+      let tempRuler = new testRulerClass("","",p1,p2,cameraDistance,result.id, this.state.font)
       this.scene.add (tempRuler)
       
     }

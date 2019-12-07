@@ -1,26 +1,49 @@
 import * as THREE from 'three';
-import { Geometry } from 'three';
 
 class testStorageSquareLayerOutline extends THREE.Mesh{
-    constructor(geometry,material,position,width){
+    constructor(geometry,material,width){
            
         super(geometry,material)
       
         this.material = new THREE.MeshBasicMaterial({color: 0x0000ff})
         this.geometry = this.createGeometry(width)
-        this.p1 = this.getWorldPoint(position,width)
-        this.p2 = this.getP1(position,width)
-        
-        
+        this.p1 = undefined
+        this.p2 = undefined
+        this.p3 = undefined
+        this.p4 = undefined
     }
 
-    getP1=(position,width)=>{
-        let p1 = {
-            x:position-width/2,
-            y:position.y,
-            z:position-width/2
+
+    getPointWorldPosition=()=>{
+        console.log('getPointWorldPosition') 
+        
+        
+        for(let i=0; i<4; i++)
+        {
+            let tempPoint = new THREE.Vector3(this.geometry.vertices[i].x,this.geometry.vertices[i].y,this.geometry.vertices[i].z)
+            let worldPosition = this.localToWorld(tempPoint)
+            let output = {
+                x:worldPosition.x,
+                y:worldPosition.y,
+                z:worldPosition.z
+            }
+            if(i===0)
+            {
+                this.p1 = output
+            }
+            else if(i===1)
+            {
+                this.p2 = output
+            }
+            else if(i===2)
+            {
+                this.p3 = output
+            }
+            else if(i===3)
+            {
+                this.p4 = output
+            }
         }
-        return p1
     }
 
     
