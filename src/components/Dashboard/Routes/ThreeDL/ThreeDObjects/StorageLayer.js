@@ -3,10 +3,15 @@ import { Geometry } from 'three';
 
 class StorageSquareLayerOutline {
     constructor(position,width){
-        this.v1 = new THREE.Vector3(position.x-width/2,position.y,position.z-width/2)
-        this.v2 = new THREE.Vector3(position.x-width/2,position.y,position.z+width/2)
-        this.v3 = new THREE.Vector3(position.x+width/2,position.y,position.z+width/2)
-        this.v4 = new THREE.Vector3(position.x+width/2,position.y,position.z-width/2)
+        // this.v1 = new THREE.Vector3(position.x-width/2,position.y,position.z-width/2)
+        // this.v2 = new THREE.Vector3(position.x-width/2,position.y,position.z+width/2)
+        // this.v3 = new THREE.Vector3(position.x+width/2,position.y,position.z+width/2)
+        // this.v4 = new THREE.Vector3(position.x+width/2,position.y,position.z-width/2)
+
+        this.v1 = new THREE.Vector3(0-width/2,0,0-width/2)
+        this.v2 = new THREE.Vector3(0-width/2,0,0+width/2)
+        this.v3 = new THREE.Vector3(0+width/2,0,0+width/2)
+        this.v4 = new THREE.Vector3(0+width/2,0,0-width/2)
 
         this.layout = new THREE.Geometry()
         this.layout.vertices.push(this.v1, this.v2, this.v3, this.v4)

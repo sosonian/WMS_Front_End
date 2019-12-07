@@ -7,6 +7,7 @@ import SideRuler from './ThreeDObjects/SideRuler';
 import ControllerUnitLayout from './ControllerUnitLayer/ControllerUnitLayout'
 import testSideRuler from './ThreeDObjects/testSideRuler'
 import testRulerClass from './ThreeDObjects/ObjectCustomizedClass/testRulerClass'
+import { cloneNode } from '@babel/types';
 
 
 class ThreeDRender extends Component{
@@ -40,6 +41,7 @@ class ThreeDRender extends Component{
         objectName:undefined,
         objectType:undefined,
         eventType:undefined,
+        cameraDistance:undefined,
         pos:{
           x:undefined,
           y:undefined
@@ -190,6 +192,7 @@ class ThreeDRender extends Component{
     plane1.material.side = THREE.DoubleSide
     plane1.name = 'the O plane'
     this.scene.add(plane1)
+    plane1.position.set(0,0,0)
 
     let position2 = {
       x:10,
@@ -202,6 +205,7 @@ class ThreeDRender extends Component{
     plane2.material.side = THREE.DoubleSide
     plane2.name = 'the 1 plane'
     this.scene.add(plane2)
+    plane2.position.set(10,0,-10)
   }
 
 
@@ -394,7 +398,7 @@ class ThreeDRender extends Component{
     else
     {
       console.log('ThreeDRender Mouse Down without alt key')
-      console.log(e.button)
+      console.log(this.scene)
       if(e.button === 0)
       {
         let result = this.detectObjectSelectedOrNot(e)
@@ -402,12 +406,14 @@ class ThreeDRender extends Component{
         {
           this.selectedObjectPaintedOrNot(result, true)
           this.showSideRuler(result)
+          let cameraDistance = this.getCameraDistance(result,this.camera1)
           this.setState({
             objectSelect:{
               activate:true,
               objectID:result.id,
               objectName:result.name,
               objectType:result.type,
+              cameraDistance:cameraDistance,
               eventType:'select',
               pos:{
                 x:e.clientX-this.rect.left,
@@ -433,6 +439,7 @@ class ThreeDRender extends Component{
               activate:false,
               objectID:undefined,
               objectName:undefined,
+              cameraDistance:undefined,
               objectType:undefined,
               eventType:undefined,
               pos:{
@@ -479,10 +486,17 @@ class ThreeDRender extends Component{
     
   }
 
+  getCameraDistance=(selectObject,camera)=>{
+    console.log('selectObject position')
+    console.log(selectObject.position)
+    let output = selectObject.position.distanceTo(camera.position)
+    return output
+  }
+
   showSideRuler= (result)=>{
     console.log('showSideRuler : ')
     console.log(result)
-    let cameraDistance = result.position.distanceTo(this.camera1.position)
+    let cameraDistance = this.getCameraDistance(result,this.camera1)
 
     if(this.state.font)
     {
@@ -493,18 +507,22 @@ class ThreeDRender extends Component{
       //rulerGeometry.dispose()
       //cameraDistance = null
       //tempRuler = null 
+      //this.scene.updateMatrix()
+      let p1 = new THREE.Vector3(result.geometry.vertices[0].x,result.geometry.vertices[0].y,result.geometry.vertices[0].z)
+      let p2 = new THREE.Vector3(result.geometry.vertices[1].x,result.geometry.vertices[1].y,result.geometry.vertices[1].z)
 
-      let tempRuler = new testRulerClass("","",result.geometry.vertices[0],result.geometry.vertices[1],cameraDistance,result.id, this.state.font)
+      // Beware of Mesh.localToWorld(), this function would change the Vertice of Geometry !!! Use a new clone Vertice to the position transformation
+
+      let tempRuler = new testRulerClass("","",result.localToWorld(p1),result.localToWorld(p2),cameraDistance,result.id, this.state.font)
       this.scene.add (tempRuler)
-      this.putTextOnCanvas()
+      
     }
   }
 
-  putTextOnCanvas=()=>{
-    
-  }
+ 
 
   detectObjectSelectedOrNot=(e)=>{
+    console.log('detectObjectSelectedOrNot')
     const rayCaster = new THREE.Raycaster()
     const mouseToken = new THREE.Vector2()
     this.rect = this.mount.getBoundingClientRect()
@@ -516,19 +534,23 @@ class ThreeDRender extends Component{
     
     if(intersects.length>0)
     {
-      //console.log('intersects.length :', intersects.length)
+      console.log('intersects')
+      console.log(intersects)
       for(var i =0; i <intersects.length; i++)
       {
         if(intersects[i].object.type == 'Mesh' && intersects[i].object.class !== 'sideRuler')
         {
           //intersects[i].object.material.color.set(0x13D73F)
-          //console.log(intersects[i].object)
+          console.log('find Mesh')
+          console.log(intersects[i].object)
           return intersects[i].object
         }   
         else
         {
+          
           if(i===intersects.length-1)
           {
+            console.log('find no Mesh')
             return null
           }
         }
@@ -563,6 +585,30 @@ class ThreeDRender extends Component{
     {   
       this.setState({
         orbitControlMode : true
+      })
+    }
+  }
+
+  threeDLayerOnWheel = () =>{
+    console.log('threeDLayerOnWheel')
+    console.log(this.state.objectSelect.activate)
+    if(this.state.objectSelect.activate)
+    {
+      let selectObject = this.scene.getObjectById(this.state.objectSelect.objectID)
+      let cameraDistance = this.getCameraDistance(selectObject,this.camera1)
+      this.setState({
+        objectSelect:{
+          activate:this.state.objectSelect.activate,
+          objectID:this.state.objectSelect.objectID,
+          objectName:this.state.objectSelect.objectName,
+          cameraDistance:cameraDistance,
+          objectType:this.state.objectSelect.objectType,
+          eventType:this.state.objectSelect.activate,
+          pos:{
+            x:this.state.objectSelect.pos.x,
+            y:this.state.objectSelect.pos.y
+          }
+        }  
       })
     }
   }
@@ -640,6 +686,7 @@ class ThreeDRender extends Component{
         onMouseMove={this.ThreeDLayerMouseMove}
         onMouseUp={this.threeDLayerMouseUp}
         onContextMenu={this.onContextMenu}
+        onWheel={this.threeDLayerOnWheel}
         style={myStyle}
         ref={(mount) => { this.mount = mount }}
       >
