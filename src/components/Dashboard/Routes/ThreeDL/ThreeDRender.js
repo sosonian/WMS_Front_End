@@ -194,7 +194,6 @@ class ThreeDRender extends Component{
 
   }
 
-
   setFontToState = async() =>{
     let font = await this.getFontLoaderReady()
     this.setState({
