@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import RulerClass from './ObjectCustomizedClass/RulerClass'
+import RulerClass from './ObjectCustomizedClass/SideRuler/RulerClass'
 
 
 

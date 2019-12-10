@@ -8,7 +8,7 @@ import SideRuler from './ThreeDObjects/SideRuler';
 import ControllerUnitLayout from './ControllerUnitLayer/ControllerUnitLayout'
 import testSideRuler from './ThreeDObjects/testSideRuler'
 import testRulerClass from './ThreeDObjects/ObjectCustomizedClass/testRulerClass'
-import { cloneNode } from '@babel/types';
+import SideRulerClass from './ThreeDObjects/ObjectCustomizedClass/SideRuler/SideRulerClass'
 
 
 class ThreeDRender extends Component{
@@ -330,6 +330,17 @@ class ThreeDRender extends Component{
         //this.cameraControl.update();
       }
     }
+
+    if(this.state.objectSelect.activate)
+    {
+      let rulerClass = this.scene.getObjectByName('sideRuler'+this.state.objectSelect.objectID)
+      if(rulerClass)
+      {
+        //console.log("rulerClass")
+        //console.log(rulerClass)
+        rulerClass.rulerSizeChange(this.state.objectSelect.cameraDistance)
+      }
+    }
     
     this.stats.end();
     this.refPP = window.requestAnimationFrame(this.animate)
@@ -457,8 +468,8 @@ class ThreeDRender extends Component{
     if(removeObject)
     {
       //console.log(removeObject)
-      removeObject.geometry.dispose()
-      removeObject.material.dispose()
+      removeObject.children[0].geometry.dispose()
+      removeObject.children[0].material.dispose()
       this.scene.remove(removeObject)
      
       //removeObject.geometry.dispose()
@@ -472,27 +483,26 @@ class ThreeDRender extends Component{
   }
 
   getCameraDistance=(selectObject,camera)=>{
-    console.log('selectObject position')
-    console.log(selectObject.position)
+    //console.log('selectObject position')
+    //console.log(selectObject.position)
     let output = selectObject.position.distanceTo(camera.position)
     return output
   }
 
   showSideRuler= (result)=>{
-    console.log('showSideRuler : ')
-    console.log(result)
+    //console.log('showSideRuler : ')
+    //console.log(result)
     let cameraDistance = this.getCameraDistance(result,this.camera1)
 
     if(this.state.font)
     {
-      // let p1 = new THREE.Vector3(result.geometry.vertices[0].x,result.geometry.vertices[0].y,result.geometry.vertices[0].z)
-      // let p2 = new THREE.Vector3(result.geometry.vertices[1].x,result.geometry.vertices[1].y,result.geometry.vertices[1].z)
-      // let tempRuler = new testRulerClass("","",result.localToWorld(p1),result.localToWorld(p2),cameraDistance,result.id, this.state.font)
 
       let p1 = result.p1
       let p2 = result.p2
 
-      let tempRuler = new testRulerClass("","",p1,p2,cameraDistance,result.id, this.state.font)
+      //let tempRuler = new testRulerClass("","",p1,p2,cameraDistance,result.id, this.state.font)
+      //this.scene.add(tempRuler)
+      let tempRuler = new SideRulerClass(p1,p2,cameraDistance,result.id,this.state.font)
       this.scene.add(tempRuler)
     }
   }
@@ -500,7 +510,7 @@ class ThreeDRender extends Component{
  
 
   detectObjectSelectedOrNot=(e)=>{
-    console.log('detectObjectSelectedOrNot')
+    //console.log('detectObjectSelectedOrNot')
     const rayCaster = new THREE.Raycaster()
     const mouseToken = new THREE.Vector2()
     this.rect = this.mount.getBoundingClientRect()
@@ -512,15 +522,15 @@ class ThreeDRender extends Component{
     
     if(intersects.length>0)
     {
-      console.log('intersects')
-      console.log(intersects)
+      //console.log('intersects')
+      //console.log(intersects)
       for(var i =0; i <intersects.length; i++)
       {
         if(intersects[i].object.type == 'Mesh' && intersects[i].object.class !== 'sideRuler')
         {
           //intersects[i].object.material.color.set(0x13D73F)
-          console.log('find Mesh')
-          console.log(intersects[i].object)
+          //console.log('find Mesh')
+          //console.log(intersects[i].object)
           return intersects[i].object
         }   
         else
@@ -528,7 +538,7 @@ class ThreeDRender extends Component{
           
           if(i===intersects.length-1)
           {
-            console.log('find no Mesh')
+            //console.log('find no Mesh')
             return null
           }
         }
@@ -568,8 +578,8 @@ class ThreeDRender extends Component{
   }
 
   threeDLayerOnWheel = () =>{
-    console.log('threeDLayerOnWheel')
-    console.log(this.state.objectSelect.activate)
+    //console.log('threeDLayerOnWheel')
+    //console.log(this.state.objectSelect.activate)
     if(this.state.objectSelect.activate)
     {
       let selectObject = this.scene.getObjectById(this.state.objectSelect.objectID)
