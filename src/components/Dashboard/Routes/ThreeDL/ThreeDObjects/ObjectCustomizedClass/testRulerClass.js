@@ -23,12 +23,10 @@ class testRulerClass extends THREE.Mesh {
         let dz = p1.z-p2.z
 
         return Math.sqrt(dx*dx+dy*dy+dz*dz)
-
     }
 
     changeSize=(cameraDistance)=>{
         
-
     }
 
     createRuler=(point1,point2)=>{
@@ -103,7 +101,7 @@ class testRulerClass extends THREE.Mesh {
 
             mergeRulerGeometry.mergeMesh(numberMesh)
             
-            count = count +1
+            count = count + 1
 
             measureUnitP1 = null
             measureUnitP2 = null

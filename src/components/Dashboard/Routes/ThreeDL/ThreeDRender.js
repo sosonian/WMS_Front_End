@@ -239,18 +239,18 @@ class ThreeDRender extends Component{
   }
 
   setSideView=()=>{
-      this.camera3 = new THREE.PerspectiveCamera(
-        70,
-        200 / 200,
-        0.1,
-        1000
-      )
-      this.camera3.position.z =0
-      this.camera3.position.x =-10
-      this.camera3.position.y =1
-      this.camera3.lookAt(0,0,0)
-      this.renderer3 = new THREE.WebGLRenderer()
-      this.renderer3.setClearColor(0xeeeeee, 1.0)
+    this.camera3 = new THREE.PerspectiveCamera(
+      70,
+      200 / 200,
+      0.1,
+      1000
+    )
+    this.camera3.position.z =0
+    this.camera3.position.x =-10
+    this.camera3.position.y =1
+    this.camera3.lookAt(0,0,0)
+    this.renderer3 = new THREE.WebGLRenderer()
+    this.renderer3.setClearColor(0xeeeeee, 1.0)
   }
 
   updateSideView=()=>{
@@ -485,7 +485,6 @@ class ThreeDRender extends Component{
 
     if(this.state.font)
     {
-      
       // let p1 = new THREE.Vector3(result.geometry.vertices[0].x,result.geometry.vertices[0].y,result.geometry.vertices[0].z)
       // let p2 = new THREE.Vector3(result.geometry.vertices[1].x,result.geometry.vertices[1].y,result.geometry.vertices[1].z)
       // let tempRuler = new testRulerClass("","",result.localToWorld(p1),result.localToWorld(p2),cameraDistance,result.id, this.state.font)
@@ -494,8 +493,7 @@ class ThreeDRender extends Component{
       let p2 = result.p2
 
       let tempRuler = new testRulerClass("","",p1,p2,cameraDistance,result.id, this.state.font)
-      this.scene.add (tempRuler)
-      
+      this.scene.add(tempRuler)
     }
   }
 
@@ -606,10 +604,10 @@ class ThreeDRender extends Component{
     if((this.state.frontViewSize.width !==msg.width-4)||(this.state.frontViewSize.height !==msg.height-29))
     {
       this.setState({
-      frontViewSize:{
-        width:msg.width-4,
-        height:msg.height-29
-      }
+        frontViewSize:{
+          width:msg.width-4,
+          height:msg.height-29
+        }
       })
     }
   }
@@ -618,10 +616,10 @@ class ThreeDRender extends Component{
     if((this.state.sideViewSize.width !==msg.width-4)||(this.state.sideViewSize.height !==msg.height-29))
     {
       this.setState({
-      sideViewSize:{
-        width:msg.width-4,
-        height:msg.height-29
-      }
+        sideViewSize:{
+          width:msg.width-4,
+          height:msg.height-29
+        }
       })
     }
   }
