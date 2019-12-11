@@ -23,10 +23,18 @@ class SideRulerClass extends THREE.Group {
 
     groupObject=()=>{
         let rulerMainBody =this.createRulerBody(this.rulerPoint1,this.rulerPoint2,this.rulerSizeToken)
+        let rulerScaleUnits = this.createRulerScale(this.rulerPoint1,this.rulerPoint2,this.rulerLength,this.rulerSizeToken,rulerMainBody)
         if(rulerMainBody)
         {
             this.add(rulerMainBody)
+            this.add(rulerScaleUnits)
         }
+    }
+
+    rulerChange=(cameraDistance)=>{
+        this.rulerSizeChange(cameraDistance)
+        this.rulerSizeToken = this.getRulerSizeToken(cameraDistance)
+        this.rulerScaleUnitChange()
     }
 
     rulerSizeChange=(cameraDistance)=>{
@@ -45,7 +53,18 @@ class SideRulerClass extends THREE.Group {
         }
     }
 
-
+    rulerScaleUnitChange=()=>{
+        //console.log('rulerScaleUnitChange')
+        //console.log(this.children[1])
+        this.children[1].geometry.dispose()
+        this.remove(this.children[1])
+        //console.log('after remove')
+        //console.log(this)
+        let rulerScaleUnits = this.createRulerScale(this.rulerPoint1,this.rulerPoint2,this.rulerLength,this.rulerSizeToken,this.children[0])
+        this.add(rulerScaleUnits)
+        //console.log('after add')
+        //console.log(this)
+    }
 
     getRulerLength=(p1,p2)=>{
         let dx = p1.x-p2.x
@@ -105,8 +124,6 @@ class SideRulerClass extends THREE.Group {
         }
     }
 
-
-
     createRulerBody=(point1,point2,sizeToken)=>{
         let ruler = new THREE.Geometry()
         let sizeNumber = 0.1*sizeToken
@@ -123,7 +140,7 @@ class SideRulerClass extends THREE.Group {
         return mainBodyMesh
     }
 
-    createRulerScale=(point1,point2,length,sizeToken)=>{
+    createRulerScale=(point1,point2,length,sizeToken,rulerMainBody)=>{
         let output = null
         if(length && length >0)
         {
@@ -134,15 +151,14 @@ class SideRulerClass extends THREE.Group {
                let unitPoints = this.calculatePointsOnZAxis(point1,point2,sizeToken)
                //console.log('unitPoints : ')
                //console.log(unitPoints)
-               if(this.children[0].geometry)
+               if(rulerMainBody.geometry)
                {
-                   output =  this.createMeasureMainPoints(unitPoints,this.children[0].geometry)
+                   output =  this.createMeasureMainPoints(unitPoints,sizeToken)
                    //let rulerMesh = new RulerClass(output, this.material)
                    //rulerMesh.name = this.rulerMeshName
                    unitPoints = null
-                   this.children[0].geometry.dispose()
                    //output.dispose()
-                   
+
                }
            }
         }
@@ -152,53 +168,63 @@ class SideRulerClass extends THREE.Group {
     calculatePointsOnZAxis=(point1,point2,sizeToken)=>{
         let measureUnitPoints = []
         let count = Number(point2.z)
-        let scaleSize = 1
+        let scale = 1
         if(1.5>=sizeToken && sizeToken >=0)
         {
-            scaleSize = 1
+            scale = 1
         }
         else if(2 >= sizeToken && sizeToken > 1.5)
         {
-            scaleSize = 2
+            scale = 2
         }
         else if(sizeToken>2)
         {
-            scaleSize = 5
+            scale = 5
         }
 
         while(count >= point1.z)
         {
             let point = new THREE.Vector3(point2.x, point2.y, Number(count))
             measureUnitPoints.push(point)
-            count = count -scaleSize
+            count = count -scale
             point = null
         }
-        return measureUnitPoints
+
+        let output = {
+            points : measureUnitPoints,
+            scale : scale
+        }
+
+        return output
     }
 
-    createMeasureMainPoints= (pointArray,mergeRulerGeometry)=>{
+    createMeasureMainPoints= (pointsResult,sizeToken)=>{
         let count = 0
-        //let measureUnitPoint = new THREE.Geometry()
-        while(count<pointArray.length)
+        let outputGeometry = new THREE.Geometry()
+        let sizeControl = sizeToken*0.2
+        while(count<pointsResult.points.length)
         {
             //console.log('createMeasureMainPoints while loop count : ', count)
-            let measureUnitP1 = new THREE.Vector3(pointArray[count].x-0.2,pointArray[count].y,pointArray[count].z-0.05)
-            let measureUnitP2 = new THREE.Vector3(pointArray[count].x-0.2,pointArray[count].y,pointArray[count].z)
-            let measureUnitP3 = new THREE.Vector3(pointArray[count].x,pointArray[count].y,pointArray[count].z)
-            let measureUnitP4 = new THREE.Vector3(pointArray[count].x,pointArray[count].y,pointArray[count].z-0.05)
+            let measureUnitP1 = new THREE.Vector3(pointsResult.points[count].x-sizeControl,pointsResult.points[count].y,pointsResult.points[count].z-(sizeControl/4))
+            let measureUnitP2 = new THREE.Vector3(pointsResult.points[count].x-sizeControl,pointsResult.points[count].y,pointsResult.points[count].z)
+            let measureUnitP3 = new THREE.Vector3(pointsResult.points[count].x,pointsResult.points[count].y,pointsResult.points[count].z)
+            let measureUnitP4 = new THREE.Vector3(pointsResult.points[count].x,pointsResult.points[count].y,pointsResult.points[count].z-(sizeControl/4))
             let measureUnitPoint = new THREE.Geometry()
             measureUnitPoint.vertices.push(measureUnitP1, measureUnitP2, measureUnitP3, measureUnitP4)
  
             let face1 = new THREE.Face3(0,1,2)
             let face2 = new THREE.Face3(0,2,3)
             measureUnitPoint.faces.push(face1,face2)
-            mergeRulerGeometry.merge(measureUnitPoint)
+            outputGeometry.merge(measureUnitPoint)
+
+
             //console.log('createMeasureMainPoints mergeRulerGeometry 1')
             //console.log(mergeRulerGeometry)
-            let numberMesh = this.createMeasureMainPointsNumber(pointArray[count],count)
+            let numberMesh = this.createMeasureMainPointsNumber(pointsResult.points[count],count,pointsResult.scale,sizeToken)
             //console.log('numberMesh s: ', numberMesh)
+            outputGeometry.mergeMesh(numberMesh)
 
-            mergeRulerGeometry.mergeMesh(numberMesh)
+            //mergeRulerGeometry.mergeMesh(numberMesh)
             
             count = count + 1
 
@@ -216,26 +242,29 @@ class SideRulerClass extends THREE.Group {
         }
         //console.log('createMeasureMainPoints mergeRulerGeometry 2')
         //console.log(mergeRulerGeometry)
-        
-        return mergeRulerGeometry
+        let output = new THREE.Mesh(outputGeometry,this.rulerMaterial)
+        outputGeometry.dispose()
+        return output
     }
 
-    createMeasureMainPointsNumber=(point,index)=>{
+    createMeasureMainPointsNumber=(point,index,scale,sizeToken)=>{
         //console.log('createMeasureMainPointsNumber process')
         let material = new THREE.MeshBasicMaterial({
             color:0xff7391,
             side:THREE.DoubleSide
         })
 
-        let message = index+'m'
-        let shapes = this.rulerFont.generateShapes(message,0.15)
+        let message = index*scale+'m'
+        let fontSizeControl = sizeToken*0.2
+        let fontPoistionControl = sizeToken*0.1
+        let shapes = this.rulerFont.generateShapes(message,fontSizeControl)
         //console.log(shapes)
         let fontGeometry = new THREE.ShapeGeometry(shapes)    
         //console.log(fontGeometry)    
         let numberMesh = new THREE.Mesh(fontGeometry,material)
 
         numberMesh.rotateX(-Math.PI/2)
-        numberMesh.position.set(point.x-0.4,point.y,point.z-0.1)
+        numberMesh.position.set(point.x-(fontPoistionControl*6),point.y,point.z-fontPoistionControl)
         //console.log(numberMesh)
 
         shapes = null

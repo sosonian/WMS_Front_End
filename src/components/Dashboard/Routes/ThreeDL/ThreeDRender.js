@@ -159,6 +159,8 @@ class ThreeDRender extends Component{
     {
       this.handleResize(preState)
     }
+
+    
     
     this.updateFrontView()
     this.updateSideView()
@@ -301,7 +303,8 @@ class ThreeDRender extends Component{
   animate = () => {
     
     this.stats.begin();
-    //this.plane.rotation.x += this.state.rotationValue
+    let plane1 = this.scene.getObjectByName('the 1 plane')
+    plane1.rotation.x += this.state.rotationValue
  
     let c1Background = new THREE.Color('rgb(255,255,255)')
     this.renderer1.setClearColor(c1Background)
@@ -336,9 +339,12 @@ class ThreeDRender extends Component{
       let rulerClass = this.scene.getObjectByName('sideRuler'+this.state.objectSelect.objectID)
       if(rulerClass)
       {
+        let rulerUnit = rulerClass.children[1]
         //console.log("rulerClass")
         //console.log(rulerClass)
-        rulerClass.rulerSizeChange(this.state.objectSelect.cameraDistance)
+        
+        rulerClass.rulerChange(this.state.objectSelect.cameraDistance)
+        
       }
     }
     
@@ -394,13 +400,14 @@ class ThreeDRender extends Component{
     else
     {
       console.log('ThreeDRender Mouse Down without alt key')
-      console.log(this.scene)
+      //console.log(this.scene)
       if(e.button === 0)
       {
         let result = this.detectObjectSelectedOrNot(e)
         if(result !== null && this.state.objectSelect.activate !== true)
         {
           this.selectedObjectPaintedOrNot(result, true)
+          console.log(result)
           this.showSideRuler(result)
           let cameraDistance = this.getCameraDistance(result,this.camera1)
           this.setState({

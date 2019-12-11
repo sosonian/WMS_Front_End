@@ -5,7 +5,7 @@ class testStorageSquareLayerOutline extends THREE.Mesh{
            
         super(geometry,material)
       
-        this.material = new THREE.MeshBasicMaterial({color: 0x0000ff})
+        this.material = new THREE.MeshBasicMaterial({color: 0x0000ff,side:THREE.DoubleSide})
         this.geometry = this.createGeometry(width)
         this.p1 = undefined
         this.p2 = undefined
