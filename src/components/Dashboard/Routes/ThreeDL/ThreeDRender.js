@@ -3,11 +3,7 @@ import * as THREE from 'three';
 import Stats from 'stats.js';
 import orbControls from './OrbitControls';
 import StorageLayer from './ThreeDObjects/StorageLayer';
-import testStorageLayer from './ThreeDObjects/testStorageLayer'
-import SideRuler from './ThreeDObjects/SideRuler';
 import ControllerUnitLayout from './ControllerUnitLayer/ControllerUnitLayout'
-import testSideRuler from './ThreeDObjects/testSideRuler'
-import testRulerClass from './ThreeDObjects/ObjectCustomizedClass/testRulerClass'
 import SideRulerClass from './ThreeDObjects/ObjectCustomizedClass/SideRuler/SideRulerClass'
 
 
@@ -160,6 +156,19 @@ class ThreeDRender extends Component{
       this.handleResize(preState)
     }
 
+    if(this.state.objectSelect.activate)
+    {
+      let rulerClass = this.scene.getObjectByName('sideRuler'+this.state.objectSelect.objectID)
+      if(rulerClass)
+      {
+        //console.log("rulerClass")
+        //console.log(rulerClass)
+        
+        rulerClass.rulerChange(this.state.objectSelect.cameraDistance)
+        
+      }
+    }
+
     
     
     this.updateFrontView()
@@ -180,14 +189,14 @@ class ThreeDRender extends Component{
     ////  Need to figure out mechanics of updateMatrixWorld()
     ////
 
-    let plane1 = new testStorageLayer("","",7)
+    let plane1 = new StorageLayer("","",7)
     plane1.name = 'the 1 plane'
     this.scene.add(plane1)
     plane1.position.set(0,0,0)
     this.scene.updateMatrixWorld();
     plane1.getPointWorldPosition()
 
-    let plane2 = new testStorageLayer("","",5)
+    let plane2 = new StorageLayer("","",5)
     plane2.name = 'the 2 plane'
     this.scene.add(plane2)
     plane2.position.set(10,0,-10)
@@ -334,19 +343,7 @@ class ThreeDRender extends Component{
       }
     }
 
-    if(this.state.objectSelect.activate)
-    {
-      let rulerClass = this.scene.getObjectByName('sideRuler'+this.state.objectSelect.objectID)
-      if(rulerClass)
-      {
-        let rulerUnit = rulerClass.children[1]
-        //console.log("rulerClass")
-        //console.log(rulerClass)
-        
-        rulerClass.rulerChange(this.state.objectSelect.cameraDistance)
-        
-      }
-    }
+   
     
     this.stats.end();
     this.refPP = window.requestAnimationFrame(this.animate)

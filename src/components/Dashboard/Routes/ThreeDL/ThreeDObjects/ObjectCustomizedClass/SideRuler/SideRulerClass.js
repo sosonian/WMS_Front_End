@@ -1,7 +1,27 @@
 import * as THREE from 'three';
-import RulerClass from './RulerClass'
 
-
+////////// some features of SideRuler class //////////
+//
+// input :
+//   point1         : origin point of one side of target object3D
+//   point2         : end point of one side of target object3D 
+//   cameraDistance : distance from camera to target obejct3D, used to calculate the proper size of ruler
+//   objectID       : the id of target object3D, used to identical the target which ruler attached to.
+//   font           : font are loaded when the initialization of ThreeDRender, used to produce character geometry. 
+//
+// this class is a group object. children[0] is the main body of the ruler (mesh), children[1] is the merge of all scale units (mesh).
+//
+// use rulerChange(cameraDistance) to change the ruler size and scale unit with the cameraDistance. 
+//
+// so far, numerics of measrure unit are produced by fontLoader, which is expensive. 
+// considering to build 26 alphabets and 9 numerics geometry first.  
+//
+// geometry.dispose() is not a fully complete function, beware of memory leak issues.
+//
+// console.log() would block the GC process, could make memory leak worse.
+//
+//
+///////////////////////////////////////////////////////
 
 class SideRulerClass extends THREE.Group {
     constructor(point1,point2,cameraDistance,objectID,font){   
@@ -32,15 +52,15 @@ class SideRulerClass extends THREE.Group {
     }
 
     rulerChange=(cameraDistance)=>{
-        this.rulerSizeChange(cameraDistance)
         this.rulerSizeToken = this.getRulerSizeToken(cameraDistance)
+        this.rulerSizeChange(cameraDistance)
         this.rulerScaleUnitChange()
     }
 
-    rulerSizeChange=(cameraDistance)=>{
+    rulerSizeChange=()=>{
         //console.log('rulerSizeChange')
         //console.log(cameraDistance)
-        let sizeToken = this.getRulerSizeToken(cameraDistance)*0.1
+        let sizeToken = this.rulerSizeToken*0.1
 
         if(this.children[0].geometry)
         {
