@@ -11,6 +11,8 @@ class ControllerUnitLayout extends Component {
         super(props)
         this.state = {
             controllerUnitState:this.getInitialState(),
+
+            // setting number of container
             containerNumber:4,
 
             ControllerUnitContainerState:[],
